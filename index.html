@@ -4,10 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>منصة التنسيق الرقمي - الجزائر 🇩🇿</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <style>
 :root {
   --algeria-green: #006633;
@@ -155,7 +161,8 @@ body { background: var(--bg-main); color: var(--text); overflow-x: hidden; min-h
 .page-header h2 { font-size: var(--font-xxl); font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 14px; }
 .page-header h2 i { color: var(--algeria-green); }
 .header-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.sync-badge { font-size: 16px; font-weight: 700; padding: 10px 24px; border-radius: 14px; background: rgba(0, 102, 51, 0.06); border: 2px solid rgba(0, 102, 51, 0.12); color: var(--algeria-green); display: flex; align-items: center; gap: 10px; }
+.sync-badge { font-size: 16px; font-weight: 700; padding: 10px 24px; border-radius: 14px; background: rgba(0, 102, 51, 0.06); border: 2px solid rgba(0, 102, 51, 0.12); color: var(--algeria-green); display: flex; align-items: center; gap: 10px; cursor: pointer; transition: var(--transition); }
+.sync-badge:hover { background: rgba(0, 102, 51, 0.12); transform: scale(1.02); }
 
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 24px; }
 .kpi-card { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: 24px 22px; position: relative; overflow: hidden; transition: var(--transition); box-shadow: var(--shadow-light); }
@@ -409,7 +416,7 @@ tbody tr:hover { background: var(--table-hover); }
       <div class="page-header">
         <h2><i class="fa-solid fa-gauge-high"></i> لوحة التحكم والأداء</h2>
         <div class="header-actions">
-          <span class="sync-badge" id="syncBadge"><i class="fa-solid fa-circle-check"></i> متصل</span>
+          <span class="sync-badge" id="syncBadge" onclick="forceSync()"><i class="fa-solid fa-rotate"></i> تحديث الآن</span>
           <button class="change-pass-btn" onclick="openChangePassword()"><i class="fa-solid fa-key"></i> تغيير كلمة السر</button>
         </div>
       </div>
@@ -599,12 +606,26 @@ tbody tr:hover { background: var(--table-hover); }
 
 <script>
 // ============================================================
-// GOOGLE SHEETS - رابط ثابت
+// 🔥 إعدادات Firebase - تم تعبئتها ببياناتك
 // ============================================================
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsVYWZv2vomDM8wW4UBmAy9oLcU-yoH8NQcXnroI9sstW91zmAsEQ8gjOm2Axv600tnw/exec";
+const firebaseConfig = {
+    apiKey: "AIzaSyA-rNHBXHMRLS-0mF2529IbsNpRR9hf6Yc",
+    authDomain: "faresmerrah.firebaseapp.com",
+    databaseURL: "https://faresmerrah-default-rtdb.firebaseio.com",
+    projectId: "faresmerrah",
+    storageBucket: "faresmerrah.firebasestorage.app",
+    messagingSenderId: "589540782949",
+    appId: "1:589540782949:web:916186c0587f2b4a2c678c"
+};
 
 // ============================================================
-// DATA
+// تهيئة Firebase
+// ============================================================
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// ============================================================
+// DATA - كل البيانات الأصلية محفوظة
 // ============================================================
 let MASTER_PASSWORD = "1996";
 let currentRole = null;
@@ -714,9 +735,10 @@ function loadTheme() {
 }
 
 // ============================================================
-// STORAGE HELPERS
+// STORAGE HELPERS - محفوظة مع Firebase
 // ============================================================
 function loadDB() {
+  // تحميل البيانات من localStorage كنسخة احتياطية
   activeIssues = JSON.parse(localStorage.getItem(LS_KEYS.core) || "[]");
   archivedIssues = JSON.parse(localStorage.getItem(LS_KEYS.resolved) || "[]");
   fileTypes = JSON.parse(localStorage.getItem(LS_KEYS.fileTypes) || "null") || DEFAULT_FILE_TYPES.slice();
@@ -728,108 +750,107 @@ function loadDB() {
   lastSyncTimestamp = parseInt(localStorage.getItem(LS_KEYS.lastSync) || "0");
 }
 
-function saveActive() {
-  localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
-  syncToGoogleSheets();
+function saveToFirebase() {
+  const data = {
+    activeIssues: activeIssues,
+    archivedIssues: archivedIssues,
+    centerIssues: centerIssues,
+    centerArchived: centerArchived,
+    interChat: interChatMessages,
+    fileTypes: fileTypes,
+    timestamp: Date.now()
+  };
+  database.ref('data').set(data).catch(err => console.log('Save error:', err));
 }
 
-function saveArchive() {
-  localStorage.setItem(LS_KEYS.resolved, JSON.stringify(archivedIssues));
-  syncToGoogleSheets();
-}
-
-function saveFileTypes() {
-  localStorage.setItem(LS_KEYS.fileTypes, JSON.stringify(fileTypes));
-  syncToGoogleSheets();
-}
-
-function saveCenterIssues() {
-  localStorage.setItem(LS_KEYS.centerIssues, JSON.stringify(centerIssues));
-  syncToGoogleSheets();
-}
-
-function saveCenterArchived() {
-  localStorage.setItem(LS_KEYS.centerArchived, JSON.stringify(centerArchived));
-  syncToGoogleSheets();
-}
-
-function saveInterChat() {
-  localStorage.setItem(LS_KEYS.interChat, JSON.stringify(interChatMessages));
-  syncToGoogleSheets();
-}
-
-function getCenterName() { return localStorage.getItem(LS_KEYS.centerName) || "مركز تكويني"; }
-function setCenterName(name) { localStorage.setItem(LS_KEYS.centerName, name); }
-
-function getChatMessages(code) {
-  return JSON.parse(localStorage.getItem('chat_messages_' + code) || "[]");
-}
-
-function saveChatMessages(code, msgs) {
-  localStorage.setItem('chat_messages_' + code, JSON.stringify(msgs));
-  syncToGoogleSheets();
-}
-
-function getInterChatMessages() {
-  return JSON.parse(localStorage.getItem(LS_KEYS.interChat) || "[]");
-}
-
-function saveInterChatMessages(msgs) {
-  localStorage.setItem(LS_KEYS.interChat, JSON.stringify(msgs));
-  syncToGoogleSheets();
-}
-
-function getAllChatMessages() {
-  const all = [];
-  const codes = new Set();
-  [...activeIssues, ...archivedIssues, ...centerIssues, ...centerArchived].forEach(i => codes.add(i.code));
-  codes.forEach(code => {
-    const msgs = getChatMessages(code);
-    msgs.forEach(m => all.push({ ...m, code }));
-  });
-  return all;
-}
-
-function toggleRemember() {
-  const checked = document.getElementById('rememberMe').checked;
-  if (checked) {
-    const role = document.getElementById('centerFields').style.display === 'none' ? 'directorate' : 'center';
-    if (role === 'directorate') {
-      const user = document.getElementById('loginUser').value;
-      const pass = document.getElementById('loginPass').value;
-      if (user && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, user, pass }));
-    } else {
-      const center = document.getElementById('loginCenterSelect').value;
-      const pass = document.getElementById('loginCenterPass').value;
-      if (center && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, center, pass }));
-    }
-  } else { localStorage.removeItem(LS_KEYS.remember); }
-}
-
-function loadRemembered() {
-  const data = localStorage.getItem(LS_KEYS.remember);
-  if (data) {
-    try {
-      const parsed = JSON.parse(data);
-      if (parsed.role === 'directorate') {
-        selectLoginRole('directorate');
-        document.getElementById('loginUser').value = parsed.user || '';
-        document.getElementById('loginPass').value = parsed.pass || '';
-        document.getElementById('rememberMe').checked = true;
-      } else if (parsed.role === 'center') {
-        selectLoginRole('center');
-        document.getElementById('loginCenterSelect').value = parsed.center || '';
-        document.getElementById('loginCenterPass').value = parsed.pass || '';
-        document.getElementById('rememberMe').checked = true;
-        document.getElementById('loginCenterSearch').value = parsed.center || '';
-        filterCenterSelect();
+function listenToFirebase() {
+  database.ref('data').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      let changed = false;
+      const oldCount = activeIssues.length + centerIssues.length;
+      
+      if (data.activeIssues) { activeIssues = data.activeIssues; changed = true; }
+      if (data.archivedIssues) { archivedIssues = data.archivedIssues; changed = true; }
+      if (data.centerIssues) { centerIssues = data.centerIssues; changed = true; }
+      if (data.centerArchived) { centerArchived = data.centerArchived; changed = true; }
+      if (data.interChat) { interChatMessages = data.interChat; changed = true; }
+      if (data.fileTypes) { fileTypes = data.fileTypes; changed = true; }
+      
+      if (changed) {
+        // حفظ في localStorage للنسخ الاحتياطي
+        localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
+        localStorage.setItem(LS_KEYS.resolved, JSON.stringify(archivedIssues));
+        localStorage.setItem(LS_KEYS.centerIssues, JSON.stringify(centerIssues));
+        localStorage.setItem(LS_KEYS.centerArchived, JSON.stringify(centerArchived));
+        localStorage.setItem(LS_KEYS.interChat, JSON.stringify(interChatMessages));
+        localStorage.setItem(LS_KEYS.fileTypes, JSON.stringify(fileTypes));
+        
+        const newCount = activeIssues.length + centerIssues.length;
+        if (newCount > oldCount) {
+          showToast('📩 إنشغال جديد', 'تم استلام إنشغال جديد من أحد المراكز!');
+          try {
+            const audio = new Audio('data:audio/wav;base64,UklGRlwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQwAAACAgICAf39/f39/f39/gICAf39/f39/f3+AgIB/f39/f39/f3+AgIB/f39/f38=');
+            audio.play().catch(() => {});
+          } catch(e) {}
+        }
+        updateUI();
       }
-    } catch(e) {}
+    }
+  });
+}
+
+function forceSync() {
+  const badge = document.getElementById('syncBadge');
+  if (!badge) return;
+  const originalHtml = badge.innerHTML;
+  badge.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التحديث...';
+  badge.style.opacity = '0.7';
+  
+  database.ref('data').once('value').then((snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      if (data.activeIssues) activeIssues = data.activeIssues;
+      if (data.archivedIssues) archivedIssues = data.archivedIssues;
+      if (data.centerIssues) centerIssues = data.centerIssues;
+      if (data.centerArchived) centerArchived = data.centerArchived;
+      if (data.interChat) interChatMessages = data.interChat;
+      if (data.fileTypes) fileTypes = data.fileTypes;
+      updateUI();
+      showToast('✅ تم التحديث', 'تم جلب أحدث البيانات بنجاح');
+    }
+    badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> تم التحديث ✅';
+    badge.style.opacity = '1';
+    setTimeout(() => { badge.innerHTML = originalHtml; }, 2000);
+  }).catch(() => {
+    showToast('❌ خطأ', 'فشل جلب البيانات من الخادم');
+    badge.innerHTML = originalHtml;
+    badge.style.opacity = '1';
+  });
+}
+
+function updateUI() {
+  if (currentRole === 'directorate') {
+    renderKPIs();
+    updateChart();
+    renderList();
+    renderArchive();
+    renderTokensGrid();
+    renderFileTypesManageList();
+  } else {
+    renderChatHub();
+    refreshCenterUI();
+  }
+  // تحديث وقت آخر مزامنة
+  const now = new Date();
+  const syncTime = document.querySelector('.sync-badge');
+  if (syncTime) {
+    // يمكن إضافة وقت التحديث هنا
   }
 }
 
 // ============================================================
-// LOGIN
+// تسجيل الدخول - محفوظ كما هو
 // ============================================================
 let selectedLoginRole = 'directorate';
 
@@ -901,131 +922,46 @@ function handleLogin() {
   }
 }
 
-// ============================================================
-// GOOGLE SHEETS SYNC - مع منع الكتابة فوق التغييرات المحلية
-// ============================================================
-async function syncToGoogleSheets() {
-  try {
-    const data = {
-      'الإنشغالات': activeIssues,
-      'الأرشيف': archivedIssues,
-      'بلاغات_المراكز': centerIssues,
-      'أرشيف_المراكز': centerArchived,
-      'المحادثات': getAllChatMessages(),
-      'غرفة_المؤسسات': getInterChatMessages(),
-      'timestamp': Date.now()
-    };
-    
-    const formData = new FormData();
-    formData.append('action', 'write');
-    formData.append('data', JSON.stringify(data));
-    
-    await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
-    localStorage.setItem(LS_KEYS.lastSync, Date.now().toString());
-  } catch(e) { console.log('Sync error:', e); }
-}
-
-async function syncFromGoogleSheets() {
-  if (isSyncing || !currentRole) return;
-  isSyncing = true;
-  try {
-    const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=read&t=${Date.now()}`);
-    const result = await res.json();
-    if (result.status === 'success' && result.data) {
-      const d = result.data;
-      
-      // التحقق من وجود بيانات جديدة
-      const remoteTimestamp = d.timestamp || 0;
-      if (remoteTimestamp <= lastSyncTimestamp) {
-        isSyncing = false;
-        return;
-      }
-      
-      let changed = false;
-      
-      // تحديث البيانات فقط إذا كانت مختلفة
-      if (d['الإنشغالات']) {
-        const newActive = JSON.stringify(d['الإنشغالات']);
-        const currentActive = JSON.stringify(activeIssues);
-        if (newActive !== currentActive) {
-          activeIssues = d['الإنشغالات'];
-          changed = true;
-        }
-      }
-      if (d['الأرشيف']) {
-        const newArchive = JSON.stringify(d['الأرشيف']);
-        const currentArchive = JSON.stringify(archivedIssues);
-        if (newArchive !== currentArchive) {
-          archivedIssues = d['الأرشيف'];
-          changed = true;
-        }
-      }
-      if (d['بلاغات_المراكز']) {
-        const newCenter = JSON.stringify(d['بلاغات_المراكز']);
-        const currentCenter = JSON.stringify(centerIssues);
-        if (newCenter !== currentCenter) {
-          centerIssues = d['بلاغات_المراكز'];
-          changed = true;
-        }
-      }
-      if (d['أرشيف_المراكز']) {
-        const newCenterArch = JSON.stringify(d['أرشيف_المراكز']);
-        const currentCenterArch = JSON.stringify(centerArchived);
-        if (newCenterArch !== currentCenterArch) {
-          centerArchived = d['أرشيف_المراكز'];
-          changed = true;
-        }
-      }
-      
-      if (d['المحادثات']) {
-        d['المحادثات'].forEach(msg => {
-          const existing = getChatMessages(msg.code);
-          if (!existing.some(m => m.time === msg.time && m.sender === msg.sender)) {
-            existing.push(msg);
-            saveChatMessages(msg.code, existing);
-            changed = true;
-          }
-        });
-      }
-      
-      if (d['غرفة_المؤسسات']) {
-        const existing = getInterChatMessages();
-        let interChanged = false;
-        d['غرفة_المؤسسات'].forEach(msg => {
-          if (!existing.some(m => m.time === msg.time && m.sender === msg.sender)) {
-            existing.push(msg);
-            interChanged = true;
-          }
-        });
-        if (interChanged) {
-          saveInterChatMessages(existing);
-          changed = true;
-        }
-      }
-      
-      if (changed) {
-        // حفظ البيانات محلياً
-        localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
-        localStorage.setItem(LS_KEYS.resolved, JSON.stringify(archivedIssues));
-        localStorage.setItem(LS_KEYS.centerIssues, JSON.stringify(centerIssues));
-        localStorage.setItem(LS_KEYS.centerArchived, JSON.stringify(centerArchived));
-        localStorage.setItem(LS_KEYS.lastSync, remoteTimestamp.toString());
-        lastSyncTimestamp = remoteTimestamp;
-        
-        if (currentRole === 'directorate') {
-          renderKPIs(); updateChart(); renderList(); renderArchive();
-        } else {
-          renderChatHub();
-        }
-        showToast('🔄 مزامنة', 'تم تحديث البيانات من الخادم');
-      }
+function toggleRemember() {
+  const checked = document.getElementById('rememberMe').checked;
+  if (checked) {
+    const role = document.getElementById('centerFields').style.display === 'none' ? 'directorate' : 'center';
+    if (role === 'directorate') {
+      const user = document.getElementById('loginUser').value;
+      const pass = document.getElementById('loginPass').value;
+      if (user && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, user, pass }));
+    } else {
+      const center = document.getElementById('loginCenterSelect').value;
+      const pass = document.getElementById('loginCenterPass').value;
+      if (center && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, center, pass }));
     }
-  } catch(e) { console.log('Fetch error:', e); }
-  isSyncing = false;
+  } else { localStorage.removeItem(LS_KEYS.remember); }
+}
+
+function loadRemembered() {
+  const data = localStorage.getItem(LS_KEYS.remember);
+  if (data) {
+    try {
+      const parsed = JSON.parse(data);
+      if (parsed.role === 'directorate') {
+        selectLoginRole('directorate');
+        document.getElementById('loginUser').value = parsed.user || '';
+        document.getElementById('loginPass').value = parsed.pass || '';
+        document.getElementById('rememberMe').checked = true;
+      } else if (parsed.role === 'center') {
+        selectLoginRole('center');
+        document.getElementById('loginCenterSelect').value = parsed.center || '';
+        document.getElementById('loginCenterPass').value = parsed.pass || '';
+        document.getElementById('rememberMe').checked = true;
+        document.getElementById('loginCenterSearch').value = parsed.center || '';
+        filterCenterSelect();
+      }
+    } catch(e) {}
+  }
 }
 
 // ============================================================
-// CHANGE PASSWORD
+// تغيير كلمة السر - محفوظ
 // ============================================================
 function openChangePassword() {
   document.getElementById('currentPass').value = '';
@@ -1052,12 +988,32 @@ function changePassword() {
 }
 
 // ============================================================
-// INIT APP
+// INIT APP - مع Firebase
 // ============================================================
 function initApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appRoot').style.display = 'block';
   loadDB();
+  
+  // بدء الاستماع للتحديثات الفورية من Firebase
+  listenToFirebase();
+  
+  // جلب البيانات الأولية
+  database.ref('data').once('value').then((snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      if (data.activeIssues) activeIssues = data.activeIssues;
+      if (data.archivedIssues) archivedIssues = data.archivedIssues;
+      if (data.centerIssues) centerIssues = data.centerIssues;
+      if (data.centerArchived) centerArchived = data.centerArchived;
+      if (data.interChat) interChatMessages = data.interChat;
+      if (data.fileTypes) fileTypes = data.fileTypes;
+    }
+    setupInterface();
+  });
+}
+
+function setupInterface() {
   setupSidebar();
   populateDropdowns();
   renderInstitutionsList();
@@ -1092,13 +1048,11 @@ function initApp() {
     setupPasteFeature();
   }
   
-  setTimeout(syncFromGoogleSheets, 1500);
-  setInterval(syncFromGoogleSheets, 10000);
   setInterval(checkForNewMessages, 3000);
 }
 
 // ============================================================
-// SIDEBAR
+// SIDEBAR - محفوظ
 // ============================================================
 function setupSidebar() {
   const navList = document.getElementById('navList');
@@ -1137,9 +1091,6 @@ function setupSidebar() {
   }
 }
 
-// ============================================================
-// TAB SWITCHING
-// ============================================================
 function switchTab(tab) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   const target = document.getElementById('page-' + tab);
@@ -1153,7 +1104,7 @@ function switchTab(tab) {
 }
 
 // ============================================================
-// DROPDOWNS
+// DROPDOWNS - محفوظ
 // ============================================================
 function populateDropdowns() {
   const centerSel = document.getElementById('add-form-center');
@@ -1166,7 +1117,7 @@ function populateDropdowns() {
 }
 
 // ============================================================
-// INSTITUTIONS & FILE TYPES
+// INSTITUTIONS & FILE TYPES - محفوظ
 // ============================================================
 function renderInstitutionsList() {
   const ul = document.getElementById('institutionsList');
@@ -1192,7 +1143,7 @@ function addFileType() {
   const val = input.value.trim();
   if (!val) return;
   fileTypes.push(val);
-  saveFileTypes();
+  saveToFirebase();
   input.value = '';
   renderFileTypesManageList();
   populateDropdowns();
@@ -1201,18 +1152,45 @@ function addFileType() {
 function editFileType(idx) {
   if (currentRole !== 'directorate') { showToast("⚠️ غير مسموح", "هذه الخاصية متاحة للمديرية فقط"); return; }
   const newVal = prompt("تعديل التصنيف:", fileTypes[idx]);
-  if (newVal !== null && newVal.trim() !== '') { fileTypes[idx] = newVal.trim(); saveFileTypes(); renderFileTypesManageList(); populateDropdowns(); }
+  if (newVal !== null && newVal.trim() !== '') { fileTypes[idx] = newVal.trim(); saveToFirebase(); renderFileTypesManageList(); populateDropdowns(); }
 }
 
 function deleteFileType(idx) {
   if (currentRole !== 'directorate') { showToast("⚠️ غير مسموح", "هذه الخاصية متاحة للمديرية فقط"); return; }
-  if (confirm("هل أنت متأكد من حذف هذا التصنيف؟")) { fileTypes.splice(idx, 1); saveFileTypes(); renderFileTypesManageList(); populateDropdowns(); }
+  if (confirm("هل أنت متأكد من حذف هذا التصنيف؟")) { fileTypes.splice(idx, 1); saveToFirebase(); renderFileTypesManageList(); populateDropdowns(); }
 }
 
-function saveNotes() { localStorage.setItem(LS_KEYS.notes, document.getElementById('strategicNotes').value); }
+function saveNotes() { 
+  localStorage.setItem(LS_KEYS.notes, document.getElementById('strategicNotes').value);
+  // حفظ في Firebase
+  database.ref('notes').set(document.getElementById('strategicNotes').value);
+}
 
 // ============================================================
-// BROADCAST
+// TOKENS - محفوظ
+// ============================================================
+function filterTokens() { renderTokensGrid(); }
+
+function renderTokensGrid() {
+  const grid = document.getElementById('tokensGrid');
+  const search = (document.getElementById('tokenSearchInput')?.value || '').trim().toLowerCase();
+  let filtered = INSTITUTIONS_DATA;
+  if (search) filtered = INSTITUTIONS_DATA.filter(inst => inst.name.toLowerCase().includes(search) || inst.code.toLowerCase().includes(search) || inst.password.includes(search));
+  if (filtered.length === 0) { grid.innerHTML = '<div style="color:var(--text-dim); padding:40px; text-align:center; font-size:18px;">لا توجد مؤسسات تطابق البحث.</div>'; return; }
+  grid.innerHTML = filtered.map(inst => `
+    <div class="token-item">
+      <div class="token-code">${escapeHtml(inst.password)}</div>
+      <div class="token-name">${escapeHtml(inst.name)}</div>
+      <div class="token-code-id">${escapeHtml(inst.code)} ${inst.type === 'private' ? '🏫' : '🏛️'}</div>
+      <div class="token-actions"><button class="btn-mini" onclick="copyToken('${inst.password}')"><i class="fa-regular fa-copy"></i> نسخ</button></div>
+    </div>
+  `).join('');
+}
+
+function copyToken(token) { navigator.clipboard.writeText(token).then(() => showToast("✅ تم النسخ", "تم نسخ كلمة السر إلى الحافظة.")); }
+
+// ============================================================
+// BROADCAST - محفوظ
 // ============================================================
 function selectBroadcastTarget(target) {
   broadcastTarget = target;
@@ -1247,7 +1225,7 @@ function sendBroadcast() {
     const issue = { code: code + '-' + inst.code, center: inst.name, type: "تعميم", priority: priority, author: "المديرية (تعميم)", details: `📢 **${title}**\n\n${content}\n\n📌 هذا التعميم مرسل إلى: ${inst.name}`, status: "قيد المعالجة 🔄", createdAt: Date.now(), source: 'directorate', attachments: [], isBroadcast: true };
     activeIssues.unshift(issue);
   });
-  saveActive();
+  saveToFirebase();
   renderKPIs();
   updateChart();
   renderList();
@@ -1257,30 +1235,7 @@ function sendBroadcast() {
 }
 
 // ============================================================
-// TOKENS
-// ============================================================
-function filterTokens() { renderTokensGrid(); }
-
-function renderTokensGrid() {
-  const grid = document.getElementById('tokensGrid');
-  const search = (document.getElementById('tokenSearchInput')?.value || '').trim().toLowerCase();
-  let filtered = INSTITUTIONS_DATA;
-  if (search) filtered = INSTITUTIONS_DATA.filter(inst => inst.name.toLowerCase().includes(search) || inst.code.toLowerCase().includes(search) || inst.password.includes(search));
-  if (filtered.length === 0) { grid.innerHTML = '<div style="color:var(--text-dim); padding:40px; text-align:center; font-size:18px;">لا توجد مؤسسات تطابق البحث.</div>'; return; }
-  grid.innerHTML = filtered.map(inst => `
-    <div class="token-item">
-      <div class="token-code">${escapeHtml(inst.password)}</div>
-      <div class="token-name">${escapeHtml(inst.name)}</div>
-      <div class="token-code-id">${escapeHtml(inst.code)} ${inst.type === 'private' ? '🏫' : '🏛️'}</div>
-      <div class="token-actions"><button class="btn-mini" onclick="copyToken('${inst.password}')"><i class="fa-regular fa-copy"></i> نسخ</button></div>
-    </div>
-  `).join('');
-}
-
-function copyToken(token) { navigator.clipboard.writeText(token).then(() => showToast("✅ تم النسخ", "تم نسخ كلمة السر إلى الحافظة.")); }
-
-// ============================================================
-// GENERATE REF CODE
+// GENERATE REF CODE - محفوظ
 // ============================================================
 function generateRefCode() {
   const now = new Date();
@@ -1288,7 +1243,7 @@ function generateRefCode() {
 }
 
 // ============================================================
-// SUBMIT NEW ISSUE
+// SUBMIT NEW ISSUE - محفوظ مع Firebase
 // ============================================================
 function submitNewIssue() {
   const center = document.getElementById('add-form-center').value;
@@ -1299,7 +1254,7 @@ function submitNewIssue() {
   if (!center || !type || !details) { alert("يرجى تعبئة كل الحقول الأساسية قبل الحفظ."); return; }
   const newIssue = { code: generateRefCode(), center, type, priority, author: author || "غير محدد", details, status: "قيد المعالجة 🔄", createdAt: Date.now(), source: 'directorate', attachments: [] };
   activeIssues.unshift(newIssue);
-  saveActive();
+  saveToFirebase();
   showToast("✅ تم الحفظ", `تم تدوين الإنشغال ${newIssue.code} بنجاح!`);
   document.getElementById('add-form-author').value = '';
   document.getElementById('add-form-details').value = '';
@@ -1310,7 +1265,105 @@ function submitNewIssue() {
 }
 
 // ============================================================
-// KPIs & CHART
+// SEND FROM CENTER - محفوظ مع Firebase
+// ============================================================
+function setupPasteFeature() {
+  window.addEventListener('paste', function(e) {
+    const sendPage = document.getElementById('page-send-panel');
+    if (!sendPage || sendPage.classList.contains('hidden')) return;
+    const items = (e.clipboardData || window.clipboardData).items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const blob = items[i].getAsFile();
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          pendingCenterFile = { data: ev.target.result, type: 'image', name: 'لقطة شاشة.png' };
+          const zone = document.getElementById('pasteZone');
+          if (zone) { zone.classList.add('captured'); zone.textContent = '📸 تم التقاط الصورة وجاهزة للإرسال!'; }
+        };
+        reader.readAsDataURL(blob);
+        e.preventDefault();
+        break;
+      }
+    }
+  });
+}
+
+function resetPasteZone() {
+  pendingCenterFile = null;
+  const zone = document.getElementById('pasteZone');
+  if (zone) { zone.classList.remove('captured'); zone.textContent = '📸 اضغط هنا ثم Ctrl+V للصق لقطة شاشة'; }
+}
+
+function handleCenterFileSelection(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const fileType = file.type === 'application/pdf' ? 'pdf' : 'image';
+    pendingCenterFile = { data: ev.target.result, type: fileType, name: file.name };
+    const zone = document.getElementById('pasteZone');
+    if (zone) { zone.classList.add('captured'); zone.textContent = fileType === 'pdf' ? '📄 تم اختيار ملف PDF جاهز للإرسال!' : '📸 تم اختيار صورة جاهزة للإرسال!'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+function sendFromCenter() {
+  const details = document.getElementById('form-details').value.trim();
+  if (!details) { alert("يرجى كتابة الشرح الدقيق للمشكلة قبل الإرسال."); return; }
+  const type = document.getElementById('form-type').value;
+  const priority = document.getElementById('form-priority').value;
+  const reporter = document.getElementById('form-reporter').value.trim() || "غير محدد";
+  const center = getCenterName();
+  const code = generateRefCode();
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الإرسال...';
+  const attachments = [];
+  if (pendingCenterFile) { 
+    attachments.push({ 
+      name: pendingCenterFile.name || (pendingCenterFile.type === 'image' ? 'صورة_مرفقة.png' : 'مرفق.pdf'), 
+      type: pendingCenterFile.type === 'image' ? 'image/png' : 'application/pdf', 
+      data: pendingCenterFile.data 
+    }); 
+  }
+  const payload = { code, center, type, priority, reporter, details, status: "قيد المعالجة 🔄", attachments, source: 'center', createdAt: Date.now() };
+  centerIssues.unshift(payload);
+  const activeCopy = { 
+    code, center, type, priority, 
+    author: reporter, details, status: "قيد المعالجة 🔄", 
+    createdAt: Date.now(), source: 'center', 
+    attachments: attachments.length > 0 ? attachments : [] 
+  };
+  activeIssues.unshift(activeCopy);
+  saveToFirebase();
+  showToast("✅ تم الإرسال", `تم إرسال الإنشغال ${code} بنجاح!`);
+  document.getElementById('form-details').value = '';
+  document.getElementById('form-reporter').value = '';
+  document.getElementById('form-file').value = '';
+  document.getElementById('form-priority').selectedIndex = 0;
+  resetPasteZone();
+  renderChatHub();
+  renderList();
+  renderKPIs();
+  updateChart();
+  btn.disabled = false;
+  btn.textContent = 'بث وإرسال الإنشغال 📡';
+}
+
+function getCenterName() { return localStorage.getItem(LS_KEYS.centerName) || "مركز تكويني"; }
+function setCenterName(name) { localStorage.setItem(LS_KEYS.centerName, name); }
+
+function refreshCenterUI() {
+  const name = getCenterName();
+  document.getElementById('centerBadgeName').textContent = name;
+  const sidebarName = document.getElementById('profileName');
+  if (sidebarName) sidebarName.textContent = name;
+}
+
+// ============================================================
+// KPIs & CHART - محفوظ
 // ============================================================
 function renderKPIs() {
   const total = activeIssues.length + archivedIssues.length;
@@ -1340,7 +1393,7 @@ function updateChart() {
 }
 
 // ============================================================
-// LIST FUNCTIONS
+// LIST FUNCTIONS - محفوظ مع Firebase
 // ============================================================
 let currentListTab = 'all';
 
@@ -1388,7 +1441,7 @@ function archiveCenterIssue(code) {
   const issue = activeIssues[idx];
   activeIssues.splice(idx, 1);
   centerArchived.push(issue);
-  saveActive(); saveCenterArchived();
+  saveToFirebase();
   renderList(); renderKPIs(); updateChart();
   showToast("📦 تم الأرشفة", `تم أرشفة الإنشغال ${code} من المراكز.`);
 }
@@ -1446,7 +1499,7 @@ function restoreFromCenterArchive(code) {
   issue.status = "قيد المعالجة 🔄";
   centerArchived.splice(idx, 1);
   activeIssues.push(issue);
-  saveActive(); saveCenterArchived();
+  saveToFirebase();
   renderList(); renderKPIs(); updateChart();
   showToast("✅ تم الاسترجاع", `تم استرجاع الإنشغال ${code} من أرشيف المراكز.`);
 }
@@ -1454,49 +1507,25 @@ function restoreFromCenterArchive(code) {
 function deleteFromCenterArchive(code) {
   if (!confirm("هل أنت متأكد من الحذف النهائي من أرشيف المراكز؟")) return;
   centerArchived = centerArchived.filter(i => i.code !== code);
-  saveCenterArchived();
+  saveToFirebase();
   renderList();
 }
 
-// ============================================================
-// TOGGLE STATUS - تم الإصلاح النهائي
-// ============================================================
 function toggleStatus(code, value) {
   if (value === 'resolved') {
     const idx = activeIssues.findIndex(i => i.code === code);
-    if (idx === -1) {
-      showToast("⚠️ خطأ", "لم يتم العثور على الإنشغال");
-      return;
-    }
-    
+    if (idx === -1) { showToast("⚠️ خطأ", "لم يتم العثور على الإنشغال"); return; }
     const issue = activeIssues[idx];
     issue.status = "تم الحل ✅";
-    
     activeIssues.splice(idx, 1);
     archivedIssues.unshift(issue);
-    
-    // حفظ مع تحديث الطابع الزمني
-    localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
-    localStorage.setItem(LS_KEYS.resolved, JSON.stringify(archivedIssues));
-    localStorage.setItem(LS_KEYS.lastSync, Date.now().toString());
-    lastSyncTimestamp = Date.now();
-    
-    // تحديث واجهة المستخدم
+    saveToFirebase();
     renderKPIs();
     updateChart();
     renderList();
     renderArchive();
-    
-    // تحديث حالة المركز
     const centerIdx = centerIssues.findIndex(i => i.code === code);
-    if (centerIdx !== -1) { 
-      centerIssues[centerIdx].status = "تم الحل ✅"; 
-      localStorage.setItem(LS_KEYS.centerIssues, JSON.stringify(centerIssues));
-    }
-    
-    // المزامنة مع Google Sheets
-    syncToGoogleSheets();
-    
+    if (centerIdx !== -1) { centerIssues[centerIdx].status = "تم الحل ✅"; saveToFirebase(); }
     showToast("✅ تم الحل", `تم تسوية الإنشغال ${code} ونقله إلى الأرشيف`);
   }
 }
@@ -1504,12 +1533,12 @@ function toggleStatus(code, value) {
 function deleteIssue(code) {
   if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
   activeIssues = activeIssues.filter(i => i.code !== code);
-  saveActive();
+  saveToFirebase();
   renderKPIs(); updateChart(); renderList();
 }
 
 // ============================================================
-// ARCHIVE
+// ARCHIVE - محفوظ مع Firebase
 // ============================================================
 function renderArchive() {
   const search = (document.getElementById('archive-search')?.value || '').trim().toLowerCase();
@@ -1548,19 +1577,19 @@ function restoreFromArchive(code) {
   issue.status = "قيد المعالجة 🔄";
   archivedIssues.splice(idx, 1);
   activeIssues.unshift(issue);
-  saveActive(); saveArchive();
+  saveToFirebase();
   renderKPIs(); updateChart(); renderList(); renderArchive();
 }
 
 function deleteFromArchive(code) {
   if (!confirm("هل أنت متأكد من الحذف النهائي من الأرشيف؟")) return;
   archivedIssues = archivedIssues.filter(i => i.code !== code);
-  saveArchive();
+  saveToFirebase();
   renderKPIs(); updateChart(); renderArchive();
 }
 
 // ============================================================
-// DETAILS MODAL
+// DETAILS MODAL - محفوظ
 // ============================================================
 function openDetails(code, fromArchive) {
   let source = fromArchive ? archivedIssues : activeIssues;
@@ -1591,8 +1620,49 @@ function openDetails(code, fromArchive) {
 function closeDetails() { document.getElementById('detailsModal').classList.remove('open'); }
 
 // ============================================================
-// CHAT SYSTEM
+// CHAT SYSTEM - محفوظ مع Firebase
 // ============================================================
+function getChatMessages(code) {
+  return JSON.parse(localStorage.getItem('chat_messages_' + code) || "[]");
+}
+
+function saveChatMessages(code, msgs) {
+  localStorage.setItem('chat_messages_' + code, JSON.stringify(msgs));
+  // حفظ في Firebase
+  const chatData = {};
+  chatData[code] = msgs;
+  database.ref('chats').update(chatData);
+}
+
+function listenToChats() {
+  database.ref('chats').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      Object.keys(data).forEach(code => {
+        const existing = getChatMessages(code);
+        const newMsgs = data[code];
+        if (newMsgs && newMsgs.length > existing.length) {
+          saveChatMessages(code, newMsgs);
+          if (currentChatCode === code) {
+            renderChatMessages(currentRole);
+          } else {
+            const lastMsg = newMsgs[newMsgs.length - 1];
+            if (lastMsg.sender !== currentRole) {
+              const msgKey = code + '_' + lastMsg.time;
+              if (!notifiedMessages.has(msgKey)) {
+                notifiedMessages.add(msgKey);
+                showToastWithAction(lastMsg.text || '(مرفق)', `📩 رسالة جديدة من ${lastMsg.sender} - ${code}`, () => { openChat(code, currentRole); });
+              }
+            }
+          }
+          if (currentRole === 'directorate') renderList();
+          else renderChatHub();
+        }
+      });
+    }
+  });
+}
+
 function openChat(code, role) {
   const allIssues = [...activeIssues, ...archivedIssues, ...centerIssues, ...centerArchived];
   const issue = allIssues.find(i => i.code === code);
@@ -1666,11 +1736,10 @@ function sendChatMessage() {
   input.value = '';
   removeAttachment();
   renderChatMessages(currentRole);
-  syncToGoogleSheets();
 }
 
 // ============================================================
-// INTER-INSTITUTION CHAT
+// INTER-INSTITUTION CHAT - محفوظ مع Firebase
 // ============================================================
 function populateInterChatRecipients() {
   const select = document.getElementById('interChatRecipient');
@@ -1693,6 +1762,15 @@ function openInterChat() {
 }
 
 function closeInterChat() { document.getElementById('interChatModal').classList.remove('open'); }
+
+function getInterChatMessages() {
+  return JSON.parse(localStorage.getItem(LS_KEYS.interChat) || "[]");
+}
+
+function saveInterChatMessages(msgs) {
+  localStorage.setItem(LS_KEYS.interChat, JSON.stringify(msgs));
+  database.ref('interChat').set(msgs);
+}
 
 function renderInterChatMessages() {
   const container = document.getElementById('interChatMessages');
@@ -1746,96 +1824,7 @@ function sendInterChatMessage() {
 }
 
 // ============================================================
-// CENTER: SEND ISSUE
-// ============================================================
-function setupPasteFeature() {
-  window.addEventListener('paste', function(e) {
-    const sendPage = document.getElementById('page-send-panel');
-    if (!sendPage || sendPage.classList.contains('hidden')) return;
-    const items = (e.clipboardData || window.clipboardData).items;
-    if (!items) return;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf('image') !== -1) {
-        const blob = items[i].getAsFile();
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-          pendingCenterFile = { data: ev.target.result, type: 'image', name: 'لقطة شاشة.png' };
-          const zone = document.getElementById('pasteZone');
-          if (zone) { zone.classList.add('captured'); zone.textContent = '📸 تم التقاط الصورة وجاهزة للإرسال!'; }
-        };
-        reader.readAsDataURL(blob);
-        e.preventDefault();
-        break;
-      }
-    }
-  });
-}
-
-function resetPasteZone() {
-  pendingCenterFile = null;
-  const zone = document.getElementById('pasteZone');
-  if (zone) { zone.classList.remove('captured'); zone.textContent = '📸 اضغط هنا ثم Ctrl+V للصق لقطة شاشة'; }
-}
-
-function handleCenterFileSelection(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    const fileType = file.type === 'application/pdf' ? 'pdf' : 'image';
-    pendingCenterFile = { data: ev.target.result, type: fileType, name: file.name };
-    const zone = document.getElementById('pasteZone');
-    if (zone) { zone.classList.add('captured'); zone.textContent = fileType === 'pdf' ? '📄 تم اختيار ملف PDF جاهز للإرسال!' : '📸 تم اختيار صورة جاهزة للإرسال!'; }
-  };
-  reader.readAsDataURL(file);
-}
-
-function sendFromCenter() {
-  const details = document.getElementById('form-details').value.trim();
-  if (!details) { alert("يرجى كتابة الشرح الدقيق للمشكلة قبل الإرسال."); return; }
-  const type = document.getElementById('form-type').value;
-  const priority = document.getElementById('form-priority').value;
-  const reporter = document.getElementById('form-reporter').value.trim() || "غير محدد";
-  const center = getCenterName();
-  const code = generateRefCode();
-  const btn = document.getElementById('sendBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ جاري الإرسال...';
-  const attachments = [];
-  if (pendingCenterFile) { 
-    attachments.push({ 
-      name: pendingCenterFile.name || (pendingCenterFile.type === 'image' ? 'صورة_مرفقة.png' : 'مرفق.pdf'), 
-      type: pendingCenterFile.type === 'image' ? 'image/png' : 'application/pdf', 
-      data: pendingCenterFile.data 
-    }); 
-  }
-  const payload = { code, center, type, priority, reporter, details, status: "قيد المعالجة 🔄", attachments, source: 'center', createdAt: Date.now() };
-  centerIssues.unshift(payload);
-  saveCenterIssues();
-  const activeCopy = { 
-    code, center, type, priority, 
-    author: reporter, details, status: "قيد المعالجة 🔄", 
-    createdAt: Date.now(), source: 'center', 
-    attachments: attachments.length > 0 ? attachments : [] 
-  };
-  activeIssues.unshift(activeCopy);
-  saveActive();
-  showToast("✅ تم الإرسال", `تم إرسال الإنشغال ${code} بنجاح!`);
-  document.getElementById('form-details').value = '';
-  document.getElementById('form-reporter').value = '';
-  document.getElementById('form-file').value = '';
-  document.getElementById('form-priority').selectedIndex = 0;
-  resetPasteZone();
-  renderChatHub();
-  renderList();
-  renderKPIs();
-  updateChart();
-  btn.disabled = false;
-  btn.textContent = 'بث وإرسال الإنشغال 📡';
-}
-
-// ============================================================
-// CENTER: CHAT HUB
+// CENTER: CHAT HUB - محفوظ
 // ============================================================
 function renderChatHub() {
   const container = document.getElementById('chatHubContainer');
@@ -1867,17 +1856,7 @@ function renderChatHub() {
 }
 
 // ============================================================
-// CENTER UI REFRESH
-// ============================================================
-function refreshCenterUI() {
-  const name = getCenterName();
-  document.getElementById('centerBadgeName').textContent = name;
-  const sidebarName = document.getElementById('profileName');
-  if (sidebarName) sidebarName.textContent = name;
-}
-
-// ============================================================
-// CHECK FOR NEW MESSAGES
+// CHECK FOR NEW MESSAGES - محفوظ
 // ============================================================
 function checkForNewMessages() {
   const allCodes = new Set();
@@ -1908,7 +1887,7 @@ function checkForNewMessages() {
 }
 
 // ============================================================
-// TOAST
+// TOAST - محفوظ
 // ============================================================
 function showToastWithAction(title, text, action) {
   const area = document.getElementById('toast-area');
@@ -1932,7 +1911,7 @@ function showToast(title, text) {
 }
 
 // ============================================================
-// SCROLL DRAG
+// SCROLL DRAG - محفوظ
 // ============================================================
 function initScrollDrag(scrollId, trackId, thumbId) {
   const scrollEl = document.getElementById(scrollId);
@@ -1982,13 +1961,13 @@ function initScrollDrag(scrollId, trackId, thumbId) {
 }
 
 // ============================================================
-// LIGHTBOX
+// LIGHTBOX - محفوظ
 // ============================================================
 function openLightbox(src) { document.getElementById('lightboxImg').src = src; document.getElementById('lightboxOverlay').classList.add('open'); }
 function closeLightbox() { document.getElementById('lightboxOverlay').classList.remove('open'); document.getElementById('lightboxImg').src = ''; }
 
 // ============================================================
-// LOGOUT
+// LOGOUT - محفوظ
 // ============================================================
 function logout() {
   if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
@@ -2003,11 +1982,15 @@ function logout() {
     document.getElementById('loginCenterPass').value = '';
     document.getElementById('loginCenterSearch').value = '';
     notifiedMessages.clear();
+    // إزالة المستمعين
+    database.ref('data').off();
+    database.ref('chats').off();
+    database.ref('interChat').off();
   }
 }
 
 // ============================================================
-// UTILS
+// UTILS - محفوظ
 // ============================================================
 function escapeHtml(str) {
   if (str === undefined || str === null) return '';
@@ -2015,14 +1998,17 @@ function escapeHtml(str) {
 }
 
 // ============================================================
-// WINDOW ONLOAD
+// WINDOW ONLOAD - محفوظ
 // ============================================================
 window.onload = function() {
   loadTheme();
   selectLoginRole('directorate');
   loadRemembered();
+  // بدء الاستماع للمحادثات
+  listenToChats();
 };
 
+// استماع للتغييرات في localStorage للتحديث بين النوافذ
 window.addEventListener('storage', function(e) {
   const watchedKeys = [LS_KEYS.core, LS_KEYS.resolved, LS_KEYS.centerIssues, LS_KEYS.centerArchived];
   if (watchedKeys.includes(e.key)) {
@@ -2030,6 +2016,10 @@ window.addEventListener('storage', function(e) {
     else { renderChatHub(); }
   }
 });
+
+console.log('🚀 منصة التنسيق الرقمي - تعمل مع Firebase');
+console.log('📡 تحديث فوري بين جميع الأجهزة!');
+console.log('🔥 Firebase متصل: ' + firebaseConfig.databaseURL);
 </script>
 </body>
 </html>
