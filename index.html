@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة التنسيق الرقمي - الجزائر 🇩🇿</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --algeria-green: #006633;
+  --algeria-green-dark: #004d26;
+  --algeria-green-light: #008844;
+  --algeria-red: #d21034;
+  --algeria-red-dark: #b00c2a;
+  --algeria-white: #f5f5f5;
+  --gold: #d4af37;
+  --gold-light: #f0d060;
+  
+  --bg-main: #f0f2f5;
+  --bg-card: #ffffff;
+  --bg-card-2: #f8f9fa;
+  --bg-card-3: #e9ecef;
+  --border: #b0b8c0;
+  --border-light: #d0d4da;
+  --text: #0a0a1a;
+  --text-light: #1a1a30;
+  --text-dim: #4a4a5a;
+  --shadow: 0 15px 50px rgba(0,0,0,0.15);
+  --shadow-light: 0 2px 10px rgba(0,0,0,0.06);
+  --input-bg: #ffffff;
+  --input-border: #b0b8c0;
+  --table-hover: rgba(0,102,51,0.04);
+  --radius: 18px;
+  --radius-sm: 14px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  --font-base: 18px;
+  --font-lg: 22px;
+  --font-xl: 28px;
+  --font-xxl: 34px;
+}
+
+[data-theme="dark"] {
+  --bg-main: #0a0e17;
+  --bg-card: #141d2b;
+  --bg-card-2: #1a2536;
+  --bg-card-3: #223048;
+  --border: #3a5068;
+  --border-light: #4a6080;
+  --text: #f0f4f8;
+  --text-light: #dce4ec;
+  --text-dim: #8aa0b8;
+  --shadow: 0 15px 50px rgba(0,0,0,0.5);
+  --shadow-light: 0 2px 10px rgba(0,0,0,0.3);
+  --input-bg: #0a0e17;
+  --input-border: #3a5068;
+  --table-hover: rgba(255,255,255,0.02);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: 'Cairo', sans-serif; font-size: var(--font-base); }
+body { background: var(--bg-main); color: var(--text); overflow-x: hidden; min-height: 100vh; transition: background 0.3s, color 0.3s; position: relative; line-height: 1.7; }
+
+.flag-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; opacity: 0.06; }
+.flag-bg .flag-stripe { position: absolute; width: 100%; height: 33.33%; }
+.flag-bg .stripe-green { top: 0; background: var(--algeria-green); }
+.flag-bg .stripe-white { top: 33.33%; background: var(--algeria-white); }
+.flag-bg .stripe-red { top: 66.66%; background: var(--algeria-red); }
+.flag-bg .star-moon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 200px; color: var(--algeria-red); opacity: 0.08; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: var(--algeria-green); border-radius: 12px; }
+
+.fares-logo { display: inline-flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 900; background: linear-gradient(135deg, var(--algeria-green), var(--algeria-red)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 4px; position: relative; }
+.fares-logo::before { content: '✦'; color: var(--gold); -webkit-text-fill-color: var(--gold); font-size: 20px; }
+.fares-logo::after { content: '✦'; color: var(--gold); -webkit-text-fill-color: var(--gold); font-size: 20px; }
+.fares-logo-sub { font-size: 15px; font-weight: 600; color: var(--text-dim); -webkit-text-fill-color: var(--text-dim); letter-spacing: 2px; background: none; }
+
+#toast-area { position: fixed; top: 25px; right: 25px; z-index: 10000; display: flex; flex-direction: column; gap: 14px; max-width: 500px; }
+.toast { background: var(--bg-card); border: 2px solid var(--border); border-right: 6px solid var(--algeria-green); border-radius: 16px; padding: 22px 28px; box-shadow: var(--shadow); animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; }
+@keyframes slideInRight { from { transform: translateX(130%) scale(0.9); opacity: 0; } to { transform: translateX(0) scale(1); opacity: 1; } }
+.toast .toast-title { font-size: 20px; font-weight: 800; color: var(--algeria-green); margin-bottom: 4px; }
+.toast .toast-text { font-size: 17px; color: var(--text); line-height: 1.7; }
+.toast .toast-action { margin-top: 6px; font-size: 15px; color: var(--algeria-green); font-weight: 700; }
+
+#loginScreen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-main); z-index: 9999; padding: 20px; }
+.login-container { position: relative; width: 100%; max-width: 820px; z-index: 1; }
+.login-card { background: var(--bg-card); border: 3px solid var(--border); border-radius: 28px; padding: 40px 44px 34px; position: relative; overflow: hidden; box-shadow: var(--shadow); }
+.login-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--algeria-green), var(--algeria-white), var(--algeria-red)); }
+.login-header { text-align: center; margin-bottom: 28px; }
+.login-logo { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--algeria-green), var(--algeria-red)); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 12px; box-shadow: 0 10px 40px rgba(0, 102, 51, 0.2); position: relative; color: white; }
+.login-logo .badge { position: absolute; bottom: -2px; right: -2px; width: 30px; height: 30px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 14px; border: 3px solid var(--bg-card); color: var(--text); }
+.login-card h1 { font-size: 30px; font-weight: 900; color: var(--text); letter-spacing: 1px; }
+.login-card .subtitle { color: var(--text-dim); font-size: 17px; font-weight: 600; margin-top: 4px; }
+
+.role-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.role-selector button { padding: 16px 14px; border-radius: 16px; font-weight: 800; font-size: 18px; background: var(--bg-card-2); border: 3px solid var(--border); color: var(--text-dim); transition: var(--transition); cursor: pointer; font-family: inherit; }
+.role-selector button i { margin-left: 12px; font-size: 20px; }
+.role-selector button:hover { border-color: var(--algeria-green); color: var(--text); }
+.role-selector button.active { border-color: var(--algeria-green); background: rgba(0, 102, 51, 0.08); color: var(--algeria-green); }
+
+.login-fields-row { display: flex; flex-direction: row; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
+.login-fields-row .login-field { flex: 1; min-width: 180px; margin-bottom: 0; }
+.login-fields-row .login-field label { display: block; font-size: 15px; font-weight: 700; color: var(--text-light); margin-bottom: 4px; }
+.login-fields-row .login-field input, .login-fields-row .login-field select { width: 100%; padding: 14px 18px; background: var(--input-bg); border: 3px solid var(--input-border); border-radius: 12px; color: var(--text); font-size: 18px; transition: var(--transition); font-family: inherit; display: block; }
+.login-fields-row .login-field input:focus, .login-fields-row .login-field select:focus { border-color: var(--algeria-green); box-shadow: 0 0 0 4px rgba(0, 102, 51, 0.1); outline: none; }
+#directorateFields .login-fields-row, #centerFields .login-fields-row { display: flex; flex-direction: row; flex-wrap: wrap; gap: 14px; }
+#directorateFields .login-fields-row .login-field, #centerFields .login-fields-row .login-field { flex: 1; min-width: 160px; }
+
+.login-field .remember { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+.login-field .remember input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--algeria-green); cursor: pointer; }
+.login-field .remember label { font-size: 16px; cursor: pointer; margin: 0; color: var(--text-dim); }
+
+.btn-login { width: 100%; padding: 18px; border-radius: 16px; background: linear-gradient(135deg, var(--algeria-green), var(--algeria-green-dark)); color: #fff; font-weight: 800; font-size: 20px; margin-top: 6px; cursor: pointer; transition: var(--transition); box-shadow: 0 10px 35px rgba(0, 102, 51, 0.2); font-family: inherit; border: none; }
+.btn-login:hover { transform: translateY(-2px); box-shadow: 0 15px 45px rgba(0, 102, 51, 0.25); }
+
+.login-error { display: none; background: rgba(210, 16, 52, 0.08); border: 2px solid rgba(210, 16, 52, 0.2); color: var(--algeria-red); padding: 14px 18px; border-radius: 14px; font-size: 17px; font-weight: 700; margin-top: 14px; text-align: center; }
+.login-info { margin-top: 14px; padding: 14px 18px; background: var(--bg-card-2); border-radius: 14px; font-size: 14px; color: var(--text-dim); text-align: center; line-height: 2; border: 2px dashed var(--border); }
+.center-hint { margin-top: 6px; padding: 12px 16px; background: rgba(0, 102, 51, 0.05); border: 2px dashed rgba(0, 102, 51, 0.15); border-radius: 12px; font-size: 15px; color: var(--text-dim); text-align: center; display: none; }
+
+.theme-toggle { position: fixed; bottom: 25px; left: 25px; z-index: 999; width: 56px; height: 56px; border-radius: 50%; background: var(--bg-card); border: 3px solid var(--border); color: var(--text); font-size: 24px; cursor: pointer; box-shadow: var(--shadow); transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+.theme-toggle:hover { transform: scale(1.08); border-color: var(--algeria-green); }
+
+.change-pass-btn { padding: 10px 22px; border-radius: 12px; font-size: 16px; font-weight: 700; background: transparent; border: 3px solid var(--gold); color: var(--gold); cursor: pointer; transition: var(--transition); font-family: inherit; }
+.change-pass-btn:hover { background: var(--gold); color: #fff; }
+
+#appRoot { display: none; min-height: 100vh; position: relative; z-index: 1; }
+.app-flex { display: flex; min-height: 100vh; }
+
+.sidebar { width: 280px; flex-shrink: 0; background: var(--bg-card); border-left: 2px solid var(--border); padding: 20px 16px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.profile-card { background: linear-gradient(135deg, var(--algeria-green), var(--algeria-green-dark)); border-radius: var(--radius-sm); padding: 20px 16px; text-align: center; margin-bottom: 20px; color: white; position: relative; overflow: hidden; }
+.profile-card::after { content: '🇩🇿'; position: absolute; bottom: -10px; left: -10px; font-size: 60px; opacity: 0.08; }
+.profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 10px; color: #fff; border: 2px solid rgba(255,255,255,0.2); }
+.profile-card h3 { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 2px; }
+.profile-card p { font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 600; }
+.role-badge { display: inline-block; padding: 6px 20px; border-radius: 24px; font-size: 14px; font-weight: 800; margin-top: 6px; background: rgba(255,255,255,0.15); color: #fff; }
+
+.nav-list { list-style: none; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.nav-btn { width: 100%; text-align: right; display: flex; align-items: center; gap: 16px; background: transparent; color: var(--text-dim); padding: 16px 18px; border-radius: 14px; font-size: 17px; font-weight: 700; transition: var(--transition); cursor: pointer; font-family: inherit; border: none; }
+.nav-btn i { width: 26px; text-align: center; font-size: 20px; }
+.nav-btn:hover { background: var(--table-hover); color: var(--text); }
+.nav-btn.active { background: rgba(0, 102, 51, 0.08); color: var(--algeria-green); border-right: 4px solid var(--algeria-green); }
+.nav-btn.logout-btn { color: var(--algeria-red); margin-top: auto; border-top: 2px solid var(--border); padding-top: 16px; }
+.nav-btn.logout-btn:hover { background: rgba(210, 16, 52, 0.06); }
+.sidebar-footer { font-size: 13px; color: var(--text-dim); text-align: center; padding-top: 14px; border-top: 2px solid var(--border); margin-top: 10px; line-height: 2; }
+
+.main-workspace { flex: 1; padding: 24px 30px; min-width: 0; }
+.page { display: block; }
+.page.hidden { display: none; }
+.page-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.page-header h2 { font-size: var(--font-xxl); font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 14px; }
+.page-header h2 i { color: var(--algeria-green); }
+.header-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.sync-badge { font-size: 16px; font-weight: 700; padding: 10px 24px; border-radius: 14px; background: rgba(0, 102, 51, 0.06); border: 2px solid rgba(0, 102, 51, 0.12); color: var(--algeria-green); display: flex; align-items: center; gap: 10px; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 24px; }
+.kpi-card { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: 24px 22px; position: relative; overflow: hidden; transition: var(--transition); box-shadow: var(--shadow-light); }
+.kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.kpi-card .kpi-icon { position: absolute; left: 18px; top: 18px; font-size: 42px; opacity: 0.06; }
+.kpi-card .kpi-label { font-size: 16px; color: var(--text-dim); font-weight: 700; margin-bottom: 6px; }
+.kpi-card .kpi-value { font-size: 38px; font-weight: 900; letter-spacing: 1px; }
+.kpi-total .kpi-value { color: var(--algeria-green); }
+.kpi-pending .kpi-value { color: #e67e22; }
+.kpi-done .kpi-value { color: #28a745; }
+.kpi-efficiency .kpi-value { color: var(--gold); }
+
+.chart-card { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: 24px; height: 340px; box-shadow: var(--shadow-light); }
+.btn-primary, .btn-secondary, .btn-gold { padding: 16px 34px; border-radius: 16px; font-weight: 800; font-size: 19px; border: none; cursor: pointer; transition: var(--transition); font-family: inherit; display: inline-flex; align-items: center; gap: 14px; }
+.btn-primary { background: linear-gradient(135deg, var(--algeria-green), var(--algeria-green-dark)); color: #fff; box-shadow: 0 8px 25px rgba(0, 102, 51, 0.2); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(0, 102, 51, 0.25); }
+.btn-secondary { background: linear-gradient(135deg, var(--algeria-red), var(--algeria-red-dark)); color: #fff; box-shadow: 0 8px 25px rgba(210, 16, 52, 0.2); }
+.btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(210, 16, 52, 0.25); }
+.btn-gold { background: linear-gradient(135deg, var(--gold), #b8942f); color: #fff; box-shadow: 0 8px 25px rgba(212, 175, 55, 0.2); }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(212, 175, 55, 0.25); }
+.btn-sm { padding: 12px 24px; font-size: 16px; border-radius: 14px; }
+
+.form-card { background: var(--bg-card); border: 3px solid var(--border); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow-light); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.form-grid .full { grid-column: 1 / -1; }
+.form-field label { display: block; font-size: 18px; font-weight: 700; color: var(--text-light); margin-bottom: 8px; }
+.form-field input, .form-field select, .form-field textarea { width: 100%; padding: 18px 24px; background: var(--input-bg); border: 3px solid var(--input-border); border-radius: 14px; color: var(--text); font-size: 20px; transition: var(--transition); font-family: inherit; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--algeria-green); box-shadow: 0 0 0 4px rgba(0, 102, 51, 0.10); outline: none; }
+.form-field textarea { min-height: 140px; resize: vertical; line-height: 2; font-size: 19px; }
+
+.filter-bar { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-bar input, .filter-bar select { padding: 16px 24px; background: var(--bg-card); border: 3px solid var(--border); border-radius: 14px; color: var(--text); font-size: 18px; font-family: inherit; transition: var(--transition); }
+.filter-bar input:focus, .filter-bar select:focus { border-color: var(--algeria-green); outline: none; box-shadow: 0 0 0 4px rgba(0, 102, 51, 0.08); }
+.filter-bar input { flex: 1; min-width: 220px; }
+.filter-bar select { min-width: 180px; }
+
+.table-wrap { background: var(--bg-card); border: 3px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-light); }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; min-width: 1200px; border-collapse: collapse; }
+thead th { background: var(--bg-card-2); color: var(--text-light); font-size: 17px; font-weight: 800; padding: 18px 16px; text-align: right; white-space: nowrap; border-bottom: 3px solid var(--border); }
+tbody td { padding: 16px 16px; font-size: 16px; border-bottom: 2px solid var(--border); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--table-hover); }
+
+.pill { display: inline-block; padding: 6px 18px; border-radius: 24px; font-size: 14px; font-weight: 800; }
+.pill-urgent { background: rgba(210, 16, 52, 0.12); color: var(--algeria-red); }
+.pill-medium { background: rgba(255, 193, 7, 0.15); color: #b8860b; }
+.pill-normal { background: rgba(0, 102, 51, 0.08); color: var(--algeria-green); }
+
+.btn-mini { padding: 10px 18px; border-radius: 12px; font-size: 15px; font-weight: 700; background: var(--bg-card-2); border: 2px solid var(--border); color: var(--text); cursor: pointer; transition: var(--transition); white-space: nowrap; font-family: inherit; }
+.btn-mini:hover { border-color: var(--algeria-green); color: var(--algeria-green); }
+.btn-mini.danger { border-color: var(--algeria-red); color: var(--algeria-red); }
+.btn-mini.danger:hover { background: var(--algeria-red); color: #fff; }
+.btn-mini.view-btn { border-color: var(--gold); color: var(--gold); }
+.btn-mini.view-btn:hover { background: var(--gold); color: #fff; }
+.btn-mini.success { border-color: #28a745; color: #28a745; }
+.btn-mini.success:hover { background: #28a745; color: #fff; }
+
+.status-select { padding: 10px 16px; background: var(--input-bg); border: 3px solid var(--border); border-radius: 12px; color: var(--text); font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; }
+.btn-chat { padding: 10px 16px; border-radius: 12px; font-size: 15px; font-weight: 700; background: var(--bg-card-2); border: 2px solid var(--border); color: var(--text); cursor: pointer; transition: var(--transition); font-family: inherit; }
+.btn-chat:hover { border-color: var(--algeria-green); color: var(--algeria-green); }
+.btn-chat.new-msg { background: var(--algeria-red); color: #fff; border-color: var(--algeria-red); animation: pulseBtn 1.5s ease-in-out infinite; }
+@keyframes pulseBtn { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(210, 16, 52, 0.3); } 50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(210, 16, 52, 0.15); } }
+.status-resolved { background: rgba(0, 102, 51, 0.08); color: var(--algeria-green); padding: 6px 18px; border-radius: 24px; font-size: 14px; font-weight: 800; display: inline-block; }
+.status-pending { background: rgba(255, 193, 7, 0.12); color: #b8860b; padding: 6px 18px; border-radius: 24px; font-size: 14px; font-weight: 800; display: inline-block; }
+.empty-msg { padding: 60px; text-align: center; color: var(--text-dim); font-weight: 700; font-size: 20px; }
+
+.tabs-container { display: flex; gap: 8px; margin-bottom: 20px; background: var(--bg-card); border-radius: 16px; padding: 8px; border: 2px solid var(--border); flex-wrap: wrap; }
+.tab-btn { flex: 1; padding: 14px 24px; border-radius: 14px; font-weight: 800; font-size: 17px; background: transparent; color: var(--text-dim); cursor: pointer; transition: var(--transition); font-family: inherit; border: none; min-width: 120px; }
+.tab-btn.active { background: var(--algeria-green); color: #fff; box-shadow: 0 4px 20px rgba(0, 102, 51, 0.2); }
+.tab-btn:hover:not(.active) { background: var(--table-hover); }
+
+.token-search { margin-bottom: 14px; }
+.token-search input { width: 100%; padding: 18px 24px; background: var(--input-bg); border: 3px solid var(--border); border-radius: 14px; color: var(--text); font-size: 20px; font-family: inherit; }
+.token-search input:focus { border-color: var(--algeria-green); outline: none; }
+.token-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
+.token-item { background: var(--bg-card-2); border: 3px solid var(--border); border-radius: var(--radius-sm); padding: 18px; text-align: center; transition: var(--transition); }
+.token-item:hover { border-color: var(--algeria-green); }
+.token-item .token-code { font-size: 26px; font-weight: 900; color: var(--algeria-green); letter-spacing: 3px; font-family: 'Courier New', monospace; background: var(--bg-card); padding: 8px 16px; border-radius: 10px; display: inline-block; }
+.token-item .token-name { font-size: 16px; color: var(--text); margin-top: 8px; font-weight: 700; }
+.token-item .token-actions { margin-top: 10px; display: flex; gap: 10px; justify-content: center; }
+
+.chat-hub-table-wrap { background: var(--bg-card); border: 3px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-light); }
+.chat-hub-table-wrap table { min-width: 800px; }
+
+.chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--bg-card-2); }
+.chat-bubble { max-width: 78%; padding: 16px 22px; border-radius: 20px; font-size: 18px; line-height: 1.9; position: relative; }
+.chat-bubble.center-msg { align-self: flex-end; background: linear-gradient(135deg, var(--algeria-green), var(--algeria-green-dark)); color: #fff; border-bottom-left-radius: 6px; }
+.chat-bubble.directorate-msg { align-self: flex-start; background: var(--bg-card); color: var(--text); border: 2px solid var(--border); border-bottom-right-radius: 6px; }
+.chat-sender-label { display: block; font-size: 13px; font-weight: 800; opacity: 0.7; margin-bottom: 4px; }
+.chat-time { display: block; font-size: 12px; opacity: 0.5; margin-top: 6px; }
+.chat-attach-img { max-width: 180px; border-radius: 12px; margin-top: 8px; cursor: pointer; display: block; }
+
+.chat-input-area { padding: 16px 20px; border-top: 3px solid var(--border); background: var(--bg-card); flex-shrink: 0; }
+.chat-attach-preview { display: none; align-items: center; gap: 12px; background: var(--bg-card-2); border: 2px solid var(--border); border-radius: 12px; padding: 10px 16px; margin-bottom: 12px; font-size: 15px; }
+.chat-row { display: flex; gap: 14px; align-items: center; }
+.chat-row input[type="text"] { flex: 1; padding: 16px 22px; background: var(--input-bg); border: 3px solid var(--border); border-radius: 30px; color: var(--text); font-size: 18px; font-family: inherit; }
+.chat-row input[type="text"]:focus { border-color: var(--algeria-green); outline: none; }
+.chat-icon-btn { width: 54px; height: 54px; border-radius: 50%; background: var(--bg-card-2); border: 2px solid var(--border); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); flex-shrink: 0; font-size: 20px; }
+.chat-icon-btn:hover { border-color: var(--algeria-green); }
+.chat-icon-btn.send { background: linear-gradient(135deg, var(--algeria-green), var(--algeria-green-dark)); color: #fff; border: none; }
+.chat-icon-btn.send:hover { filter: brightness(1.1); }
+.chat-icon-btn.send-accent { background: linear-gradient(135deg, var(--gold), #b8942f); color: #fff; border: none; }
+
+.notes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.notes-grid .full { grid-column: 1 / -1; }
+.panel { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-light); }
+.panel h3 { font-size: 20px; font-weight: 800; margin-bottom: 14px; color: var(--text); display: flex; align-items: center; gap: 12px; }
+#strategicNotes { width: 100%; min-height: 200px; padding: 18px; background: var(--input-bg); border: 3px solid var(--border); border-radius: 14px; color: var(--text); font-size: 19px; line-height: 2; resize: vertical; font-family: inherit; }
+#strategicNotes:focus { border-color: var(--algeria-green); outline: none; }
+
+.manage-add-row { display: flex; gap: 14px; margin-bottom: 14px; }
+.manage-add-row input { flex: 1; padding: 16px 22px; background: var(--input-bg); border: 3px solid var(--border); border-radius: 14px; color: var(--text); font-size: 18px; font-family: inherit; }
+.manage-add-row input:focus { border-color: var(--algeria-green); outline: none; }
+.manage-add-row button { padding: 14px 26px; border-radius: 14px; background: var(--algeria-green); color: #fff; font-weight: 800; font-size: 17px; cursor: pointer; transition: var(--transition); font-family: inherit; border: none; }
+.manage-add-row button:hover { filter: brightness(1.1); }
+.manage-list { list-style: none; display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; }
+.manage-list li { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 20px; background: var(--bg-card-2); border: 2px solid var(--border); border-radius: 12px; font-size: 17px; }
+.manage-list .item-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 8000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(6px); }
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--bg-card); border-radius: var(--radius); width: 100%; max-width: 660px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: var(--shadow); animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); border: 2px solid var(--border); }
+@keyframes modalIn { from { transform: scale(0.95) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+#chatModal .modal-box { max-width: 540px; height: 580px; }
+#interChatModal .modal-box { max-width: 580px; height: 600px; }
+
+.modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 3px solid var(--border); flex-shrink: 0; }
+.modal-head h3 { font-size: 22px; font-weight: 800; color: var(--text); }
+.modal-head .sub { font-size: 15px; color: var(--text-dim); font-weight: 600; }
+.btn-close-modal { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card-2); border: 2px solid var(--border); color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: var(--transition); }
+.btn-close-modal:hover { background: var(--algeria-red); color: #fff; border-color: var(--algeria-red); }
+
+.modal-body { padding: 24px 28px; overflow-y: auto; flex: 1; }
+.modal-body .detail-section { margin-bottom: 18px; }
+.modal-body .detail-section .label { font-size: 15px; color: var(--text-dim); font-weight: 700; display: block; margin-bottom: 4px; }
+.modal-body .detail-section .value { font-size: 18px; color: var(--text); line-height: 2; padding: 14px 20px; background: var(--bg-card-2); border-radius: 12px; }
+.modal-body .attachment-display { margin-top: 16px; padding: 18px; background: var(--bg-card-2); border-radius: 12px; text-align: center; }
+.modal-body .attachment-display img { max-width: 100%; max-height: 320px; border-radius: 12px; cursor: pointer; }
+
+#lightboxOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9000; align-items: center; justify-content: center; }
+#lightboxOverlay.open { display: flex; }
+#lightboxOverlay img { max-width: 92vw; max-height: 88vh; border-radius: 16px; }
+.lightbox-close { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; border-radius: 50%; background: var(--algeria-red); color: #fff; border: none; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+.center-badge { background: rgba(0, 102, 51, 0.06); border: 2px solid rgba(0, 102, 51, 0.12); color: var(--algeria-green); padding: 10px 24px; border-radius: 30px; font-size: 17px; font-weight: 700; display: inline-flex; align-items: center; gap: 12px; }
+.paste-zone { border: 3px dashed var(--border); border-radius: 16px; padding: 22px; text-align: center; font-size: 18px; color: var(--text-dim); font-weight: 700; cursor: pointer; transition: var(--transition); grid-column: 1 / -1; }
+.paste-zone:hover { border-color: var(--algeria-green); }
+.paste-zone.captured { border-color: #28a745; color: #28a745; background: rgba(40, 167, 69, 0.04); }
+
+.custom-scroll-track { height: 6px; background: var(--bg-card-2); border-radius: 8px; margin: 8px 16px 16px; position: relative; overflow: hidden; }
+.custom-scroll-thumb { height: 100%; background: var(--algeria-green); border-radius: 8px; position: absolute; right: 0; transition: none; min-width: 40px; }
+
+.broadcast-section { background: var(--bg-card-2); border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 18px; margin-bottom: 18px; }
+.broadcast-section h4 { font-size: 19px; font-weight: 800; margin-bottom: 12px; color: var(--text); }
+.broadcast-options { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.broadcast-options button { padding: 12px 22px; border-radius: 12px; font-weight: 700; font-size: 16px; border: 3px solid var(--border); background: var(--bg-card); color: var(--text-dim); cursor: pointer; transition: var(--transition); font-family: inherit; }
+.broadcast-options button:hover { border-color: var(--algeria-green); color: var(--text); }
+.broadcast-options button.active { border-color: var(--algeria-green); background: rgba(0, 102, 51, 0.06); color: var(--algeria-green); }
+.broadcast-textarea { width: 100%; min-height: 120px; padding: 16px 20px; background: var(--input-bg); border: 3px solid var(--border); border-radius: 14px; color: var(--text); font-size: 19px; font-family: inherit; resize: vertical; }
+.broadcast-textarea:focus { border-color: var(--algeria-green); outline: none; }
+
+.inter-chat-recipient { padding: 10px 14px; margin-bottom: 12px; background: var(--bg-card-2); border-radius: 12px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.inter-chat-recipient label { font-size: 16px; font-weight: 700; color: var(--text-dim); }
+.inter-chat-recipient select { flex: 1; padding: 12px 16px; background: var(--input-bg); border: 3px solid var(--border); border-radius: 12px; color: var(--text); font-size: 17px; font-family: inherit; min-width: 180px; }
+.inter-chat-recipient select:focus { border-color: var(--algeria-green); outline: none; }
+.inter-chat-recipient .recipient-badge { padding: 6px 16px; border-radius: 24px; font-size: 14px; font-weight: 800; background: var(--algeria-green); color: #fff; }
+
+@media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .form-grid { grid-template-columns: 1fr; } .notes-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .app-flex { flex-direction: column; } .sidebar { width: 100%; height: auto; position: relative; border-left: none; border-bottom: 2px solid var(--border); } .main-workspace { padding: 16px; } .login-card { padding: 24px 18px; } .kpi-grid { grid-template-columns: 1fr; } .modal-box { max-width: 100%; margin: 10px; } .tabs-container { flex-direction: column; } .role-selector { grid-template-columns: 1fr; } .page-header h2 { font-size: 24px; } .theme-toggle { bottom: 15px; left: 15px; width: 50px; height: 50px; font-size: 20px; } .login-fields-row { flex-direction: column; } .login-fields-row .login-field { min-width: 100%; } #directorateFields .login-fields-row { flex-direction: column; } #directorateFields .login-fields-row .login-field { min-width: 100%; } #centerFields .login-fields-row { flex-direction: column; } #centerFields .login-fields-row .login-field { min-width: 100%; } }
+</style>
+</head>
+<body>
+
+<div class="flag-bg">
+  <div class="flag-stripe stripe-green"></div>
+  <div class="flag-stripe stripe-white"></div>
+  <div class="flag-stripe stripe-red"></div>
+  <div class="star-moon">☪</div>
+</div>
+
+<button class="theme-toggle" onclick="toggleTheme()" title="تبديل الثيم">
+  <i class="fa-solid fa-moon" id="themeIcon"></i>
+</button>
+
+<div id="toast-area"></div>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo"><i class="fa-solid fa-shield-halved"></i><div class="badge"><i class="fa-solid fa-star"></i></div></div>
+        <h1>منصة التنسيق الرقمي</h1>
+        <p class="subtitle">نظام متكامل للمديرية والمراكز التكوينية</p>
+        <div style="margin-top:8px;"><span class="fares-logo">FARES</span><span class="fares-logo-sub"> ✦ المطور ✦</span></div>
+      </div>
+
+      <div class="role-selector">
+        <button class="active" id="loginRoleDirectorate" onclick="selectLoginRole('directorate')"><i class="fa-solid fa-building-columns"></i> المديرية</button>
+        <button id="loginRoleCenter" onclick="selectLoginRole('center')"><i class="fa-solid fa-school"></i> مركز / معهد</button>
+      </div>
+
+      <div id="directorateFields">
+        <div class="login-fields-row">
+          <div class="login-field"><label><i class="fa-solid fa-user"></i> اسم المستخدم</label><input type="text" id="loginUser" placeholder="أدخل اسم المستخدم" onkeyup="if(event.key==='Enter')handleLogin()"></div>
+          <div class="login-field"><label><i class="fa-solid fa-key"></i> كلمة المرور</label><input type="password" id="loginPass" placeholder="أدخل كلمة المرور" onkeyup="if(event.key==='Enter')handleLogin()"></div>
+        </div>
+      </div>
+
+      <div id="centerFields" style="display:none;">
+        <div class="login-fields-row">
+          <div class="login-field"><label><i class="fa-solid fa-search"></i> ابحث عن المؤسسة</label><input type="text" id="loginCenterSearch" placeholder="اكتب اسم المؤسسة..." onkeyup="filterCenterSelect()"></div>
+          <div class="login-field"><label><i class="fa-solid fa-building"></i> اختر المؤسسة</label><select id="loginCenterSelect"><option value="">-- اختر المؤسسة --</option></select></div>
+          <div class="login-field"><label><i class="fa-solid fa-key"></i> كلمة السر</label><input type="password" id="loginCenterPass" placeholder="أدخل كلمة السر" onkeyup="if(event.key==='Enter')handleLogin()"></div>
+        </div>
+        <div class="center-hint" id="centerHint"><i class="fa-solid fa-phone"></i> كلمة السر يتم الحصول عليها بالاتصال بالمديرية</div>
+      </div>
+
+      <div class="login-field" style="text-align:right; margin-bottom:10px;">
+        <div class="remember"><input type="checkbox" id="rememberMe" onchange="toggleRemember()"><label for="rememberMe">تذكر بيانات الدخول</label></div>
+      </div>
+
+      <button class="btn-login" onclick="handleLogin()"><i class="fa-solid fa-lock"></i> دخول آمن للنظام</button>
+      <div class="login-error" id="loginError">⚠️ بيانات الدخول غير صحيحة!</div>
+      <div class="login-info"><span class="fares-logo">✦ FARES ✦</span><span style="display:block; font-size:14px; color:var(--text-dim); margin-top:4px;">نظام التنسيق الرقمي المتكامل - النسخة الوطنية 🇩🇿</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP ROOT -->
+<div id="appRoot">
+<div class="app-flex">
+
+  <aside class="sidebar" id="appSidebar">
+    <div class="profile-card">
+      <div class="profile-avatar" id="profileAvatar"><i class="fa-solid fa-user-tie"></i></div>
+      <h3 id="profileName">المديرية</h3>
+      <p id="profileTitle">رئيس مصلحة التنسيق</p>
+      <span class="role-badge directorate" id="profileRoleBadge">المديرية</span>
+    </div>
+    <ul class="nav-list" id="navList"></ul>
+    <button class="nav-btn logout-btn" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> تسجيل الخروج</button>
+    <div class="sidebar-footer"><span class="fares-logo" style="font-size:14px;">✦ FARES ✦</span><br>نظام التنسيق الرقمي المتكامل 🇩🇿<br>🎁 هدية خاصة من الزميل: فارس</div>
+  </aside>
+
+  <main class="main-workspace" id="mainWorkspace">
+
+    <!-- DASHBOARD -->
+    <section class="page" id="page-dashboard">
+      <div class="page-header">
+        <h2><i class="fa-solid fa-gauge-high"></i> لوحة التحكم والأداء</h2>
+        <div class="header-actions">
+          <span class="sync-badge" id="syncBadge"><i class="fa-solid fa-circle-check"></i> متصل</span>
+          <button class="change-pass-btn" onclick="openChangePassword()"><i class="fa-solid fa-key"></i> تغيير كلمة السر</button>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-total"><div class="kpi-icon"><i class="fa-solid fa-layer-group"></i></div><div class="kpi-label">الإنشغالات الكلية</div><div class="kpi-value" id="kpi-total">0</div></div>
+        <div class="kpi-card kpi-pending"><div class="kpi-icon"><i class="fa-solid fa-hourglass-half"></i></div><div class="kpi-label">قيد المعالجة</div><div class="kpi-value" id="kpi-pending">0</div></div>
+        <div class="kpi-card kpi-done"><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div><div class="kpi-label">تم تسويتها</div><div class="kpi-value" id="kpi-done">0</div></div>
+        <div class="kpi-card kpi-efficiency"><div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div><div class="kpi-label">معدل الكفاءة</div><div class="kpi-value" id="kpi-efficiency">0%</div></div>
+      </div>
+      <div class="chart-card"><canvas id="analyticsChart"></canvas></div>
+    </section>
+
+    <!-- ADD ISSUE -->
+    <section class="page hidden" id="page-add">
+      <div class="page-header"><h2><i class="fa-solid fa-pen-to-square"></i> تدوين إنشغال جديد</h2></div>
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-field"><label>المؤسسة التكوينية المعنية</label><select id="add-form-center"></select></div>
+          <div class="form-field"><label>تصنيف الإنشغال</label><select id="add-form-type"></select></div>
+          <div class="form-field"><label>درجة الأولوية</label><select id="add-form-priority"><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select></div>
+          <div class="form-field"><label>المحرر</label><input type="text" id="add-form-author" placeholder="مثال: مدير المعهد..."></div>
+          <div class="form-field full"><label>تفاصيل الإنشغال</label><textarea id="add-form-details" placeholder="اكتب تفاصيل الإنشغال بدقة..."></textarea></div>
+        </div>
+        <button class="btn-primary" style="width:100%; justify-content:center;" onclick="submitNewIssue()"><i class="fa-solid fa-save"></i> حفظ وتدوين الإنشغال</button>
+      </div>
+    </section>
+
+    <!-- BROADCAST -->
+    <section class="page hidden" id="page-broadcast">
+      <div class="page-header"><h2><i class="fa-solid fa-bullhorn"></i> إرسال تعميم / إنشغال للجميع</h2></div>
+      <div class="form-card">
+        <div class="broadcast-section">
+          <h4>🎯 اختر الجهة المستهدفة</h4>
+          <div class="broadcast-options">
+            <button class="active" data-target="all" onclick="selectBroadcastTarget('all')">الجميع</button>
+            <button data-target="centers" onclick="selectBroadcastTarget('centers')">المراكز والمعاهد</button>
+            <button data-target="private" onclick="selectBroadcastTarget('private')">المدارس الخاصة</button>
+          </div>
+          <p style="font-size:16px; color:var(--text-dim); margin-top:6px;" id="broadcastCount">سيتم الإرسال إلى: جميع المؤسسات (0 مؤسسة)</p>
+        </div>
+        <div class="form-grid">
+          <div class="form-field full"><label>عنوان التعميم</label><input type="text" id="broadcast-title" placeholder="أدخل عنوان التعميم..."></div>
+          <div class="form-field full"><label>نص التعميم / الإنشغال</label><textarea id="broadcast-content" class="broadcast-textarea" placeholder="اكتب نص التعميم أو الإنشغال..."></textarea></div>
+          <div class="form-field full"><label>درجة الأهمية</label><select id="broadcast-priority"><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select></div>
+        </div>
+        <button class="btn-gold" style="width:100%; justify-content:center;" onclick="sendBroadcast()"><i class="fa-solid fa-broadcast"></i> إرسال التعميم للجميع</button>
+      </div>
+    </section>
+
+    <!-- LIST -->
+    <section class="page hidden" id="page-list">
+      <div class="page-header"><h2><i class="fa-solid fa-list-check"></i> متابعة القوائم</h2></div>
+      <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchListTab('all')">جميع الإنشغالات</button>
+        <button class="tab-btn" onclick="switchListTab('directorate')">من المديرية</button>
+        <button class="tab-btn" onclick="switchListTab('centers')">من المراكز</button>
+        <button class="tab-btn" onclick="switchListTab('archived_center')">📦 أرشيف المراكز</button>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="list-search" placeholder="بحث..." onkeyup="renderList()">
+        <select id="list-priority-filter" onchange="renderList()"><option value="">كل الأولويات</option><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select>
+        <select id="list-source-filter" onchange="renderList()"><option value="">كل المصادر</option><option value="directorate">المديرية</option><option value="center">المراكز</option></select>
+      </div>
+      <div class="table-wrap">
+        <div class="table-scroll" id="listTableScroll"><table><thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>الأولوية</th><th>المحرر</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>الشات</th><th>إجراءات</th></tr></thead><tbody id="listTableBody"></tbody></table></div>
+        <div class="custom-scroll-track" id="listScrollTrack"><div class="custom-scroll-thumb" id="listScrollThumb" style="width:40%;"></div></div>
+      </div>
+    </section>
+
+    <!-- ARCHIVE -->
+    <section class="page hidden" id="page-archive">
+      <div class="page-header"><h2><i class="fa-solid fa-box-archive"></i> الأرشيف</h2></div>
+      <div class="filter-bar">
+        <input type="text" id="archive-search" placeholder="بحث..." onkeyup="renderArchive()">
+        <select id="archive-source-filter" onchange="renderArchive()"><option value="">كل المصادر</option><option value="directorate">المديرية</option><option value="center">المراكز</option></select>
+      </div>
+      <div class="table-wrap">
+        <div class="table-scroll" id="archiveTableScroll"><table><thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>الأولوية</th><th>المحرر</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="archiveTableBody"></tbody></table></div>
+        <div class="custom-scroll-track" id="archiveScrollTrack"><div class="custom-scroll-thumb" id="archiveScrollThumb" style="width:40%;"></div></div>
+      </div>
+    </section>
+
+    <!-- TOKENS -->
+    <section class="page hidden" id="page-tokens">
+      <div class="page-header"><h2><i class="fa-solid fa-key"></i> كلمات سر المؤسسات</h2><span class="sync-badge"><i class="fa-solid fa-address-card"></i> قائمة ثابتة</span></div>
+      <div class="form-card">
+        <div style="padding:14px 20px; background:var(--bg-card-2); border-radius:12px; margin-bottom:16px; border-right:5px solid var(--algeria-green);"><p style="color:var(--text-light); font-size:16px; line-height:1.9;"><i class="fa-solid fa-phone" style="color:var(--algeria-green); margin-left:8px;"></i><strong>ملاحظة:</strong> كلمات السر يتم إعطاؤها للمؤسسات عن طريق الاتصال الهاتفي.</p></div>
+        <div class="token-search"><input type="text" id="tokenSearchInput" placeholder="🔍 ابحث عن مؤسسة..." onkeyup="filterTokens()"></div>
+        <div id="tokensListContainer"><div class="token-grid" id="tokensGrid"></div></div>
+      </div>
+    </section>
+
+    <!-- SEND PANEL -->
+    <section class="page hidden" id="page-send-panel">
+      <div class="page-header"><h2><i class="fa-solid fa-paper-plane"></i> إرسال إنشغال رسمي</h2><span class="center-badge"><i class="fa-solid fa-building"></i><span id="centerBadgeName">مركز تكويني</span></span></div>
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-field"><label>تصنيف الإنشغال</label><select id="form-type"></select></div>
+          <div class="form-field"><label>درجة الأهمية</label><select id="form-priority"><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select></div>
+          <div class="form-field"><label>اسم المحرر</label><input type="text" id="form-reporter" placeholder="مثال: مدير المعهد..."></div>
+          <div class="form-field"><label>إرفاق ملف</label><input type="file" id="form-file" accept="image/*,application/pdf" onchange="handleCenterFileSelection(event)"></div>
+          <div class="paste-zone" id="pasteZone" tabindex="0">📸 اضغط هنا ثم Ctrl+V للصق لقطة شاشة</div>
+          <div class="form-field full"><label>الشرح الدقيق للمشكلة</label><textarea id="form-details" placeholder="اكتب شرحاً دقيقاً للمشكلة..."></textarea></div>
+        </div>
+        <button class="btn-gold" style="width:100%; justify-content:center;" id="sendBtn" onclick="sendFromCenter()"><i class="fa-solid fa-broadcast"></i> بث وإرسال الإنشغال</button>
+      </div>
+    </section>
+
+    <!-- CHAT HUB -->
+    <section class="page hidden" id="page-chat-hub">
+      <div class="page-header"><h2><i class="fa-solid fa-comments"></i> متابعة الردود</h2><button class="btn-gold btn-sm" onclick="openInterChat()"><i class="fa-solid fa-users"></i> غرفة المؤسسات</button></div>
+      <div id="chatHubContainer"></div>
+    </section>
+
+    <!-- NOTES -->
+    <section class="page hidden" id="page-notes">
+      <div class="page-header"><h2><i class="fa-solid fa-note-sticky"></i> المفكرة</h2></div>
+      <div class="notes-grid">
+        <div class="panel full"><h3><i class="fa-solid fa-note-sticky"></i> المفكرة الاستراتيجية</h3><textarea id="strategicNotes" placeholder="دوّن ملاحظاتك الاستراتيجية..." oninput="saveNotes()"></textarea></div>
+        <div class="panel" id="institutionsPanel"><h3><i class="fa-solid fa-building-columns"></i> إدارة المؤسسات</h3><div class="manage-add-row institution-edit-disabled"><input type="text" id="newInstitutionInput" placeholder="قائمة المؤسسات ثابتة" disabled><button disabled>إضافة</button></div><ul class="manage-list" id="institutionsList"></ul><p style="color:var(--text-dim); font-size:14px; margin-top:12px; text-align:center;"><i class="fa-solid fa-info-circle"></i> قائمة المؤسسات ثابتة ولا يمكن تعديلها</p></div>
+        <div class="panel" id="fileTypesPanel"><h3><i class="fa-solid fa-folder-tree"></i> إدارة تصنيفات الإنشغال</h3>
+          <div class="manage-add-row" id="fileTypeManageRow">
+            <input type="text" id="newFileTypeInput" placeholder="تصنيف جديد...">
+            <button onclick="addFileType()">إضافة</button>
+          </div>
+          <ul class="manage-list" id="fileTypesList"></ul>
+        </div>
+        <div class="panel" id="centerInfoPanel" style="display:none;"><h3><i class="fa-solid fa-info-circle"></i> معلومات</h3><div class="info-text" style="color:var(--text-dim); font-size:16px; padding:18px; background:var(--bg-card-2); border-radius:12px; text-align:center; line-height:2.2;"><i class="fa-solid fa-building-columns" style="font-size:34px; display:block; margin-bottom:12px; opacity:0.15; color:var(--algeria-green);"></i><p>تصنيفات الإنشغال يتم إدارتها من قبل المديرية.</p><p style="font-size:15px;">للتواصل مع المديرية، استخدم غرفة الشات المخصصة لكل إنشغال.</p></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="changePassModal" onclick="if(event.target===this)closeChangePassword()">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-head"><div><h3>🔑 تغيير كلمة السر</h3></div><button class="btn-close-modal" onclick="closeChangePassword()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="form-field"><label>كلمة السر الحالية</label><input type="password" id="currentPass" placeholder="أدخل كلمة السر الحالية"></div>
+      <div class="form-field"><label>كلمة السر الجديدة</label><input type="password" id="newPass" placeholder="أدخل كلمة السر الجديدة"></div>
+      <div class="form-field"><label>تأكيد كلمة السر الجديدة</label><input type="password" id="confirmPass" placeholder="أعد كتابة كلمة السر الجديدة"></div>
+      <button class="btn-primary" style="width:100%; justify-content:center;" onclick="changePassword()"><i class="fa-solid fa-save"></i> تغيير كلمة السر</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="detailsModal" onclick="if(event.target===this)closeDetails()">
+  <div class="modal-box">
+    <div class="modal-head"><div><h3 id="detailsTitle">تفاصيل الإنشغال</h3></div><button class="btn-close-modal" onclick="closeDetails()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body" id="detailsBody"><div id="detailsContent"></div><div id="detailsAttachment" class="attachment-display" style="display:none;"></div></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="chatModal" onclick="if(event.target===this)closeChat()">
+  <div class="modal-box">
+    <div class="modal-head"><div><h3 id="chatTitle">💬 غرفة الشات</h3><div class="sub" id="chatSubtitle"></div></div><button class="btn-close-modal" onclick="closeChat()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <div class="chat-attach-preview" id="chatAttachPreview"><i class="fa-solid fa-paperclip"></i><span id="chatAttachName"></span><button onclick="removeAttachment()"><i class="fa-solid fa-circle-xmark"></i></button></div>
+      <div class="chat-row">
+        <label class="chat-icon-btn" title="إرفاق ملف"><i class="fa-solid fa-paperclip"></i><input type="file" id="chatFileInput" style="display:none" onchange="handleChatFileAttach(event)"></label>
+        <input type="text" id="chatInput" placeholder="اكتب رسالتك..." onkeyup="if(event.key==='Enter')sendChatMessage()">
+        <button class="chat-icon-btn send" id="chatSendBtn" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="interChatModal" onclick="if(event.target===this)closeInterChat()">
+  <div class="modal-box" style="max-width:600px; height:600px;">
+    <div class="modal-head"><div><h3>💬 غرفة المؤسسات</h3><div class="sub">شات خاص بين المؤسسات</div></div><button class="btn-close-modal" onclick="closeInterChat()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="chat-messages" id="interChatMessages"></div>
+    <div class="chat-input-area">
+      <div class="inter-chat-recipient"><label><i class="fa-solid fa-user"></i> إرسال إلى:</label><select id="interChatRecipient"><option value="all">الجميع</option></select><span class="recipient-badge" id="recipientBadge">الجميع</span></div>
+      <div class="chat-row">
+        <label class="chat-icon-btn" title="إرفاق ملف"><i class="fa-solid fa-paperclip"></i><input type="file" id="interChatFileInput" style="display:none" onchange="handleInterChatFileAttach(event)"></label>
+        <input type="text" id="interChatInput" placeholder="اكتب رسالتك..." onkeyup="if(event.key==='Enter')sendInterChatMessage()">
+        <button class="chat-icon-btn send-accent" onclick="sendInterChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="lightboxOverlay" onclick="closeLightbox()"><div class="lightbox-close"><i class="fa-solid fa-xmark"></i></div><img id="lightboxImg" src="" alt="صورة مكبرة"></div>
+
+<script>
+// ============================================================
+// GOOGLE SHEETS - رابط ثابت
+// ============================================================
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsVYWZv2vomDM8wW4UBmAy9oLcU-yoH8NQcXnroI9sstW91zmAsEQ8gjOm2Axv600tnw/exec";
+
+// ============================================================
+// DATA
+// ============================================================
+let MASTER_PASSWORD = "1996";
+let currentRole = null;
+let activeIssues = [];
+let archivedIssues = [];
+let fileTypes = [];
+let centerIssues = [];
+let centerArchived = [];
+let analyticsChartInstance = null;
+let currentChatCode = null;
+let pendingAttachment = null;
+let pendingCenterFile = null;
+let interChatMessages = [];
+let interChatPendingAttachment = null;
+let notifiedMessages = new Set();
+let broadcastTarget = 'all';
+let isSyncing = false;
+let lastSyncTimestamp = 0;
+
+const LS_KEYS = {
+  core: "hassan_core_db",
+  resolved: "hassan_resolved_db",
+  fileTypes: "hassan_file_types",
+  notes: "hassan_notes",
+  centerIssues: "center_sent_issues",
+  centerArchived: "center_archived_issues",
+  centerName: "center_app_name",
+  remember: "hassan_remember",
+  theme: "hassan_theme",
+  interChat: "inter_institution_chat",
+  masterPass: "hassan_master_pass",
+  lastSync: "hassan_last_sync"
+};
+
+const DEFAULT_FILE_TYPES = ["منظومة الرقمنة والأرضية الرقمية","مصلحة المتابعة البيداغوجية والبرامج","الهياكل والشبكات وتكنولوجيا المعلومات","الموارد البشرية والتكوين","الصيانة والتجهيزات"];
+
+const INSTITUTIONS_DATA = [
+  { name: "المعهد الوطني المتخصص في التكوين المهني برج بوعريريج", code: "INSFP001", password: "789012", type: "center" },
+  { name: "المعهد الوطني المتخصص في التكوين المهني برج بوعريرييج", code: "INSFP002", password: "456789", type: "center" },
+  { name: "المعهد الوطني المتخصص في التكوين المهني رأس الوادي", code: "INSFP003", password: "123456", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج بوعريريج", code: "CFPA001", password: "654321", type: "center" },
+  { name: "مركز التكوين المهني و التمهين العش", code: "CFPA002", password: "987654", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج بوعريريج", code: "CFPA003", password: "321987", type: "center" },
+  { name: "مركز التكوين المهني و التمهين حسنوة", code: "CFPA004", password: "159753", type: "center" },
+  { name: "مركز التكوين المهني و التمهين الياشير", code: "CFPA005", password: "753951", type: "center" },
+  { name: "مركز التكوين المهني و التمهين بليمور", code: "CFPA006", password: "852456", type: "center" },
+  { name: "مركز التكوين المهني و التمهين الجماعية", code: "CFPA007", password: "951753", type: "center" },
+  { name: "مركز التكوين المهني و التمهين خليل", code: "CFPA008", password: "357159", type: "center" },
+  { name: "مركز التكوين المهني والتمهين المهير", code: "CFPA009", password: "246813", type: "center" },
+  { name: "مركز التكوين المهني و التمهين الحمادية", code: "CFPA010", password: "579123", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج الغدير", code: "CFPA011", password: "864209", type: "center" },
+  { name: "مركز التكوين المهني و التمهين عين تاغروت", code: "CFPA012", password: "135790", type: "center" },
+  { name: "مركز التكوين المهني و التمهين العناصر", code: "CFPA013", password: "246801", type: "center" },
+  { name: "مركز التكوين المهني و التمهين راس الوادي", code: "CFPA014", password: "802468", type: "center" },
+  { name: "مركز التكوين المهني و التمهين مجانة", code: "CFPA015", password: "951357", type: "center" },
+  { name: "مركز التكوين المهني و التمهين المنصورة", code: "CFPA016", password: "123789", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج زمورة", code: "CFPA017", password: "456123", type: "center" },
+  { name: "مركز التكوين المهني والتمهين ذكور", code: "CFPA018", password: "789456", type: "center" },
+  { name: "احمد للتكوين", code: "PRV001", password: "321654", type: "private" },
+  { name: "وشن سكول", code: "PRV002", password: "654987", type: "private" },
+  { name: "لكبير للتكوين المهني", code: "PRV003", password: "987123", type: "private" },
+  { name: "ايكول صخراوي", code: "PRV004", password: "123987", type: "private" },
+  { name: "سعاد ماضوي لتكوين", code: "PRV005", password: "456789", type: "private" },
+  { name: "براج سكول", code: "PRV006", password: "789123", type: "private" },
+  { name: "الأنامل الذهبية", code: "PRV007", password: "147258", type: "private" },
+  { name: "يد الأمل", code: "PRV008", password: "258369", type: "private" },
+  { name: "لبرايجيه", code: "PRV009", password: "369147", type: "private" },
+  { name: "شامل سكول", code: "PRV010", password: "471258", type: "private" },
+  { name: "ملحقة المؤسسة الخاصة للتكوين المهني ايكول صخراوي", code: "PRV011", password: "582369", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني خطوط المستقبل", code: "PRV012", password: "693147", type: "private" },
+  { name: "نوران", code: "PRV013", password: "714258", type: "private" },
+  { name: "داماس", code: "PRV014", password: "825369", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني البصير برو", code: "PRV015", password: "936147", type: "private" },
+  { name: "بالنيت وصال", code: "PRV016", password: "147369", type: "private" },
+  { name: "الأميرة الصغيرة", code: "PRV017", password: "258147", type: "private" },
+  { name: "الملكة الماسية", code: "PRV018", password: "369258", type: "private" },
+  { name: "البيروني", code: "PRV019", password: "471369", type: "private" },
+  { name: "المقراني سكول", code: "PRV020", password: "582147", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني السليل", code: "PRV021", password: "693258", type: "private" },
+  { name: "كوندور اكاديمي", code: "PRV022", password: "714369", type: "private" },
+  { name: "ولد عمر", code: "PRV023", password: "825147", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني عقباش", code: "PRV024", password: "936258", type: "private" }
+];
+
+// ============================================================
+// THEME
+// ============================================================
+function toggleTheme() {
+  const html = document.getElementById('htmlRoot');
+  const icon = document.getElementById('themeIcon');
+  if (html.getAttribute('data-theme') === 'dark') {
+    html.removeAttribute('data-theme');
+    icon.className = 'fa-solid fa-moon';
+    localStorage.setItem(LS_KEYS.theme, 'light');
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    icon.className = 'fa-solid fa-sun';
+    localStorage.setItem(LS_KEYS.theme, 'dark');
+  }
+}
+
+function loadTheme() {
+  const theme = localStorage.getItem(LS_KEYS.theme);
+  const html = document.getElementById('htmlRoot');
+  const icon = document.getElementById('themeIcon');
+  if (theme === 'dark') { html.setAttribute('data-theme', 'dark'); icon.className = 'fa-solid fa-sun'; }
+}
+
+// ============================================================
+// STORAGE HELPERS
+// ============================================================
+function loadDB() {
+  activeIssues = JSON.parse(localStorage.getItem(LS_KEYS.core) || "[]");
+  archivedIssues = JSON.parse(localStorage.getItem(LS_KEYS.resolved) || "[]");
+  fileTypes = JSON.parse(localStorage.getItem(LS_KEYS.fileTypes) || "null") || DEFAULT_FILE_TYPES.slice();
+  centerIssues = JSON.parse(localStorage.getItem(LS_KEYS.centerIssues) || "[]");
+  centerArchived = JSON.parse(localStorage.getItem(LS_KEYS.centerArchived) || "[]");
+  interChatMessages = JSON.parse(localStorage.getItem(LS_KEYS.interChat) || "[]");
+  const savedPass = localStorage.getItem(LS_KEYS.masterPass);
+  if (savedPass) MASTER_PASSWORD = savedPass;
+  lastSyncTimestamp = parseInt(localStorage.getItem(LS_KEYS.lastSync) || "0");
+}
+
+function saveActive() {
+  localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
+  syncToGoogleSheets();
+}
+
+function saveArchive() {
+  localStorage.setItem(LS_KEYS.resolved, JSON.stringify(archivedIssues));
+  syncToGoogleSheets();
+}
+
+function saveFileTypes() {
+  localStorage.setItem(LS_KEYS.fileTypes, JSON.stringify(fileTypes));
+  syncToGoogleSheets();
+}
+
+function saveCenterIssues() {
+  localStorage.setItem(LS_KEYS.centerIssues, JSON.stringify(centerIssues));
+  syncToGoogleSheets();
+}
+
+function saveCenterArchived() {
+  localStorage.setItem(LS_KEYS.centerArchived, JSON.stringify(centerArchived));
+  syncToGoogleSheets();
+}
+
+function saveInterChat() {
+  localStorage.setItem(LS_KEYS.interChat, JSON.stringify(interChatMessages));
+  syncToGoogleSheets();
+}
+
+function getCenterName() { return localStorage.getItem(LS_KEYS.centerName) || "مركز تكويني"; }
+function setCenterName(name) { localStorage.setItem(LS_KEYS.centerName, name); }
+
+function getChatMessages(code) {
+  return JSON.parse(localStorage.getItem('chat_messages_' + code) || "[]");
+}
+
+function saveChatMessages(code, msgs) {
+  localStorage.setItem('chat_messages_' + code, JSON.stringify(msgs));
+  syncToGoogleSheets();
+}
+
+function getInterChatMessages() {
+  return JSON.parse(localStorage.getItem(LS_KEYS.interChat) || "[]");
+}
+
+function saveInterChatMessages(msgs) {
+  localStorage.setItem(LS_KEYS.interChat, JSON.stringify(msgs));
+  syncToGoogleSheets();
+}
+
+function getAllChatMessages() {
+  const all = [];
+  const codes = new Set();
+  [...activeIssues, ...archivedIssues, ...centerIssues, ...centerArchived].forEach(i => codes.add(i.code));
+  codes.forEach(code => {
+    const msgs = getChatMessages(code);
+    msgs.forEach(m => all.push({ ...m, code }));
+  });
+  return all;
+}
+
+function toggleRemember() {
+  const checked = document.getElementById('rememberMe').checked;
+  if (checked) {
+    const role = document.getElementById('centerFields').style.display === 'none' ? 'directorate' : 'center';
+    if (role === 'directorate') {
+      const user = document.getElementById('loginUser').value;
+      const pass = document.getElementById('loginPass').value;
+      if (user && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, user, pass }));
+    } else {
+      const center = document.getElementById('loginCenterSelect').value;
+      const pass = document.getElementById('loginCenterPass').value;
+      if (center && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, center, pass }));
+    }
+  } else { localStorage.removeItem(LS_KEYS.remember); }
+}
+
+function loadRemembered() {
+  const data = localStorage.getItem(LS_KEYS.remember);
+  if (data) {
+    try {
+      const parsed = JSON.parse(data);
+      if (parsed.role === 'directorate') {
+        selectLoginRole('directorate');
+        document.getElementById('loginUser').value = parsed.user || '';
+        document.getElementById('loginPass').value = parsed.pass || '';
+        document.getElementById('rememberMe').checked = true;
+      } else if (parsed.role === 'center') {
+        selectLoginRole('center');
+        document.getElementById('loginCenterSelect').value = parsed.center || '';
+        document.getElementById('loginCenterPass').value = parsed.pass || '';
+        document.getElementById('rememberMe').checked = true;
+        document.getElementById('loginCenterSearch').value = parsed.center || '';
+        filterCenterSelect();
+      }
+    } catch(e) {}
+  }
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+let selectedLoginRole = 'directorate';
+
+function selectLoginRole(role) {
+  selectedLoginRole = role;
+  document.querySelectorAll('.role-selector button').forEach(b => b.classList.remove('active'));
+  document.getElementById('loginRole' + role.charAt(0).toUpperCase() + role.slice(1)).classList.add('active');
+  if (role === 'directorate') {
+    document.getElementById('directorateFields').style.display = 'block';
+    document.getElementById('centerFields').style.display = 'none';
+  } else {
+    document.getElementById('directorateFields').style.display = 'none';
+    document.getElementById('centerFields').style.display = 'block';
+    document.getElementById('centerHint').style.display = 'block';
+    populateCenterSelect();
+  }
+}
+
+function populateCenterSelect() {
+  const select = document.getElementById('loginCenterSelect');
+  select.innerHTML = '<option value="">-- اختر المؤسسة --</option>';
+  INSTITUTIONS_DATA.forEach(inst => {
+    select.innerHTML += `<option value="${inst.name}">${inst.name}</option>`;
+  });
+  filterCenterSelect();
+}
+
+function filterCenterSelect() {
+  const search = document.getElementById('loginCenterSearch').value.trim().toLowerCase();
+  const select = document.getElementById('loginCenterSelect');
+  const options = select.querySelectorAll('option');
+  for (let i = 1; i < options.length; i++) {
+    options[i].style.display = options[i].textContent.toLowerCase().includes(search) ? '' : 'none';
+  }
+  let visibleCount = 0, visibleValue = '';
+  for (let i = 1; i < options.length; i++) {
+    if (options[i].style.display !== 'none') { visibleCount++; visibleValue = options[i].value; }
+  }
+  if (visibleCount === 1 && search.length > 0) select.value = visibleValue;
+}
+
+function handleLogin() {
+  const err = document.getElementById('loginError');
+  err.style.display = 'none';
+  if (selectedLoginRole === 'directorate') {
+    const user = document.getElementById('loginUser').value.trim();
+    const pass = document.getElementById('loginPass').value.trim();
+    if (pass === MASTER_PASSWORD || (user === 'hassan' && pass === '123456')) {
+      currentRole = 'directorate';
+      document.getElementById('loginUser').value = 'hassan';
+      initApp();
+    } else {
+      err.style.display = 'block';
+      err.textContent = '⚠️ بيانات الدخول غير صحيحة!';
+    }
+  } else {
+    const center = document.getElementById('loginCenterSelect').value;
+    const pass = document.getElementById('loginCenterPass').value.trim();
+    if (!center) { err.style.display = 'block'; err.textContent = '⚠️ يرجى اختيار المؤسسة!'; return; }
+    const inst = INSTITUTIONS_DATA.find(i => i.name === center);
+    if (inst && inst.password === pass) {
+      currentRole = 'center';
+      setCenterName(center);
+      initApp();
+    } else {
+      err.style.display = 'block';
+      err.textContent = '⚠️ كلمة السر غير صحيحة! يرجى الاتصال بالمديرية.';
+    }
+  }
+}
+
+// ============================================================
+// GOOGLE SHEETS SYNC - مع منع الكتابة فوق التغييرات المحلية
+// ============================================================
+async function syncToGoogleSheets() {
+  try {
+    const data = {
+      'الإنشغالات': activeIssues,
+      'الأرشيف': archivedIssues,
+      'بلاغات_المراكز': centerIssues,
+      'أرشيف_المراكز': centerArchived,
+      'المحادثات': getAllChatMessages(),
+      'غرفة_المؤسسات': getInterChatMessages(),
+      'timestamp': Date.now()
+    };
+    
+    const formData = new FormData();
+    formData.append('action', 'write');
+    formData.append('data', JSON.stringify(data));
+    
+    await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+    localStorage.setItem(LS_KEYS.lastSync, Date.now().toString());
+  } catch(e) { console.log('Sync error:', e); }
+}
+
+async function syncFromGoogleSheets() {
+  if (isSyncing || !currentRole) return;
+  isSyncing = true;
+  try {
+    const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=read&t=${Date.now()}`);
+    const result = await res.json();
+    if (result.status === 'success' && result.data) {
+      const d = result.data;
+      
+      // التحقق من وجود بيانات جديدة
+      const remoteTimestamp = d.timestamp || 0;
+      if (remoteTimestamp <= lastSyncTimestamp) {
+        isSyncing = false;
+        return;
+      }
+      
+      let changed = false;
+      
+      // تحديث البيانات فقط إذا كانت مختلفة
+      if (d['الإنشغالات']) {
+        const newActive = JSON.stringify(d['الإنشغالات']);
+        const currentActive = JSON.stringify(activeIssues);
+        if (newActive !== currentActive) {
+          activeIssues = d['الإنشغالات'];
+          changed = true;
+        }
+      }
+      if (d['الأرشيف']) {
+        const newArchive = JSON.stringify(d['الأرشيف']);
+        const currentArchive = JSON.stringify(archivedIssues);
+        if (newArchive !== currentArchive) {
+          archivedIssues = d['الأرشيف'];
+          changed = true;
+        }
+      }
+      if (d['بلاغات_المراكز']) {
+        const newCenter = JSON.stringify(d['بلاغات_المراكز']);
+        const currentCenter = JSON.stringify(centerIssues);
+        if (newCenter !== currentCenter) {
+          centerIssues = d['بلاغات_المراكز'];
+          changed = true;
+        }
+      }
+      if (d['أرشيف_المراكز']) {
+        const newCenterArch = JSON.stringify(d['أرشيف_المراكز']);
+        const currentCenterArch = JSON.stringify(centerArchived);
+        if (newCenterArch !== currentCenterArch) {
+          centerArchived = d['أرشيف_المراكز'];
+          changed = true;
+        }
+      }
+      
+      if (d['المحادثات']) {
+        d['المحادثات'].forEach(msg => {
+          const existing = getChatMessages(msg.code);
+          if (!existing.some(m => m.time === msg.time && m.sender === msg.sender)) {
+            existing.push(msg);
+            saveChatMessages(msg.code, existing);
+            changed = true;
+          }
+        });
+      }
+      
+      if (d['غرفة_المؤسسات']) {
+        const existing = getInterChatMessages();
+        let interChanged = false;
+        d['غرفة_المؤسسات'].forEach(msg => {
+          if (!existing.some(m => m.time === msg.time && m.sender === msg.sender)) {
+            existing.push(msg);
+            interChanged = true;
+          }
+        });
+        if (interChanged) {
+          saveInterChatMessages(existing);
+          changed = true;
+        }
+      }
+      
+      if (changed) {
+        // حفظ البيانات محلياً
+        localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
+        localStorage.setItem(LS_KEYS.resolved, JSON.stringify(archivedIssues));
+        localStorage.setItem(LS_KEYS.centerIssues, JSON.stringify(centerIssues));
+        localStorage.setItem(LS_KEYS.centerArchived, JSON.stringify(centerArchived));
+        localStorage.setItem(LS_KEYS.lastSync, remoteTimestamp.toString());
+        lastSyncTimestamp = remoteTimestamp;
+        
+        if (currentRole === 'directorate') {
+          renderKPIs(); updateChart(); renderList(); renderArchive();
+        } else {
+          renderChatHub();
+        }
+        showToast('🔄 مزامنة', 'تم تحديث البيانات من الخادم');
+      }
+    }
+  } catch(e) { console.log('Fetch error:', e); }
+  isSyncing = false;
+}
+
+// ============================================================
+// CHANGE PASSWORD
+// ============================================================
+function openChangePassword() {
+  document.getElementById('currentPass').value = '';
+  document.getElementById('newPass').value = '';
+  document.getElementById('confirmPass').value = '';
+  document.getElementById('changePassModal').classList.add('open');
+}
+
+function closeChangePassword() {
+  document.getElementById('changePassModal').classList.remove('open');
+}
+
+function changePassword() {
+  const current = document.getElementById('currentPass').value.trim();
+  const newPass = document.getElementById('newPass').value.trim();
+  const confirm = document.getElementById('confirmPass').value.trim();
+  if (current !== MASTER_PASSWORD) { alert("⚠️ كلمة السر الحالية غير صحيحة!"); return; }
+  if (newPass.length < 4) { alert("⚠️ كلمة السر الجديدة يجب أن تكون 4 أحرف على الأقل."); return; }
+  if (newPass !== confirm) { alert("⚠️ كلمة السر الجديدة وتأكيدها غير متطابقين."); return; }
+  MASTER_PASSWORD = newPass;
+  localStorage.setItem(LS_KEYS.masterPass, newPass);
+  closeChangePassword();
+  showToast("✅ تم التغيير", "تم تغيير كلمة السر بنجاح!");
+}
+
+// ============================================================
+// INIT APP
+// ============================================================
+function initApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appRoot').style.display = 'block';
+  loadDB();
+  setupSidebar();
+  populateDropdowns();
+  renderInstitutionsList();
+  renderFileTypesManageList();
+  renderTokensGrid();
+  updateBroadcastCount();
+  populateInterChatRecipients();
+  document.getElementById('strategicNotes').value = localStorage.getItem(LS_KEYS.notes) || "";
+  
+  if (currentRole === 'directorate') {
+    document.getElementById('institutionsPanel').style.display = 'block';
+    document.getElementById('fileTypesPanel').style.display = 'block';
+    document.getElementById('centerInfoPanel').style.display = 'none';
+    document.getElementById('fileTypeManageRow').style.display = 'flex';
+    renderKPIs();
+    initChart();
+    renderList();
+    renderArchive();
+    document.getElementById('page-dashboard').classList.remove('hidden');
+    switchTab('dashboard');
+    initScrollDrag('listTableScroll','listScrollTrack','listScrollThumb');
+    initScrollDrag('archiveTableScroll','archiveScrollTrack','archiveScrollThumb');
+  } else {
+    document.getElementById('institutionsPanel').style.display = 'none';
+    document.getElementById('fileTypesPanel').style.display = 'block';
+    document.getElementById('centerInfoPanel').style.display = 'block';
+    document.getElementById('fileTypeManageRow').style.display = 'none';
+    refreshCenterUI();
+    renderChatHub();
+    document.getElementById('page-send-panel').classList.remove('hidden');
+    switchTab('send-panel');
+    setupPasteFeature();
+  }
+  
+  setTimeout(syncFromGoogleSheets, 1500);
+  setInterval(syncFromGoogleSheets, 10000);
+  setInterval(checkForNewMessages, 3000);
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+function setupSidebar() {
+  const navList = document.getElementById('navList');
+  const avatar = document.getElementById('profileAvatar');
+  const name = document.getElementById('profileName');
+  const title = document.getElementById('profileTitle');
+  const badge = document.getElementById('profileRoleBadge');
+
+  if (currentRole === 'directorate') {
+    avatar.innerHTML = '<i class="fa-solid fa-user-tie"></i>';
+    name.textContent = 'المديرية';
+    title.textContent = 'رئيس مصلحة التنسيق';
+    badge.textContent = 'المديرية';
+    badge.className = 'role-badge directorate';
+    navList.innerHTML = `
+      <li><button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-gauge-high"></i> لوحة التحكم</button></li>
+      <li><button class="nav-btn" data-tab="add" onclick="switchTab('add')"><i class="fa-solid fa-pen-to-square"></i> تدوين إنشغال</button></li>
+      <li><button class="nav-btn" data-tab="broadcast" onclick="switchTab('broadcast')"><i class="fa-solid fa-bullhorn"></i> إرسال للجميع</button></li>
+      <li><button class="nav-btn" data-tab="list" onclick="switchTab('list')"><i class="fa-solid fa-list-check"></i> متابعة القوائم</button></li>
+      <li><button class="nav-btn" data-tab="archive" onclick="switchTab('archive')"><i class="fa-solid fa-box-archive"></i> الأرشيف</button></li>
+      <li><button class="nav-btn" data-tab="tokens" onclick="switchTab('tokens')"><i class="fa-solid fa-key"></i> كلمات السر</button></li>
+      <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
+    `;
+  } else {
+    const centerName = getCenterName();
+    avatar.innerHTML = '<i class="fa-solid fa-school"></i>';
+    name.textContent = centerName;
+    title.textContent = 'مركز تكويني مهني';
+    badge.textContent = 'مركز / معهد';
+    badge.className = 'role-badge center';
+    navList.innerHTML = `
+      <li><button class="nav-btn active" data-tab="send-panel" onclick="switchTab('send-panel')"><i class="fa-solid fa-paper-plane"></i> إرسال إنشغال</button></li>
+      <li><button class="nav-btn" data-tab="chat-hub" onclick="switchTab('chat-hub')"><i class="fa-solid fa-comments"></i> متابعة الردود</button></li>
+      <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
+    `;
+  }
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  const target = document.getElementById('page-' + tab);
+  if (target) target.classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const navBtn = document.querySelector(`.nav-btn[data-tab="${tab}"]`);
+  if (navBtn) navBtn.classList.add('active');
+  if (tab === 'chat-hub' && currentRole === 'center') renderChatHub();
+  if (tab === 'tokens' && currentRole === 'directorate') renderTokensGrid();
+  if (tab === 'broadcast') updateBroadcastCount();
+}
+
+// ============================================================
+// DROPDOWNS
+// ============================================================
+function populateDropdowns() {
+  const centerSel = document.getElementById('add-form-center');
+  const typeSel = document.getElementById('add-form-type');
+  const formType = document.getElementById('form-type');
+  if (centerSel) centerSel.innerHTML = INSTITUTIONS_DATA.map(i => `<option value="${escapeHtml(i.name)}">${escapeHtml(i.name)}</option>`).join('');
+  const typeOptions = fileTypes.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+  if (typeSel) typeSel.innerHTML = typeOptions;
+  if (formType) formType.innerHTML = typeOptions;
+}
+
+// ============================================================
+// INSTITUTIONS & FILE TYPES
+// ============================================================
+function renderInstitutionsList() {
+  const ul = document.getElementById('institutionsList');
+  if (!ul) return;
+  ul.innerHTML = INSTITUTIONS_DATA.map((inst, idx) => `<li><span>${escapeHtml(inst.name)}</span><span style="font-size:13px; color:var(--text-dim);">${escapeHtml(inst.code)}</span></li>`).join('');
+}
+
+function renderFileTypesManageList() {
+  const ul = document.getElementById('fileTypesList');
+  if (!ul) return;
+  ul.innerHTML = fileTypes.map((name, idx) => {
+    const role = currentRole;
+    const actions = (role === 'directorate') ? 
+      `<div class="item-actions"><button class="btn-mini" onclick="editFileType(${idx})"><i class="fa-solid fa-pen"></i></button><button class="btn-mini danger" onclick="deleteFileType(${idx})"><i class="fa-solid fa-trash"></i></button></div>` :
+      `<div class="item-actions"><span style="color:var(--text-dim); font-size:13px;">للإدارة فقط</span></div>`;
+    return `<li><span>${escapeHtml(name)}</span>${actions}</li>`;
+  }).join('') || '<li style="color:var(--text-dim); text-align:center; padding:12px;">لا توجد تصنيفات مسجلة</li>';
+}
+
+function addFileType() {
+  if (currentRole !== 'directorate') { showToast("⚠️ غير مسموح", "هذه الخاصية متاحة للمديرية فقط"); return; }
+  const input = document.getElementById('newFileTypeInput');
+  const val = input.value.trim();
+  if (!val) return;
+  fileTypes.push(val);
+  saveFileTypes();
+  input.value = '';
+  renderFileTypesManageList();
+  populateDropdowns();
+}
+
+function editFileType(idx) {
+  if (currentRole !== 'directorate') { showToast("⚠️ غير مسموح", "هذه الخاصية متاحة للمديرية فقط"); return; }
+  const newVal = prompt("تعديل التصنيف:", fileTypes[idx]);
+  if (newVal !== null && newVal.trim() !== '') { fileTypes[idx] = newVal.trim(); saveFileTypes(); renderFileTypesManageList(); populateDropdowns(); }
+}
+
+function deleteFileType(idx) {
+  if (currentRole !== 'directorate') { showToast("⚠️ غير مسموح", "هذه الخاصية متاحة للمديرية فقط"); return; }
+  if (confirm("هل أنت متأكد من حذف هذا التصنيف؟")) { fileTypes.splice(idx, 1); saveFileTypes(); renderFileTypesManageList(); populateDropdowns(); }
+}
+
+function saveNotes() { localStorage.setItem(LS_KEYS.notes, document.getElementById('strategicNotes').value); }
+
+// ============================================================
+// BROADCAST
+// ============================================================
+function selectBroadcastTarget(target) {
+  broadcastTarget = target;
+  document.querySelectorAll('.broadcast-options button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.broadcast-options button[data-target="${target}"]`)?.classList.add('active');
+  updateBroadcastCount();
+}
+
+function updateBroadcastCount() {
+  const count = document.getElementById('broadcastCount');
+  if (!count) return;
+  let targets = [];
+  if (broadcastTarget === 'all') targets = INSTITUTIONS_DATA;
+  else if (broadcastTarget === 'centers') targets = INSTITUTIONS_DATA.filter(i => i.type === 'center');
+  else if (broadcastTarget === 'private') targets = INSTITUTIONS_DATA.filter(i => i.type === 'private');
+  const label = broadcastTarget === 'all' ? 'جميع المؤسسات' : broadcastTarget === 'centers' ? 'المراكز والمعاهد' : 'المدارس الخاصة';
+  count.textContent = `سيتم الإرسال إلى: ${label} (${targets.length} مؤسسة)`;
+}
+
+function sendBroadcast() {
+  const title = document.getElementById('broadcast-title').value.trim();
+  const content = document.getElementById('broadcast-content').value.trim();
+  const priority = document.getElementById('broadcast-priority').value;
+  if (!title || !content) { alert("يرجى كتابة عنوان ونص التعميم قبل الإرسال."); return; }
+  let targets = [];
+  if (broadcastTarget === 'all') targets = INSTITUTIONS_DATA;
+  else if (broadcastTarget === 'centers') targets = INSTITUTIONS_DATA.filter(i => i.type === 'center');
+  else if (broadcastTarget === 'private') targets = INSTITUTIONS_DATA.filter(i => i.type === 'private');
+  if (targets.length === 0) { alert("لا توجد مؤسسات في الفئة المحددة."); return; }
+  const code = generateRefCode();
+  targets.forEach(inst => {
+    const issue = { code: code + '-' + inst.code, center: inst.name, type: "تعميم", priority: priority, author: "المديرية (تعميم)", details: `📢 **${title}**\n\n${content}\n\n📌 هذا التعميم مرسل إلى: ${inst.name}`, status: "قيد المعالجة 🔄", createdAt: Date.now(), source: 'directorate', attachments: [], isBroadcast: true };
+    activeIssues.unshift(issue);
+  });
+  saveActive();
+  renderKPIs();
+  updateChart();
+  renderList();
+  showToast("📢 تم الإرسال", `تم إرسال التعميم إلى ${targets.length} مؤسسة`);
+  document.getElementById('broadcast-title').value = '';
+  document.getElementById('broadcast-content').value = '';
+}
+
+// ============================================================
+// TOKENS
+// ============================================================
+function filterTokens() { renderTokensGrid(); }
+
+function renderTokensGrid() {
+  const grid = document.getElementById('tokensGrid');
+  const search = (document.getElementById('tokenSearchInput')?.value || '').trim().toLowerCase();
+  let filtered = INSTITUTIONS_DATA;
+  if (search) filtered = INSTITUTIONS_DATA.filter(inst => inst.name.toLowerCase().includes(search) || inst.code.toLowerCase().includes(search) || inst.password.includes(search));
+  if (filtered.length === 0) { grid.innerHTML = '<div style="color:var(--text-dim); padding:40px; text-align:center; font-size:18px;">لا توجد مؤسسات تطابق البحث.</div>'; return; }
+  grid.innerHTML = filtered.map(inst => `
+    <div class="token-item">
+      <div class="token-code">${escapeHtml(inst.password)}</div>
+      <div class="token-name">${escapeHtml(inst.name)}</div>
+      <div class="token-code-id">${escapeHtml(inst.code)} ${inst.type === 'private' ? '🏫' : '🏛️'}</div>
+      <div class="token-actions"><button class="btn-mini" onclick="copyToken('${inst.password}')"><i class="fa-regular fa-copy"></i> نسخ</button></div>
+    </div>
+  `).join('');
+}
+
+function copyToken(token) { navigator.clipboard.writeText(token).then(() => showToast("✅ تم النسخ", "تم نسخ كلمة السر إلى الحافظة.")); }
+
+// ============================================================
+// GENERATE REF CODE
+// ============================================================
+function generateRefCode() {
+  const now = new Date();
+  return `REF-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
+// ============================================================
+// SUBMIT NEW ISSUE
+// ============================================================
+function submitNewIssue() {
+  const center = document.getElementById('add-form-center').value;
+  const type = document.getElementById('add-form-type').value;
+  const priority = document.getElementById('add-form-priority').value;
+  const author = document.getElementById('add-form-author').value.trim();
+  const details = document.getElementById('add-form-details').value.trim();
+  if (!center || !type || !details) { alert("يرجى تعبئة كل الحقول الأساسية قبل الحفظ."); return; }
+  const newIssue = { code: generateRefCode(), center, type, priority, author: author || "غير محدد", details, status: "قيد المعالجة 🔄", createdAt: Date.now(), source: 'directorate', attachments: [] };
+  activeIssues.unshift(newIssue);
+  saveActive();
+  showToast("✅ تم الحفظ", `تم تدوين الإنشغال ${newIssue.code} بنجاح!`);
+  document.getElementById('add-form-author').value = '';
+  document.getElementById('add-form-details').value = '';
+  renderKPIs();
+  updateChart();
+  renderList();
+  switchTab('list');
+}
+
+// ============================================================
+// KPIs & CHART
+// ============================================================
+function renderKPIs() {
+  const total = activeIssues.length + archivedIssues.length;
+  const pending = activeIssues.length;
+  const done = archivedIssues.length;
+  const efficiency = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('kpi-total').textContent = total;
+  document.getElementById('kpi-pending').textContent = pending;
+  document.getElementById('kpi-done').textContent = done;
+  document.getElementById('kpi-efficiency').textContent = efficiency + '%';
+}
+
+function initChart() {
+  const ctx = document.getElementById('analyticsChart').getContext('2d');
+  analyticsChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: ['الإجمالي', 'قيد المعالجة', 'المسواة'], datasets: [{ label: 'عدد الإنشغالات', data: [activeIssues.length + archivedIssues.length, activeIssues.length, archivedIssues.length], backgroundColor: ['#006633', '#ffc107', '#28a745'], borderRadius: 8, maxBarThickness: 50 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#6c757d', font: { family: 'Cairo', weight: '700', size: 14 } }, grid: { color: 'rgba(0,0,0,0.04)' } }, y: { beginAtZero: true, ticks: { color: '#6c757d', font: { family: 'Cairo', size: 14 } }, grid: { color: 'rgba(0,0,0,0.04)' } } } }
+  });
+}
+
+function updateChart() {
+  if (!analyticsChartInstance) return;
+  const total = activeIssues.length + archivedIssues.length;
+  analyticsChartInstance.data.datasets[0].data = [total, activeIssues.length, archivedIssues.length];
+  analyticsChartInstance.update();
+}
+
+// ============================================================
+// LIST FUNCTIONS
+// ============================================================
+let currentListTab = 'all';
+
+function switchListTab(tab) {
+  currentListTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.tab-btn[onclick="switchListTab('${tab}')"]`)?.classList.add('active');
+  renderList();
+}
+
+function priorityPillHtml(p) {
+  if (p === 'مستعجل جداً') return `<span class="pill pill-urgent">مستعجل جداً 🔴</span>`;
+  if (p === 'متوسط') return `<span class="pill pill-medium">متوسط 🟡</span>`;
+  return `<span class="pill pill-normal">عادي 🟢</span>`;
+}
+
+function sourceBadgeHtml(source) {
+  if (source === 'directorate') return `<span style="color:var(--algeria-green); font-weight:800; font-size:14px;">المديرية</span>`;
+  return `<span style="color:var(--algeria-red); font-weight:800; font-size:14px;">مركز</span>`;
+}
+
+function hasUnreadMessages(code) {
+  const msgs = getChatMessages(code);
+  if (msgs.length === 0) return false;
+  return msgs[msgs.length - 1].sender === 'center' && !msgs[msgs.length - 1].read;
+}
+
+function hasAttachment(issue) { return issue.attachments && issue.attachments.length > 0; }
+
+function getTimeAgo(timestamp) {
+  const diff = Date.now() - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (days > 0) return `منذ ${days} يوم`;
+  if (hours > 0) return `منذ ${hours} ساعة`;
+  if (minutes > 0) return `منذ ${minutes} دقيقة`;
+  return 'الآن';
+}
+
+function archiveCenterIssue(code) {
+  if (!confirm("هل تريد أرشفة هذا الإنشغال من المراكز؟")) return;
+  const idx = activeIssues.findIndex(i => i.code === code && i.source === 'center');
+  if (idx === -1) return;
+  const issue = activeIssues[idx];
+  activeIssues.splice(idx, 1);
+  centerArchived.push(issue);
+  saveActive(); saveCenterArchived();
+  renderList(); renderKPIs(); updateChart();
+  showToast("📦 تم الأرشفة", `تم أرشفة الإنشغال ${code} من المراكز.`);
+}
+
+function renderList() {
+  const search = (document.getElementById('list-search')?.value || '').trim().toLowerCase();
+  const priorityFilter = document.getElementById('list-priority-filter')?.value || '';
+  const sourceFilter = document.getElementById('list-source-filter')?.value || '';
+  const tbody = document.getElementById('listTableBody');
+  if (!tbody) return;
+  let filtered = [];
+  if (currentListTab === 'archived_center') {
+    filtered = centerArchived.filter(issue => {
+      const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
+      const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
+      return matchesSearch && matchesPriority;
+    });
+  } else {
+    filtered = activeIssues.filter(issue => {
+      if (currentListTab === 'directorate' && issue.source !== 'directorate') return false;
+      if (currentListTab === 'centers' && issue.source !== 'center') return false;
+      const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
+      const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
+      const matchesSource = !sourceFilter || issue.source === sourceFilter;
+      return matchesSearch && matchesPriority && matchesSource;
+    });
+  }
+  if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="11" class="empty-msg">${currentListTab === 'archived_center' ? 'لا توجد إنشغالات مرسلة من المراكز في الأرشيف.' : 'لا توجد إنشغالات مطابقة حالياً.'}</td></tr>`; return; }
+  tbody.innerHTML = filtered.map(issue => {
+    const unread = currentListTab !== 'archived_center' && hasUnreadMessages(issue.code);
+    const hasAttach = hasAttachment(issue);
+    const timeAgo = getTimeAgo(issue.createdAt);
+    const isArchived = currentListTab === 'archived_center';
+    const isBroadcast = issue.isBroadcast || false;
+    return `<tr class="${unread ? 'row-unread' : ''}">
+      <td><strong style="font-size:16px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo} ${isBroadcast ? '📢' : ''}</span></td>
+      <td style="font-size:16px;">${escapeHtml(issue.center)}</td>
+      <td style="font-size:16px;">${escapeHtml(issue.type)}</td>
+      <td>${priorityPillHtml(issue.priority)}</td>
+      <td style="font-size:16px;">${escapeHtml(issue.author)}</td>
+      <td>${sourceBadgeHtml(issue.source)}</td>
+      <td><button class="btn-mini view-btn" onclick="openDetails('${issue.code}', ${isArchived ? 'true' : 'false'})"><i class="fa-solid fa-eye"></i></button></td>
+      <td>${hasAttach ? '<span style="color:var(--algeria-green);"><i class="fa-solid fa-paperclip"></i></span>' : '<span style="color:var(--text-dim);">-</span>'}</td>
+      <td>${isArchived ? '<span class="status-resolved">مؤرشف 📦</span>' : `<select class="status-select" onchange="toggleStatus('${issue.code}', this.value)"><option value="pending" ${issue.status.indexOf('قيد المعالجة') !== -1 ? 'selected' : ''}>قيد المعالجة</option><option value="resolved">تم الحل</option></select>`}</td>
+      <td>${isArchived ? '<span style="color:var(--text-dim);">-</span>' : `<button class="btn-chat ${unread ? 'new-msg' : ''}" onclick="openChat('${issue.code}', 'directorate')">${unread ? '<i class="fa-solid fa-bell"></i>' : '<i class="fa-solid fa-comments"></i>'}</button>`}</td>
+      <td>${isArchived ? `<button class="btn-mini success" onclick="restoreFromCenterArchive('${issue.code}')"><i class="fa-solid fa-rotate-left"></i></button><button class="btn-mini danger" onclick="deleteFromCenterArchive('${issue.code}')"><i class="fa-solid fa-trash"></i></button>` : issue.source === 'center' ? `<button class="btn-mini" onclick="archiveCenterIssue('${issue.code}')" style="border-color:var(--gold); color:var(--gold);"><i class="fa-solid fa-box-archive"></i></button><button class="btn-mini danger" onclick="deleteIssue('${issue.code}')"><i class="fa-solid fa-trash"></i></button>` : `<button class="btn-mini danger" onclick="deleteIssue('${issue.code}')"><i class="fa-solid fa-trash"></i></button>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+function restoreFromCenterArchive(code) {
+  const idx = centerArchived.findIndex(i => i.code === code);
+  if (idx === -1) return;
+  const issue = centerArchived[idx];
+  issue.status = "قيد المعالجة 🔄";
+  centerArchived.splice(idx, 1);
+  activeIssues.push(issue);
+  saveActive(); saveCenterArchived();
+  renderList(); renderKPIs(); updateChart();
+  showToast("✅ تم الاسترجاع", `تم استرجاع الإنشغال ${code} من أرشيف المراكز.`);
+}
+
+function deleteFromCenterArchive(code) {
+  if (!confirm("هل أنت متأكد من الحذف النهائي من أرشيف المراكز؟")) return;
+  centerArchived = centerArchived.filter(i => i.code !== code);
+  saveCenterArchived();
+  renderList();
+}
+
+// ============================================================
+// TOGGLE STATUS - تم الإصلاح النهائي
+// ============================================================
+function toggleStatus(code, value) {
+  if (value === 'resolved') {
+    const idx = activeIssues.findIndex(i => i.code === code);
+    if (idx === -1) {
+      showToast("⚠️ خطأ", "لم يتم العثور على الإنشغال");
+      return;
+    }
+    
+    const issue = activeIssues[idx];
+    issue.status = "تم الحل ✅";
+    
+    activeIssues.splice(idx, 1);
+    archivedIssues.unshift(issue);
+    
+    // حفظ مع تحديث الطابع الزمني
+    localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
+    localStorage.setItem(LS_KEYS.resolved, JSON.stringify(archivedIssues));
+    localStorage.setItem(LS_KEYS.lastSync, Date.now().toString());
+    lastSyncTimestamp = Date.now();
+    
+    // تحديث واجهة المستخدم
+    renderKPIs();
+    updateChart();
+    renderList();
+    renderArchive();
+    
+    // تحديث حالة المركز
+    const centerIdx = centerIssues.findIndex(i => i.code === code);
+    if (centerIdx !== -1) { 
+      centerIssues[centerIdx].status = "تم الحل ✅"; 
+      localStorage.setItem(LS_KEYS.centerIssues, JSON.stringify(centerIssues));
+    }
+    
+    // المزامنة مع Google Sheets
+    syncToGoogleSheets();
+    
+    showToast("✅ تم الحل", `تم تسوية الإنشغال ${code} ونقله إلى الأرشيف`);
+  }
+}
+
+function deleteIssue(code) {
+  if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
+  activeIssues = activeIssues.filter(i => i.code !== code);
+  saveActive();
+  renderKPIs(); updateChart(); renderList();
+}
+
+// ============================================================
+// ARCHIVE
+// ============================================================
+function renderArchive() {
+  const search = (document.getElementById('archive-search')?.value || '').trim().toLowerCase();
+  const sourceFilter = document.getElementById('archive-source-filter')?.value || '';
+  const tbody = document.getElementById('archiveTableBody');
+  if (!tbody) return;
+  let filtered = archivedIssues.filter(issue => {
+    const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
+    const matchesSource = !sourceFilter || issue.source === sourceFilter;
+    return matchesSearch && matchesSource;
+  });
+  if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="10" class="empty-msg">لا توجد إنشغالات في الأرشيف.</td></tr>`; return; }
+  tbody.innerHTML = filtered.map(issue => {
+    const hasAttach = hasAttachment(issue);
+    const timeAgo = getTimeAgo(issue.createdAt);
+    return `<tr>
+      <td><strong style="font-size:16px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo}</span></td>
+      <td style="font-size:16px;">${escapeHtml(issue.center)}</td>
+      <td style="font-size:16px;">${escapeHtml(issue.type)}</td>
+      <td>${priorityPillHtml(issue.priority)}</td>
+      <td style="font-size:16px;">${escapeHtml(issue.author)}</td>
+      <td>${sourceBadgeHtml(issue.source)}</td>
+      <td><button class="btn-mini view-btn" onclick="openDetails('${issue.code}', true)"><i class="fa-solid fa-eye"></i></button></td>
+      <td>${hasAttach ? '<span style="color:var(--algeria-green);"><i class="fa-solid fa-paperclip"></i></span>' : '<span style="color:var(--text-dim);">-</span>'}</td>
+      <td><span class="status-resolved">تم الحل ✅</span></td>
+      <td style="white-space:nowrap;"><button class="btn-mini" onclick="restoreFromArchive('${issue.code}')"><i class="fa-solid fa-rotate-left"></i></button><button class="btn-mini danger" onclick="deleteFromArchive('${issue.code}')"><i class="fa-solid fa-trash"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+function restoreFromArchive(code) {
+  if (!confirm("هل تريد إعادة هذا الإنشغال إلى القائمة النشطة؟")) return;
+  const idx = archivedIssues.findIndex(i => i.code === code);
+  if (idx === -1) return;
+  const issue = archivedIssues[idx];
+  issue.status = "قيد المعالجة 🔄";
+  archivedIssues.splice(idx, 1);
+  activeIssues.unshift(issue);
+  saveActive(); saveArchive();
+  renderKPIs(); updateChart(); renderList(); renderArchive();
+}
+
+function deleteFromArchive(code) {
+  if (!confirm("هل أنت متأكد من الحذف النهائي من الأرشيف؟")) return;
+  archivedIssues = archivedIssues.filter(i => i.code !== code);
+  saveArchive();
+  renderKPIs(); updateChart(); renderArchive();
+}
+
+// ============================================================
+// DETAILS MODAL
+// ============================================================
+function openDetails(code, fromArchive) {
+  let source = fromArchive ? archivedIssues : activeIssues;
+  let issue = source.find(i => i.code === code);
+  if (!issue) { issue = centerArchived.find(i => i.code === code); if (!issue) return; }
+  document.getElementById('detailsTitle').textContent = `📋 تفاصيل الإنشغال - ${issue.code}`;
+  const timeStr = new Date(issue.createdAt).toLocaleString('ar-DZ', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  let html = `<div class="detail-section"><span class="label">📌 المؤسسة المعنية</span><div class="value">${escapeHtml(issue.center)}</div></div>
+    <div class="detail-section"><span class="label">📂 تصنيف الإنشغال</span><div class="value">${escapeHtml(issue.type)}</div></div>
+    <div class="detail-section"><span class="label">⚡ درجة الأولوية</span><div class="value">${escapeHtml(issue.priority)}</div></div>
+    <div class="detail-section"><span class="label">✍️ المحرر</span><div class="value">${escapeHtml(issue.author)}</div></div>
+    <div class="detail-section"><span class="label">📅 تاريخ الإنشاء</span><div class="value">${timeStr}</div></div>
+    <div class="detail-section"><span class="label">📝 التفاصيل الكاملة</span><div class="value" style="white-space:pre-wrap;">${escapeHtml(issue.details)}</div></div>`;
+  document.getElementById('detailsContent').innerHTML = html;
+  const attachDiv = document.getElementById('detailsAttachment');
+  if (issue.attachments && issue.attachments.length > 0) {
+    attachDiv.style.display = 'block';
+    const attach = issue.attachments[0];
+    if (attach.type && attach.type.startsWith('image/')) {
+      attachDiv.innerHTML = `<p style="color:var(--text-dim); font-size:15px; margin-bottom:6px;">📎 المرفق:</p><img src="${attach.data}" onclick="openLightbox('${attach.data}')" style="max-width:100%; max-height:320px; border-radius:12px; cursor:pointer; border:2px solid var(--border);">`;
+    } else {
+      attachDiv.innerHTML = `<p style="color:var(--text-dim); font-size:15px; margin-bottom:6px;">📎 المرفق:</p><a href="${attach.data}" download="${escapeHtml(attach.name)}" style="display:inline-block; padding:12px 24px; background:var(--algeria-green); color:#fff; border-radius:12px; text-decoration:none; font-weight:700; font-size:17px;"><i class="fa-solid fa-download"></i> تحميل المرفق: ${escapeHtml(attach.name)}</a>`;
+    }
+  } else { attachDiv.style.display = 'none'; }
+  document.getElementById('detailsModal').classList.add('open');
+}
+
+function closeDetails() { document.getElementById('detailsModal').classList.remove('open'); }
+
+// ============================================================
+// CHAT SYSTEM
+// ============================================================
+function openChat(code, role) {
+  const allIssues = [...activeIssues, ...archivedIssues, ...centerIssues, ...centerArchived];
+  const issue = allIssues.find(i => i.code === code);
+  if (!issue) { showToast("⚠️ خطأ", "لم يتم العثور على الإنشغال"); return; }
+  currentChatCode = code;
+  document.getElementById('chatTitle').textContent = '💬 غرفة الشات الفوري';
+  document.getElementById('chatSubtitle').textContent = `${issue.center || 'مركز'} — ${code}`;
+  const msgs = getChatMessages(code);
+  let changed = false;
+  msgs.forEach(m => { if (!m.read) { m.read = true; changed = true; } });
+  if (changed) saveChatMessages(code, msgs);
+  notifiedMessages.delete(code);
+  const sendBtn = document.getElementById('chatSendBtn');
+  sendBtn.className = role === 'directorate' ? 'chat-icon-btn send' : 'chat-icon-btn send-accent';
+  renderChatMessages(role);
+  document.getElementById('chatModal').classList.add('open');
+  removeAttachment();
+}
+
+function closeChat() { document.getElementById('chatModal').classList.remove('open'); currentChatCode = null; }
+
+function renderChatMessages(role) {
+  const container = document.getElementById('chatMessages');
+  const msgs = getChatMessages(currentChatCode);
+  const htmlContent = msgs.map(m => {
+    let attachHtml = '';
+    if (m.attachment) {
+      if (m.attachment.type && m.attachment.type.startsWith('image/')) {
+        attachHtml = `<img class="chat-attach-img" src="${m.attachment.data}" onclick="openLightbox('${m.attachment.data}')">`;
+      } else {
+        attachHtml = `<a class="chat-attach-file" href="${m.attachment.data}" download="${escapeHtml(m.attachment.name)}"><i class="fa-solid fa-file"></i> ${escapeHtml(m.attachment.name)}</a>`;
+      }
+    }
+    const timeStr = new Date(m.time).toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
+    let bubbleClass = '', senderLabel = '';
+    if (m.sender === 'directorate') { bubbleClass = 'directorate-msg'; senderLabel = 'المديرية'; }
+    else { bubbleClass = 'center-msg'; senderLabel = 'المركز'; }
+    return `<div class="chat-bubble ${bubbleClass}"><span class="chat-sender-label">${senderLabel}</span>${m.text ? escapeHtml(m.text) : ''}${attachHtml}<span class="chat-time">${timeStr}</span></div>`;
+  }).join('');
+  container.innerHTML = htmlContent || '<div style="color:var(--text-dim); text-align:center; padding:40px; font-size:18px;">لا توجد رسائل بعد</div>';
+  container.scrollTop = container.scrollHeight;
+}
+
+function handleChatFileAttach(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 4 * 1024 * 1024) { alert("⚠️ حجم الملف يتجاوز الحد الأقصى المسموح به (4 ميغابايت)."); e.target.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    pendingAttachment = { name: file.name, type: file.type, data: ev.target.result };
+    document.getElementById('chatAttachName').textContent = file.name;
+    document.getElementById('chatAttachPreview').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeAttachment() {
+  pendingAttachment = null;
+  document.getElementById('chatAttachPreview').style.display = 'none';
+  document.getElementById('chatFileInput').value = '';
+}
+
+function sendChatMessage() {
+  if (!currentChatCode) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text && !pendingAttachment) return;
+  const msgs = getChatMessages(currentChatCode);
+  msgs.push({ sender: currentRole, text, attachment: pendingAttachment, time: Date.now(), read: false });
+  saveChatMessages(currentChatCode, msgs);
+  input.value = '';
+  removeAttachment();
+  renderChatMessages(currentRole);
+  syncToGoogleSheets();
+}
+
+// ============================================================
+// INTER-INSTITUTION CHAT
+// ============================================================
+function populateInterChatRecipients() {
+  const select = document.getElementById('interChatRecipient');
+  if (!select) return;
+  select.innerHTML = '<option value="all">الجميع</option>';
+  INSTITUTIONS_DATA.forEach(inst => { select.innerHTML += `<option value="${inst.name}">${inst.name}</option>`; });
+  select.innerHTML += `<option value="directorate">المديرية</option>`;
+  select.onchange = function() {
+    const badge = document.getElementById('recipientBadge');
+    if (this.value === 'all') { badge.textContent = 'الجميع'; badge.style.background = 'var(--algeria-green)'; }
+    else if (this.value === 'directorate') { badge.textContent = 'المديرية'; badge.style.background = 'var(--algeria-red)'; }
+    else { badge.textContent = this.value.length > 20 ? this.value.substring(0, 20) + '...' : this.value; badge.style.background = 'var(--algeria-green)'; }
+  };
+}
+
+function openInterChat() {
+  populateInterChatRecipients();
+  renderInterChatMessages();
+  document.getElementById('interChatModal').classList.add('open');
+}
+
+function closeInterChat() { document.getElementById('interChatModal').classList.remove('open'); }
+
+function renderInterChatMessages() {
+  const container = document.getElementById('interChatMessages');
+  const msgs = getInterChatMessages();
+  const htmlContent = msgs.map(m => {
+    const timeStr = new Date(m.time).toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
+    const isMe = m.sender === getCenterName() || m.sender === 'المديرية';
+    const bubbleClass = isMe ? 'center-msg' : 'directorate-msg';
+    const senderLabel = m.sender || 'غير معروف';
+    const recipientLabel = m.recipient ? ` → ${m.recipient}` : '';
+    let attachHtml = '';
+    if (m.attachment) {
+      if (m.attachment.type && m.attachment.type.startsWith('image/')) {
+        attachHtml = `<img class="chat-attach-img" src="${m.attachment.data}" onclick="openLightbox('${m.attachment.data}')">`;
+      } else {
+        attachHtml = `<a class="chat-attach-file" href="${m.attachment.data}" download="${escapeHtml(m.attachment.name)}"><i class="fa-solid fa-file"></i> ${escapeHtml(m.attachment.name)}</a>`;
+      }
+    }
+    return `<div class="chat-bubble ${bubbleClass}"><span class="chat-sender-label">${escapeHtml(senderLabel)}${recipientLabel}</span>${m.text ? escapeHtml(m.text) : ''}${attachHtml}<span class="chat-time">${timeStr}</span></div>`;
+  }).join('');
+  container.innerHTML = htmlContent || '<div style="color:var(--text-dim); text-align:center; padding:40px; font-size:18px;">لا توجد رسائل في غرفة المؤسسات</div>';
+  container.scrollTop = container.scrollHeight;
+}
+
+function handleInterChatFileAttach(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 4 * 1024 * 1024) { alert("⚠️ حجم الملف يتجاوز الحد الأقصى المسموح به (4 ميغابايت)."); e.target.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    interChatPendingAttachment = { name: file.name, type: file.type, data: ev.target.result };
+    showToast("📎 مرفق", `تم إرفاق ${file.name}`);
+  };
+  reader.readAsDataURL(file);
+}
+
+function sendInterChatMessage() {
+  const input = document.getElementById('interChatInput');
+  const text = input.value.trim();
+  const recipient = document.getElementById('interChatRecipient').value;
+  const recipientLabel = recipient === 'all' ? 'الجميع' : recipient === 'directorate' ? 'المديرية' : INSTITUTIONS_DATA.find(i => i.name === recipient)?.name || recipient;
+  if (!text && !interChatPendingAttachment) return;
+  const senderName = currentRole === 'directorate' ? 'المديرية' : getCenterName();
+  const msgs = getInterChatMessages();
+  msgs.push({ sender: senderName, recipient: recipientLabel, text, attachment: interChatPendingAttachment, time: Date.now() });
+  saveInterChatMessages(msgs);
+  interChatPendingAttachment = null;
+  input.value = '';
+  renderInterChatMessages();
+  document.getElementById('interChatFileInput').value = '';
+}
+
+// ============================================================
+// CENTER: SEND ISSUE
+// ============================================================
+function setupPasteFeature() {
+  window.addEventListener('paste', function(e) {
+    const sendPage = document.getElementById('page-send-panel');
+    if (!sendPage || sendPage.classList.contains('hidden')) return;
+    const items = (e.clipboardData || window.clipboardData).items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const blob = items[i].getAsFile();
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          pendingCenterFile = { data: ev.target.result, type: 'image', name: 'لقطة شاشة.png' };
+          const zone = document.getElementById('pasteZone');
+          if (zone) { zone.classList.add('captured'); zone.textContent = '📸 تم التقاط الصورة وجاهزة للإرسال!'; }
+        };
+        reader.readAsDataURL(blob);
+        e.preventDefault();
+        break;
+      }
+    }
+  });
+}
+
+function resetPasteZone() {
+  pendingCenterFile = null;
+  const zone = document.getElementById('pasteZone');
+  if (zone) { zone.classList.remove('captured'); zone.textContent = '📸 اضغط هنا ثم Ctrl+V للصق لقطة شاشة'; }
+}
+
+function handleCenterFileSelection(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const fileType = file.type === 'application/pdf' ? 'pdf' : 'image';
+    pendingCenterFile = { data: ev.target.result, type: fileType, name: file.name };
+    const zone = document.getElementById('pasteZone');
+    if (zone) { zone.classList.add('captured'); zone.textContent = fileType === 'pdf' ? '📄 تم اختيار ملف PDF جاهز للإرسال!' : '📸 تم اختيار صورة جاهزة للإرسال!'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+function sendFromCenter() {
+  const details = document.getElementById('form-details').value.trim();
+  if (!details) { alert("يرجى كتابة الشرح الدقيق للمشكلة قبل الإرسال."); return; }
+  const type = document.getElementById('form-type').value;
+  const priority = document.getElementById('form-priority').value;
+  const reporter = document.getElementById('form-reporter').value.trim() || "غير محدد";
+  const center = getCenterName();
+  const code = generateRefCode();
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الإرسال...';
+  const attachments = [];
+  if (pendingCenterFile) { 
+    attachments.push({ 
+      name: pendingCenterFile.name || (pendingCenterFile.type === 'image' ? 'صورة_مرفقة.png' : 'مرفق.pdf'), 
+      type: pendingCenterFile.type === 'image' ? 'image/png' : 'application/pdf', 
+      data: pendingCenterFile.data 
+    }); 
+  }
+  const payload = { code, center, type, priority, reporter, details, status: "قيد المعالجة 🔄", attachments, source: 'center', createdAt: Date.now() };
+  centerIssues.unshift(payload);
+  saveCenterIssues();
+  const activeCopy = { 
+    code, center, type, priority, 
+    author: reporter, details, status: "قيد المعالجة 🔄", 
+    createdAt: Date.now(), source: 'center', 
+    attachments: attachments.length > 0 ? attachments : [] 
+  };
+  activeIssues.unshift(activeCopy);
+  saveActive();
+  showToast("✅ تم الإرسال", `تم إرسال الإنشغال ${code} بنجاح!`);
+  document.getElementById('form-details').value = '';
+  document.getElementById('form-reporter').value = '';
+  document.getElementById('form-file').value = '';
+  document.getElementById('form-priority').selectedIndex = 0;
+  resetPasteZone();
+  renderChatHub();
+  renderList();
+  renderKPIs();
+  updateChart();
+  btn.disabled = false;
+  btn.textContent = 'بث وإرسال الإنشغال 📡';
+}
+
+// ============================================================
+// CENTER: CHAT HUB
+// ============================================================
+function renderChatHub() {
+  const container = document.getElementById('chatHubContainer');
+  if (!container) return;
+  const centerName = getCenterName();
+  const myIssues = centerIssues.filter(issue => issue.center === centerName);
+  
+  if (myIssues.length === 0) { 
+    container.innerHTML = `<div class="chat-hub-table-wrap"><div class="empty-msg">لا توجد بلاغات مرسلة من مركزكم للمتابعة.</div></div>`; 
+    return; 
+  }
+  let rows = myIssues.map(issue => {
+    const isResolved = issue.status && issue.status.indexOf('تم الحل') !== -1;
+    const hasAttach = issue.attachments && issue.attachments.length > 0;
+    const msgs = getChatMessages(issue.code);
+    const hasUnread = msgs.length > 0 && msgs[msgs.length - 1].sender === 'directorate' && !msgs[msgs.length - 1].read;
+    const timeAgo = getTimeAgo(issue.createdAt || Date.now());
+    const preview = issue.details ? issue.details.substring(0, 60) + (issue.details.length > 60 ? '...' : '') : '';
+    return `<tr class="${hasUnread ? 'row-unread' : ''}" onclick="openChat('${issue.code}', 'center')">
+      <td><strong style="font-size:17px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo}</span></td>
+      <td style="font-size:17px;">${escapeHtml(issue.type)}</td>
+      <td><span class="status-badge ${isResolved ? 'resolved' : 'pending'}">${isResolved ? '✅ تم الحل' : '🔄 قيد المعالجة'}</span></td>
+      <td style="font-size:16px; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(preview)}</td>
+      <td>${hasAttach ? '<span class="attach-badge"><i class="fa-solid fa-paperclip"></i> مرفق</span>' : ''}${hasUnread ? '<span class="unread-badge"><i class="fa-solid fa-bell"></i> جديد</span>' : ''}</td>
+      <td style="font-size:16px; color:var(--text-dim);"><i class="fa-regular fa-comment"></i> ${msgs.length}</td>
+    </tr>`;
+  }).join('');
+  container.innerHTML = `<div class="chat-hub-table-wrap"><div class="table-scroll"><table><thead><tr><th style="min-width:160px;">الرمز المرجعي</th><th style="min-width:150px;">المصلحة</th><th style="min-width:130px;">الحالة</th><th style="min-width:220px;">ملخص الإنشغال</th><th style="min-width:150px;">المرفقات</th><th style="min-width:90px;">الرسائل</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+
+// ============================================================
+// CENTER UI REFRESH
+// ============================================================
+function refreshCenterUI() {
+  const name = getCenterName();
+  document.getElementById('centerBadgeName').textContent = name;
+  const sidebarName = document.getElementById('profileName');
+  if (sidebarName) sidebarName.textContent = name;
+}
+
+// ============================================================
+// CHECK FOR NEW MESSAGES
+// ============================================================
+function checkForNewMessages() {
+  const allCodes = new Set();
+  [...activeIssues, ...archivedIssues, ...centerIssues, ...centerArchived].forEach(i => allCodes.add(i.code));
+  allCodes.forEach(code => {
+    const msgs = getChatMessages(code);
+    if (msgs.length === 0) return;
+    const last = msgs[msgs.length - 1];
+    const otherSide = currentRole === 'directorate' ? 'center' : 'directorate';
+    if (last.sender === otherSide && !last.read) {
+      const chatOpenOnThis = currentChatCode === code && document.getElementById('chatModal').classList.contains('open');
+      if (chatOpenOnThis) {
+        let changed = false;
+        msgs.forEach(m => { if (m.sender === otherSide && !m.read) { m.read = true; changed = true; } });
+        if (changed) saveChatMessages(code, msgs);
+        renderChatMessages(currentRole);
+      } else {
+        const msgKey = code + '_' + last.time;
+        if (!notifiedMessages.has(msgKey)) {
+          notifiedMessages.add(msgKey);
+          const senderName = currentRole === 'directorate' ? 'المركز' : 'المديرية';
+          showToastWithAction(last.text || '(مرفق)', `📩 رسالة جديدة من ${senderName} - ${code}`, () => { openChat(code, currentRole); });
+          if (currentRole === 'directorate') renderList(); else renderChatHub();
+        }
+      }
+    }
+  });
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToastWithAction(title, text, action) {
+  const area = document.getElementById('toast-area');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<div><div class="toast-title">${escapeHtml(title)}</div><div class="toast-text">${escapeHtml(text)}</div><div class="toast-action"><i class="fa-solid fa-hand-pointer"></i> اضغط لعرض الرسالة</div></div>`;
+  toast.onclick = function() { toast.remove(); if (action) action(); };
+  area.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 8000);
+  return toast;
+}
+
+function showToast(title, text) {
+  const area = document.getElementById('toast-area');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<div><div class="toast-title">${escapeHtml(title)}</div><div class="toast-text">${escapeHtml(text)}</div></div>`;
+  toast.onclick = function() { toast.remove(); };
+  area.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
+}
+
+// ============================================================
+// SCROLL DRAG
+// ============================================================
+function initScrollDrag(scrollId, trackId, thumbId) {
+  const scrollEl = document.getElementById(scrollId);
+  const track = document.getElementById(trackId);
+  const thumb = document.getElementById(thumbId);
+  if (!scrollEl || !track || !thumb) return;
+  function updateThumbSize() {
+    const ratio = scrollEl.clientWidth / scrollEl.scrollWidth;
+    thumb.style.width = Math.max(ratio * track.clientWidth, 40) + 'px';
+    updateThumbPosition();
+  }
+  function updateThumbPosition() {
+    const maxScrollLeft = scrollEl.scrollWidth - scrollEl.clientWidth;
+    const maxThumbLeft = track.clientWidth - thumb.offsetWidth;
+    if (maxScrollLeft <= 0) { thumb.style.right = '0px'; return; }
+    const ratio = scrollEl.scrollLeft / maxScrollLeft;
+    thumb.style.right = (ratio * maxThumbLeft) + 'px';
+  }
+  let dragging = false, startX = 0, startRight = 0;
+  thumb.addEventListener('mousedown', (e) => { dragging = true; startX = e.clientX; startRight = parseFloat(thumb.style.right || '0'); e.preventDefault(); });
+  thumb.addEventListener('touchstart', (e) => { dragging = true; startX = e.touches[0].clientX; startRight = parseFloat(thumb.style.right || '0'); });
+  function onMove(clientX) {
+    if (!dragging) return;
+    const delta = startX - clientX;
+    let newRight = startRight - delta;
+    const maxThumbLeft = track.clientWidth - thumb.offsetWidth;
+    newRight = Math.max(0, Math.min(maxThumbLeft, newRight));
+    thumb.style.right = newRight + 'px';
+    const ratio = maxThumbLeft > 0 ? newRight / maxThumbLeft : 0;
+    const maxScrollLeft = scrollEl.scrollWidth - scrollEl.clientWidth;
+    scrollEl.scrollLeft = ratio * maxScrollLeft;
+  }
+  document.addEventListener('mousemove', (e) => onMove(e.clientX));
+  document.addEventListener('touchmove', (e) => { if (dragging) onMove(e.touches[0].clientX); });
+  document.addEventListener('mouseup', () => dragging = false);
+  document.addEventListener('touchend', () => dragging = false);
+  scrollEl.addEventListener('scroll', updateThumbPosition);
+  window.addEventListener('resize', updateThumbSize);
+  track.addEventListener('click', (e) => {
+    if (e.target === thumb) return;
+    const rect = track.getBoundingClientRect();
+    const clickRatio = 1 - ((e.clientX - rect.left) / rect.width);
+    const maxScrollLeft = scrollEl.scrollWidth - scrollEl.clientWidth;
+    scrollEl.scrollLeft = clickRatio * maxScrollLeft;
+  });
+  setTimeout(updateThumbSize, 200);
+}
+
+// ============================================================
+// LIGHTBOX
+// ============================================================
+function openLightbox(src) { document.getElementById('lightboxImg').src = src; document.getElementById('lightboxOverlay').classList.add('open'); }
+function closeLightbox() { document.getElementById('lightboxOverlay').classList.remove('open'); document.getElementById('lightboxImg').src = ''; }
+
+// ============================================================
+// LOGOUT
+// ============================================================
+function logout() {
+  if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+    document.getElementById('appRoot').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('loginError').style.display = 'none';
+    currentRole = null;
+    localStorage.removeItem(LS_KEYS.remember);
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginCenterSelect').value = '';
+    document.getElementById('loginCenterPass').value = '';
+    document.getElementById('loginCenterSearch').value = '';
+    notifiedMessages.clear();
+  }
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escapeHtml(str) {
+  if (str === undefined || str === null) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+// ============================================================
+// WINDOW ONLOAD
+// ============================================================
+window.onload = function() {
+  loadTheme();
+  selectLoginRole('directorate');
+  loadRemembered();
+};
+
+window.addEventListener('storage', function(e) {
+  const watchedKeys = [LS_KEYS.core, LS_KEYS.resolved, LS_KEYS.centerIssues, LS_KEYS.centerArchived];
+  if (watchedKeys.includes(e.key)) {
+    if (currentRole === 'directorate') { renderKPIs(); updateChart(); renderList(); renderArchive(); }
+    else { renderChatHub(); }
+  }
+});
+</script>
+</body>
+</html>
