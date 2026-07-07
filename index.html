@@ -103,7 +103,7 @@ body { background: var(--bg-main); color: var(--text); overflow-x: hidden; min-h
 .login-card h1 { font-size: 30px; font-weight: 900; color: var(--text); letter-spacing: 1px; }
 .login-card .subtitle { color: var(--text-dim); font-size: 17px; font-weight: 600; margin-top: 4px; }
 
-.role-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.role-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 24px; }
 .role-selector button { padding: 16px 14px; border-radius: 16px; font-weight: 800; font-size: 18px; background: var(--bg-card-2); border: 3px solid var(--border); color: var(--text-dim); transition: var(--transition); cursor: pointer; font-family: inherit; }
 .role-selector button i { margin-left: 12px; font-size: 20px; }
 .role-selector button:hover { border-color: var(--algeria-green); color: var(--text); }
@@ -114,8 +114,6 @@ body { background: var(--bg-main); color: var(--text); overflow-x: hidden; min-h
 .login-fields-row .login-field label { display: block; font-size: 15px; font-weight: 700; color: var(--text-light); margin-bottom: 4px; }
 .login-fields-row .login-field input, .login-fields-row .login-field select { width: 100%; padding: 14px 18px; background: var(--input-bg); border: 3px solid var(--input-border); border-radius: 12px; color: var(--text); font-size: 18px; transition: var(--transition); font-family: inherit; display: block; }
 .login-fields-row .login-field input:focus, .login-fields-row .login-field select:focus { border-color: var(--algeria-green); box-shadow: 0 0 0 4px rgba(0, 102, 51, 0.1); outline: none; }
-#directorateFields .login-fields-row, #centerFields .login-fields-row { display: flex; flex-direction: row; flex-wrap: wrap; gap: 14px; }
-#directorateFields .login-fields-row .login-field, #centerFields .login-fields-row .login-field { flex: 1; min-width: 160px; }
 
 .login-field .remember { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
 .login-field .remember input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--algeria-green); cursor: pointer; }
@@ -331,8 +329,17 @@ tbody tr:hover { background: var(--table-hover); }
 .inter-chat-recipient select:focus { border-color: var(--algeria-green); outline: none; }
 .inter-chat-recipient .recipient-badge { padding: 6px 16px; border-radius: 24px; font-size: 14px; font-weight: 800; background: var(--algeria-green); color: #fff; }
 
+.dept-stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
+.dept-stat-card { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 20px; transition: var(--transition); }
+.dept-stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--algeria-green); }
+.dept-stat-card .dept-name { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.dept-stat-card .dept-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dept-stat-card .stat-item { text-align: center; padding: 8px; background: var(--bg-card-2); border-radius: 10px; }
+.dept-stat-card .stat-item .num { font-size: 24px; font-weight: 900; color: var(--algeria-green); }
+.dept-stat-card .stat-item .label { font-size: 13px; color: var(--text-dim); }
+
 @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .form-grid { grid-template-columns: 1fr; } .notes-grid { grid-template-columns: 1fr; } }
-@media (max-width: 768px) { .app-flex { flex-direction: column; } .sidebar { width: 100%; height: auto; position: relative; border-left: none; border-bottom: 2px solid var(--border); } .main-workspace { padding: 16px; } .login-card { padding: 24px 18px; } .kpi-grid { grid-template-columns: 1fr; } .modal-box { max-width: 100%; margin: 10px; } .tabs-container { flex-direction: column; } .role-selector { grid-template-columns: 1fr; } .page-header h2 { font-size: 24px; } .theme-toggle { bottom: 15px; left: 15px; width: 50px; height: 50px; font-size: 20px; } .login-fields-row { flex-direction: column; } .login-fields-row .login-field { min-width: 100%; } #directorateFields .login-fields-row { flex-direction: column; } #directorateFields .login-fields-row .login-field { min-width: 100%; } #centerFields .login-fields-row { flex-direction: column; } #centerFields .login-fields-row .login-field { min-width: 100%; } }
+@media (max-width: 768px) { .app-flex { flex-direction: column; } .sidebar { width: 100%; height: auto; position: relative; border-left: none; border-bottom: 2px solid var(--border); } .main-workspace { padding: 16px; } .login-card { padding: 24px 18px; } .kpi-grid { grid-template-columns: 1fr; } .modal-box { max-width: 100%; margin: 10px; } .tabs-container { flex-direction: column; } .role-selector { grid-template-columns: 1fr; } .page-header h2 { font-size: 24px; } .theme-toggle { bottom: 15px; left: 15px; width: 50px; height: 50px; font-size: 20px; } .login-fields-row { flex-direction: column; } .login-fields-row .login-field { min-width: 100%; } }
 </style>
 </head>
 <body>
@@ -357,15 +364,17 @@ tbody tr:hover { background: var(--table-hover); }
       <div class="login-header">
         <div class="login-logo"><i class="fa-solid fa-shield-halved"></i><div class="badge"><i class="fa-solid fa-star"></i></div></div>
         <h1>منصة إنشغال</h1>
-        <p class="subtitle">نظام متكامل للمديرية والمراكز التكوينية</p>
+        <p class="subtitle">نظام متكامل للمديرية والمصالح والمراكز</p>
         <div style="margin-top:8px;"><span class="fares-logo">FARES</span><span class="fares-logo-sub"> ✦ المطور ✦</span></div>
       </div>
 
       <div class="role-selector">
         <button class="active" id="loginRoleDirectorate" onclick="selectLoginRole('directorate')"><i class="fa-solid fa-building-columns"></i> المديرية</button>
-        <button id="loginRoleCenter" onclick="selectLoginRole('center')"><i class="fa-solid fa-school"></i> مركز / معهد/ مدرسة خاصة</button>
+        <button id="loginRoleDepartment" onclick="selectLoginRole('department')"><i class="fa-solid fa-users-gear"></i> مصالح المديرية</button>
+        <button id="loginRoleCenter" onclick="selectLoginRole('center')"><i class="fa-solid fa-school"></i> مركز/معهد/مدرسة </button>
       </div>
 
+      <!-- حقول المديرية -->
       <div id="directorateFields">
         <div class="login-fields-row">
           <div class="login-field"><label><i class="fa-solid fa-user"></i> اسم المستخدم</label><input type="text" id="loginUser" placeholder="أدخل اسم المستخدم" onkeyup="if(event.key==='Enter')handleLogin()"></div>
@@ -373,13 +382,25 @@ tbody tr:hover { background: var(--table-hover); }
         </div>
       </div>
 
+      <!-- حقول المصلحة -->
+      <div id="departmentFields" style="display:none;">
+        <div class="login-fields-row">
+          <div class="login-field"><label><i class="fa-solid fa-user"></i> اسم المستخدم</label><input type="text" id="loginDeptUser" placeholder="اسم المستخدم الخاص بالمصلحة" onkeyup="if(event.key==='Enter')handleLogin()"></div>
+          <div class="login-field"><label><i class="fa-solid fa-key"></i> كلمة المرور</label><input type="password" id="loginDeptPass" placeholder="كلمة المرور" onkeyup="if(event.key==='Enter')handleLogin()"></div>
+        </div>
+        <div style="font-size:14px; color:var(--text-dim); padding:8px 12px; background:var(--bg-card-2); border-radius:10px; margin-bottom:10px; text-align:center;">
+          <i class="fa-solid fa-info-circle"></i> يتم توفير اسم المستخدم وكلمة المرور من قبل المديرية
+        </div>
+      </div>
+
+      <!-- حقول المركز -->
       <div id="centerFields" style="display:none;">
         <div class="login-fields-row">
           <div class="login-field"><label><i class="fa-solid fa-search"></i> ابحث عن المؤسسة</label><input type="text" id="loginCenterSearch" placeholder="اكتب اسم المؤسسة..." onkeyup="filterCenterSelect()"></div>
           <div class="login-field"><label><i class="fa-solid fa-building"></i> اختر المؤسسة</label><select id="loginCenterSelect"><option value="">-- اختر المؤسسة --</option></select></div>
           <div class="login-field"><label><i class="fa-solid fa-key"></i> كلمة السر</label><input type="password" id="loginCenterPass" placeholder="أدخل كلمة السر" onkeyup="if(event.key==='Enter')handleLogin()"></div>
         </div>
-        <div class="center-hint" id="centerHint"><i class="fa-solid fa-phone"></i>  كلمة السر يتم الحصول عليها بالاتصال بالمديرية (حسان بلحاج)</div>
+        <div class="center-hint" id="centerHint"><i class="fa-solid fa-phone"></i> كلمة السر يتم الحصول عليها بالاتصال بالمديرية</div>
       </div>
 
       <div class="login-field" style="text-align:right; margin-bottom:10px;">
@@ -429,13 +450,33 @@ tbody tr:hover { background: var(--table-hover); }
       <div class="chart-card"><canvas id="analyticsChart"></canvas></div>
     </section>
 
+    <!-- DEPT DASHBOARD -->
+    <section class="page hidden" id="page-dept-dashboard">
+      <div class="page-header">
+        <h2><i class="fa-solid fa-chart-simple"></i> أداء المصالح</h2>
+        <span class="sync-badge"><i class="fa-solid fa-rotate"></i> تحديث تلقائي</span>
+      </div>
+      <div id="deptStatsContainer"></div>
+      <div class="chart-card" style="height:300px; margin-top:20px;"><canvas id="deptChart"></canvas></div>
+    </section>
+
+    <!-- DEPARTMENTS MANAGEMENT -->
+    <section class="page hidden" id="page-departments">
+      <div class="page-header">
+        <h2><i class="fa-solid fa-users-gear"></i> إدارة المصالح</h2>
+        <button class="btn-primary btn-sm" onclick="openAddDepartment()"><i class="fa-solid fa-plus"></i> إضافة مصلحة</button>
+      </div>
+      <div id="departmentsListContainer"></div>
+    </section>
+
     <!-- ADD ISSUE -->
     <section class="page hidden" id="page-add">
       <div class="page-header"><h2><i class="fa-solid fa-pen-to-square"></i> تدوين إنشغال جديد</h2></div>
       <div class="form-card">
         <div class="form-grid">
           <div class="form-field"><label>المؤسسة التكوينية المعنية</label><select id="add-form-center"></select></div>
-          <div class="form-field"><label>تصنيف الإنشغال</label><select id="add-form-type"></select></div>
+          <div class="form-field"><label>تصنيف الإنشغال</label><select id="add-form-type" onchange="updateDepartmentSuggestion()"></select></div>
+          <div class="form-field" id="suggestedDeptField"><label>المصلحة المقترحة</label><input type="text" id="add-form-suggested-dept" readonly placeholder="سيتم اقتراح المصلحة تلقائياً" style="background:var(--bg-card-2);"></div>
           <div class="form-field"><label>درجة الأولوية</label><select id="add-form-priority"><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select></div>
           <div class="form-field"><label>المحرر</label><input type="text" id="add-form-author" placeholder="مثال: مراح فارس..."></div>
           <div class="form-field full"><label>تفاصيل الإنشغال</label><textarea id="add-form-details" placeholder="اكتب تفاصيل الإنشغال بدقة..."></textarea></div>
@@ -479,9 +520,10 @@ tbody tr:hover { background: var(--table-hover); }
         <input type="text" id="list-search" placeholder="بحث..." onkeyup="renderList()">
         <select id="list-priority-filter" onchange="renderList()"><option value="">كل الأولويات</option><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select>
         <select id="list-source-filter" onchange="renderList()"><option value="">كل المصادر</option><option value="directorate">المديرية</option><option value="center">المراكز</option></select>
+        <select id="list-dept-filter" onchange="renderList()"><option value="">كل المصالح</option></select>
       </div>
       <div class="table-wrap">
-        <div class="table-scroll" id="listTableScroll"><table><thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>الأولوية</th><th>المحرر</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>الشات</th><th>إجراءات</th></tr></thead><tbody id="listTableBody"></tbody></table></div>
+        <div class="table-scroll" id="listTableScroll"><table><thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>المصلحة</th><th>الأولوية</th><th>المحرر</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>الشات</th><th>إجراءات</th></tr></thead><tbody id="listTableBody"></tbody></table></div>
         <div class="custom-scroll-track" id="listScrollTrack"><div class="custom-scroll-thumb" id="listScrollThumb" style="width:40%;"></div></div>
       </div>
     </section>
@@ -492,9 +534,10 @@ tbody tr:hover { background: var(--table-hover); }
       <div class="filter-bar">
         <input type="text" id="archive-search" placeholder="بحث..." onkeyup="renderArchive()">
         <select id="archive-source-filter" onchange="renderArchive()"><option value="">كل المصادر</option><option value="directorate">المديرية</option><option value="center">المراكز</option></select>
+        <select id="archive-dept-filter" onchange="renderArchive()"><option value="">كل المصالح</option></select>
       </div>
       <div class="table-wrap">
-        <div class="table-scroll" id="archiveTableScroll"><table><thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>الأولوية</th><th>المحرر</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="archiveTableBody"></tbody></table></div>
+        <div class="table-scroll" id="archiveTableScroll"><table><thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>المصلحة</th><th>الأولوية</th><th>المحرر</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="archiveTableBody"></tbody></table></div>
         <div class="custom-scroll-track" id="archiveScrollTrack"><div class="custom-scroll-thumb" id="archiveScrollThumb" style="width:40%;"></div></div>
       </div>
     </section>
@@ -516,7 +559,7 @@ tbody tr:hover { background: var(--table-hover); }
         <div class="form-grid">
           <div class="form-field"><label>تصنيف الإنشغال</label><select id="form-type"></select></div>
           <div class="form-field"><label>درجة الأهمية</label><select id="form-priority"><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select></div>
-          <div class="form-field"><label>اسم محرر الإنشغال ( إختياري )</label><input type="text" id="form-reporter" placeholder="مثال: مراح فارس..."></div>
+          <div class="form-field"><label>اسم محرر الإنشغال (إختياري)</label><input type="text" id="form-reporter" placeholder="مثال: مراح فارس..."></div>
           <div class="form-field"><label>إرفاق ملف / صورة</label><input type="file" id="form-file" accept="image/*,application/pdf" onchange="handleCenterFileSelection(event)"></div>
           <div class="paste-zone" id="pasteZone" tabindex="0">📸 اضغط هنا ثم Ctrl+V للصق لقطة شاشة</div>
           <div class="form-field full"><label>الشرح الدقيق للمشكلة أو الإنشغال</label><textarea id="form-details" placeholder="اكتب شرحاً دقيقاً للمشكلة..."></textarea></div>
@@ -565,6 +608,32 @@ tbody tr:hover { background: var(--table-hover); }
   </div>
 </div>
 
+<div class="modal-overlay" id="addDeptModal" onclick="if(event.target===this)closeAddDepartment()">
+  <div class="modal-box" style="max-width:550px;">
+    <div class="modal-head"><div><h3>➕ إضافة مصلحة جديدة</h3></div><button class="btn-close-modal" onclick="closeAddDepartment()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="form-field"><label><i class="fa-solid fa-user"></i> اسم المستخدم</label><input type="text" id="newDeptUsername" placeholder="اسم المستخدم للدخول إلى المصلحة (مثال: maintenance)" value=""></div>
+      <div class="form-field"><label><i class="fa-solid fa-building"></i> اسم المصلحة</label><input type="text" id="newDeptName" placeholder="مثال: مصلحة الصيانة"></div>
+      <div class="form-field"><label><i class="fa-solid fa-tag"></i> نوع الإنشغال المختص به</label><select id="newDeptType"></select></div>
+      <div class="form-field"><label><i class="fa-solid fa-key"></i> كلمة السر</label><input type="text" id="newDeptPassword" placeholder="أدخل كلمة سر للمصلحة" value="1234"></div>
+      <div class="form-field"><label><i class="fa-solid fa-user-tie"></i> اسم المسؤول</label><input type="text" id="newDeptManager" placeholder="اسم مسؤول المصلحة"></div>
+      <button class="btn-primary" style="width:100%; justify-content:center;" onclick="addDepartment()"><i class="fa-solid fa-save"></i> إضافة المصلحة</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="transferModal" onclick="if(event.target===this)closeTransfer()">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-head"><div><h3>🔄 تحويل الإنشغال</h3></div><button class="btn-close-modal" onclick="closeTransfer()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <p style="margin-bottom:12px; color:var(--text-dim);">تحويل الإنشغال <strong id="transferCodeDisplay"></strong> إلى:</p>
+      <div class="form-field"><label>إلى المصلحة</label><select id="transferDeptSelect"></select></div>
+      <div class="form-field"><label>سبب التحويل</label><input type="text" id="transferReason" placeholder="سبب التحويل..."></div>
+      <button class="btn-gold" style="width:100%; justify-content:center;" onclick="confirmTransfer()"><i class="fa-solid fa-arrow-left"></i> تحويل الإنشغال</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="detailsModal" onclick="if(event.target===this)closeDetails()">
   <div class="modal-box">
     <div class="modal-head"><div><h3 id="detailsTitle">تفاصيل الإنشغال</h3></div><button class="btn-close-modal" onclick="closeDetails()"><i class="fa-solid fa-xmark"></i></button></div>
@@ -606,7 +675,7 @@ tbody tr:hover { background: var(--table-hover); }
 
 <script>
 // ============================================================
-// 🔥 إعدادات Firebase - تم تعبئتها ببياناتك
+// 🔥 إعدادات Firebase
 // ============================================================
 const firebaseConfig = {
     apiKey: "AIzaSyA-rNHBXHMRLS-0mF2529IbsNpRR9hf6Yc",
@@ -618,23 +687,36 @@ const firebaseConfig = {
     appId: "1:589540782949:web:916186c0587f2b4a2c678c"
 };
 
-// ============================================================
-// تهيئة Firebase
-// ============================================================
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 // ============================================================
-// DATA - كل البيانات الأصلية محفوظة
+// 💾 بيانات اعتماد المصالح (مخزنة مسبقاً)
+// سيتم تحديثها ديناميكياً عند إضافة مصالح جديدة
+// ============================================================
+let DEPARTMENT_CREDENTIALS = {
+  // اسم المستخدم: { password: كلمة المرور, departmentId: معرف المصلحة }
+  "maintenance": { password: "1234", departmentId: "dept1" },
+  "pedagogy": { password: "5678", departmentId: "dept2" },
+  "digital": { password: "9012", departmentId: "dept3" },
+  "hr": { password: "3456", departmentId: "dept4" },
+  "networks": { password: "7890", departmentId: "dept5" }
+};
+
+// ============================================================
+// 💾 البيانات الأساسية
 // ============================================================
 let MASTER_PASSWORD = "1996";
 let currentRole = null;
+let currentDepartment = null; // معرف المصلحة الحالية
 let activeIssues = [];
 let archivedIssues = [];
 let fileTypes = [];
 let centerIssues = [];
 let centerArchived = [];
+let departments = [];
 let analyticsChartInstance = null;
+let deptChartInstance = null;
 let currentChatCode = null;
 let pendingAttachment = null;
 let pendingCenterFile = null;
@@ -657,10 +739,20 @@ const LS_KEYS = {
   theme: "hassan_theme",
   interChat: "inter_institution_chat",
   masterPass: "hassan_master_pass",
-  lastSync: "hassan_last_sync"
+  lastSync: "hassan_last_sync",
+  departments: "hassan_departments",
+  deptCredentials: "hassan_dept_credentials"
 };
 
 const DEFAULT_FILE_TYPES = ["منظومة الرقمنة والأرضية الرقمية","مصلحة المتابعة البيداغوجية والبرامج","الهياكل والشبكات وتكنولوجيا المعلومات","الموارد البشرية والتكوين","الصيانة والتجهيزات"];
+
+const DEFAULT_DEPARTMENTS = [
+  { id: "dept1", name: "مصلحة الصيانة والتجهيزات", type: "الصيانة والتجهيزات", password: "1234", manager: "مسؤول الصيانة" },
+  { id: "dept2", name: "مصلحة البيداغوجيا والبرامج", type: "المتابعة البيداغوجية والبرامج", password: "5678", manager: "مسؤول البيداغوجيا" },
+  { id: "dept3", name: "مصلحة الرقمنة والمعلوماتية", type: "منظومة الرقمنة والأرضية الرقمية", password: "9012", manager: "مسؤول الرقمنة" },
+  { id: "dept4", name: "مصلحة الموارد البشرية", type: "الموارد البشرية والتكوين", password: "3456", manager: "مسؤول الموارد البشرية" },
+  { id: "dept5", name: "مصلحة الهياكل والشبكات", type: "الهياكل والشبكات وتكنولوجيا المعلومات", password: "7890", manager: "مسؤول الهياكل" }
+];
 
 const INSTITUTIONS_DATA = [
   { name: "المعهد الوطني المتخصص في التكوين المهني ب .ب.ع 01", code: "INSFP001", password: "789012", type: "center" },
@@ -711,7 +803,7 @@ const INSTITUTIONS_DATA = [
 ];
 
 // ============================================================
-// THEME
+// 🌓 THEME
 // ============================================================
 function toggleTheme() {
   const html = document.getElementById('htmlRoot');
@@ -735,19 +827,32 @@ function loadTheme() {
 }
 
 // ============================================================
-// STORAGE HELPERS - محفوظة مع Firebase
+// 💾 STORAGE HELPERS
 // ============================================================
 function loadDB() {
-  // تحميل البيانات من localStorage كنسخة احتياطية
   activeIssues = JSON.parse(localStorage.getItem(LS_KEYS.core) || "[]");
   archivedIssues = JSON.parse(localStorage.getItem(LS_KEYS.resolved) || "[]");
   fileTypes = JSON.parse(localStorage.getItem(LS_KEYS.fileTypes) || "null") || DEFAULT_FILE_TYPES.slice();
   centerIssues = JSON.parse(localStorage.getItem(LS_KEYS.centerIssues) || "[]");
   centerArchived = JSON.parse(localStorage.getItem(LS_KEYS.centerArchived) || "[]");
   interChatMessages = JSON.parse(localStorage.getItem(LS_KEYS.interChat) || "[]");
+  departments = JSON.parse(localStorage.getItem(LS_KEYS.departments) || "null") || DEFAULT_DEPARTMENTS.slice();
+  
+  // تحميل بيانات الاعتماد المحفوظة
+  const savedCreds = localStorage.getItem(LS_KEYS.deptCredentials);
+  if (savedCreds) {
+    try {
+      DEPARTMENT_CREDENTIALS = JSON.parse(savedCreds);
+    } catch(e) {}
+  }
+  
   const savedPass = localStorage.getItem(LS_KEYS.masterPass);
   if (savedPass) MASTER_PASSWORD = savedPass;
   lastSyncTimestamp = parseInt(localStorage.getItem(LS_KEYS.lastSync) || "0");
+}
+
+function saveCredentials() {
+  localStorage.setItem(LS_KEYS.deptCredentials, JSON.stringify(DEPARTMENT_CREDENTIALS));
 }
 
 function saveToFirebase() {
@@ -758,6 +863,8 @@ function saveToFirebase() {
     centerArchived: centerArchived,
     interChat: interChatMessages,
     fileTypes: fileTypes,
+    departments: departments,
+    deptCredentials: DEPARTMENT_CREDENTIALS,
     timestamp: Date.now()
   };
   database.ref('data').set(data).catch(err => console.log('Save error:', err));
@@ -776,23 +883,21 @@ function listenToFirebase() {
       if (data.centerArchived) { centerArchived = data.centerArchived; changed = true; }
       if (data.interChat) { interChatMessages = data.interChat; changed = true; }
       if (data.fileTypes) { fileTypes = data.fileTypes; changed = true; }
+      if (data.departments) { departments = data.departments; changed = true; }
+      if (data.deptCredentials) { DEPARTMENT_CREDENTIALS = data.deptCredentials; saveCredentials(); changed = true; }
       
       if (changed) {
-        // حفظ في localStorage للنسخ الاحتياطي
         localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
         localStorage.setItem(LS_KEYS.resolved, JSON.stringify(archivedIssues));
         localStorage.setItem(LS_KEYS.centerIssues, JSON.stringify(centerIssues));
         localStorage.setItem(LS_KEYS.centerArchived, JSON.stringify(centerArchived));
         localStorage.setItem(LS_KEYS.interChat, JSON.stringify(interChatMessages));
         localStorage.setItem(LS_KEYS.fileTypes, JSON.stringify(fileTypes));
+        localStorage.setItem(LS_KEYS.departments, JSON.stringify(departments));
         
         const newCount = activeIssues.length + centerIssues.length;
         if (newCount > oldCount) {
           showToast('📩 إنشغال جديد', 'تم استلام إنشغال جديد من أحد المراكز!');
-          try {
-            const audio = new Audio('data:audio/wav;base64,UklGRlwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQwAAACAgICAf39/f39/f39/gICAf39/f39/f3+AgIB/f39/f39/f3+AgIB/f39/f38=');
-            audio.play().catch(() => {});
-          } catch(e) {}
         }
         updateUI();
       }
@@ -816,6 +921,8 @@ function forceSync() {
       if (data.centerArchived) centerArchived = data.centerArchived;
       if (data.interChat) interChatMessages = data.interChat;
       if (data.fileTypes) fileTypes = data.fileTypes;
+      if (data.departments) departments = data.departments;
+      if (data.deptCredentials) { DEPARTMENT_CREDENTIALS = data.deptCredentials; saveCredentials(); }
       updateUI();
       showToast('✅ تم التحديث', 'تم جلب أحدث البيانات بنجاح');
     }
@@ -837,20 +944,20 @@ function updateUI() {
     renderArchive();
     renderTokensGrid();
     renderFileTypesManageList();
+    renderDepartmentsList();
+    renderDeptDashboard();
+    populateDeptFilters();
+  } else if (currentRole === 'department') {
+    renderDepartmentIssues();
+    renderDeptKPIs();
   } else {
     renderChatHub();
     refreshCenterUI();
   }
-  // تحديث وقت آخر مزامنة
-  const now = new Date();
-  const syncTime = document.querySelector('.sync-badge');
-  if (syncTime) {
-    // يمكن إضافة وقت التحديث هنا
-  }
 }
 
 // ============================================================
-// تسجيل الدخول - محفوظ كما هو
+// 🔐 تسجيل الدخول
 // ============================================================
 let selectedLoginRole = 'directorate';
 
@@ -858,11 +965,17 @@ function selectLoginRole(role) {
   selectedLoginRole = role;
   document.querySelectorAll('.role-selector button').forEach(b => b.classList.remove('active'));
   document.getElementById('loginRole' + role.charAt(0).toUpperCase() + role.slice(1)).classList.add('active');
+  
+  document.getElementById('directorateFields').style.display = 'none';
+  document.getElementById('departmentFields').style.display = 'none';
+  document.getElementById('centerFields').style.display = 'none';
+  document.getElementById('centerHint').style.display = 'none';
+  
   if (role === 'directorate') {
     document.getElementById('directorateFields').style.display = 'block';
-    document.getElementById('centerFields').style.display = 'none';
+  } else if (role === 'department') {
+    document.getElementById('departmentFields').style.display = 'block';
   } else {
-    document.getElementById('directorateFields').style.display = 'none';
     document.getElementById('centerFields').style.display = 'block';
     document.getElementById('centerHint').style.display = 'block';
     populateCenterSelect();
@@ -895,6 +1008,7 @@ function filterCenterSelect() {
 function handleLogin() {
   const err = document.getElementById('loginError');
   err.style.display = 'none';
+  
   if (selectedLoginRole === 'directorate') {
     const user = document.getElementById('loginUser').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
@@ -905,6 +1019,27 @@ function handleLogin() {
     } else {
       err.style.display = 'block';
       err.textContent = '⚠️ بيانات الدخول غير صحيحة!';
+    }
+  } else if (selectedLoginRole === 'department') {
+    const username = document.getElementById('loginDeptUser').value.trim();
+    const pass = document.getElementById('loginDeptPass').value.trim();
+    
+    // التحقق من بيانات الاعتماد المخزنة
+    const cred = DEPARTMENT_CREDENTIALS[username];
+    if (cred && cred.password === pass) {
+      // العثور على المصلحة المقابلة
+      const dept = departments.find(d => d.id === cred.departmentId);
+      if (dept) {
+        currentRole = 'department';
+        currentDepartment = dept.id;
+        initApp();
+      } else {
+        err.style.display = 'block';
+        err.textContent = '⚠️ المصلحة غير موجودة في النظام!';
+      }
+    } else {
+      err.style.display = 'block';
+      err.textContent = '⚠️ اسم المستخدم أو كلمة المرور غير صحيحة! يرجى الاتصال بالمديرية.';
     }
   } else {
     const center = document.getElementById('loginCenterSelect').value;
@@ -917,7 +1052,7 @@ function handleLogin() {
       initApp();
     } else {
       err.style.display = 'block';
-      err.textContent = '⚠️ كلمة السر غير صحيحة! يرجى الاتصال بالمديرية ( حسان بلحاج ).';
+      err.textContent = '⚠️ كلمة السر غير صحيحة! يرجى الاتصال بالمديرية.';
     }
   }
 }
@@ -925,10 +1060,14 @@ function handleLogin() {
 function toggleRemember() {
   const checked = document.getElementById('rememberMe').checked;
   if (checked) {
-    const role = document.getElementById('centerFields').style.display === 'none' ? 'directorate' : 'center';
+    const role = selectedLoginRole;
     if (role === 'directorate') {
       const user = document.getElementById('loginUser').value;
       const pass = document.getElementById('loginPass').value;
+      if (user && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, user, pass }));
+    } else if (role === 'department') {
+      const user = document.getElementById('loginDeptUser').value;
+      const pass = document.getElementById('loginDeptPass').value;
       if (user && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, user, pass }));
     } else {
       const center = document.getElementById('loginCenterSelect').value;
@@ -948,6 +1087,11 @@ function loadRemembered() {
         document.getElementById('loginUser').value = parsed.user || '';
         document.getElementById('loginPass').value = parsed.pass || '';
         document.getElementById('rememberMe').checked = true;
+      } else if (parsed.role === 'department') {
+        selectLoginRole('department');
+        document.getElementById('loginDeptUser').value = parsed.user || '';
+        document.getElementById('loginDeptPass').value = parsed.pass || '';
+        document.getElementById('rememberMe').checked = true;
       } else if (parsed.role === 'center') {
         selectLoginRole('center');
         document.getElementById('loginCenterSelect').value = parsed.center || '';
@@ -961,7 +1105,7 @@ function loadRemembered() {
 }
 
 // ============================================================
-// تغيير كلمة السر - محفوظ
+// 🔑 تغيير كلمة السر
 // ============================================================
 function openChangePassword() {
   document.getElementById('currentPass').value = '';
@@ -988,17 +1132,15 @@ function changePassword() {
 }
 
 // ============================================================
-// INIT APP - مع Firebase
+// 🚀 INIT APP
 // ============================================================
 function initApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appRoot').style.display = 'block';
   loadDB();
   
-  // بدء الاستماع للتحديثات الفورية من Firebase
   listenToFirebase();
   
-  // جلب البيانات الأولية
   database.ref('data').once('value').then((snapshot) => {
     const data = snapshot.val();
     if (data) {
@@ -1008,6 +1150,8 @@ function initApp() {
       if (data.centerArchived) centerArchived = data.centerArchived;
       if (data.interChat) interChatMessages = data.interChat;
       if (data.fileTypes) fileTypes = data.fileTypes;
+      if (data.departments) departments = data.departments;
+      if (data.deptCredentials) { DEPARTMENT_CREDENTIALS = data.deptCredentials; saveCredentials(); }
     }
     setupInterface();
   });
@@ -1032,10 +1176,20 @@ function setupInterface() {
     initChart();
     renderList();
     renderArchive();
+    renderDepartmentsList();
+    renderDeptDashboard();
+    populateDeptFilters();
     document.getElementById('page-dashboard').classList.remove('hidden');
     switchTab('dashboard');
     initScrollDrag('listTableScroll','listScrollTrack','listScrollThumb');
     initScrollDrag('archiveTableScroll','archiveScrollTrack','archiveScrollThumb');
+  } else if (currentRole === 'department') {
+    document.getElementById('institutionsPanel').style.display = 'none';
+    document.getElementById('fileTypesPanel').style.display = 'none';
+    document.getElementById('centerInfoPanel').style.display = 'none';
+    document.getElementById('page-dept-dashboard').classList.remove('hidden');
+    renderDeptIssuesForDepartment();
+    switchTab('dept-dashboard');
   } else {
     document.getElementById('institutionsPanel').style.display = 'none';
     document.getElementById('fileTypesPanel').style.display = 'block';
@@ -1052,7 +1206,7 @@ function setupInterface() {
 }
 
 // ============================================================
-// SIDEBAR - محفوظ
+// 📋 SIDEBAR
 // ============================================================
 function setupSidebar() {
   const navList = document.getElementById('navList');
@@ -1069,11 +1223,25 @@ function setupSidebar() {
     badge.className = 'role-badge directorate';
     navList.innerHTML = `
       <li><button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-gauge-high"></i> لوحة التحكم</button></li>
+      <li><button class="nav-btn" data-tab="dept-dashboard" onclick="switchTab('dept-dashboard')"><i class="fa-solid fa-chart-simple"></i> أداء المصالح</button></li>
+      <li><button class="nav-btn" data-tab="departments" onclick="switchTab('departments')"><i class="fa-solid fa-users-gear"></i> إدارة المصالح</button></li>
       <li><button class="nav-btn" data-tab="add" onclick="switchTab('add')"><i class="fa-solid fa-pen-to-square"></i> تدوين إنشغال</button></li>
-      <li><button class="nav-btn" data-tab="broadcast" onclick="switchTab('broadcast')"><i class="fa-solid fa-bullhorn"></i> إرسال إنشغال </button></li>
-      <li><button class="nav-btn" data-tab="list" onclick="switchTab('list')"><i class="fa-solid fa-list-check"></i> متابعة الإنشغالات </button></li>
+      <li><button class="nav-btn" data-tab="broadcast" onclick="switchTab('broadcast')"><i class="fa-solid fa-bullhorn"></i> إرسال إنشغال</button></li>
+      <li><button class="nav-btn" data-tab="list" onclick="switchTab('list')"><i class="fa-solid fa-list-check"></i> متابعة الإنشغالات</button></li>
       <li><button class="nav-btn" data-tab="archive" onclick="switchTab('archive')"><i class="fa-solid fa-box-archive"></i> الأرشيف</button></li>
       <li><button class="nav-btn" data-tab="tokens" onclick="switchTab('tokens')"><i class="fa-solid fa-key"></i> كلمات السر</button></li>
+      <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
+    `;
+  } else if (currentRole === 'department') {
+    const dept = departments.find(d => d.id === currentDepartment);
+    avatar.innerHTML = '<i class="fa-solid fa-users-gear"></i>';
+    name.textContent = dept ? dept.name : 'مصلحة';
+    title.textContent = dept ? dept.manager : 'مسؤول المصلحة';
+    badge.textContent = 'مصلحة';
+    badge.className = 'role-badge department';
+    navList.innerHTML = `
+      <li><button class="nav-btn active" data-tab="dept-dashboard" onclick="switchTab('dept-dashboard')"><i class="fa-solid fa-gauge-high"></i> لوحة المصلحة</button></li>
+      <li><button class="nav-btn" data-tab="dept-issues" onclick="switchTab('dept-issues')"><i class="fa-solid fa-list-check"></i> الإنشغالات</button></li>
       <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
     `;
   } else {
@@ -1101,23 +1269,1157 @@ function switchTab(tab) {
   if (tab === 'chat-hub' && currentRole === 'center') renderChatHub();
   if (tab === 'tokens' && currentRole === 'directorate') renderTokensGrid();
   if (tab === 'broadcast') updateBroadcastCount();
+  if (tab === 'departments' && currentRole === 'directorate') renderDepartmentsList();
+  if (tab === 'dept-dashboard' && currentRole === 'directorate') renderDeptDashboard();
+  if (tab === 'dept-issues' && currentRole === 'department') renderDeptIssuesForDepartment();
 }
 
 // ============================================================
-// DROPDOWNS - محفوظ
+// 📊 DASHBOARD FUNCTIONS
+// ============================================================
+function renderKPIs() {
+  const total = activeIssues.length + archivedIssues.length;
+  const pending = activeIssues.length;
+  const done = archivedIssues.length;
+  const efficiency = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('kpi-total').textContent = total;
+  document.getElementById('kpi-pending').textContent = pending;
+  document.getElementById('kpi-done').textContent = done;
+  document.getElementById('kpi-efficiency').textContent = efficiency + '%';
+}
+
+function initChart() {
+  const ctx = document.getElementById('analyticsChart').getContext('2d');
+  analyticsChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: ['الإجمالي', 'قيد المعالجة', 'المسواة'], datasets: [{ label: 'عدد الإنشغالات', data: [activeIssues.length + archivedIssues.length, activeIssues.length, archivedIssues.length], backgroundColor: ['#006633', '#ffc107', '#28a745'], borderRadius: 8, maxBarThickness: 50 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#6c757d', font: { family: 'Cairo', weight: '700', size: 14 } }, grid: { color: 'rgba(0,0,0,0.04)' } }, y: { beginAtZero: true, ticks: { color: '#6c757d', font: { family: 'Cairo', size: 14 } }, grid: { color: 'rgba(0,0,0,0.04)' } } } }
+  });
+}
+
+function updateChart() {
+  if (!analyticsChartInstance) return;
+  const total = activeIssues.length + archivedIssues.length;
+  analyticsChartInstance.data.datasets[0].data = [total, activeIssues.length, archivedIssues.length];
+  analyticsChartInstance.update();
+}
+
+// ============================================================
+// 🏢 DEPARTMENT FUNCTIONS
+// ============================================================
+function renderDepartmentsList() {
+  const container = document.getElementById('departmentsListContainer');
+  if (!container) return;
+  
+  if (departments.length === 0) {
+    container.innerHTML = '<div class="empty-msg">لا توجد مصالح مسجلة</div>';
+    return;
+  }
+  
+  container.innerHTML = `<div class="dept-stats-grid">${departments.map(dept => {
+    const deptIssues = activeIssues.filter(i => i.department === dept.id);
+    const totalIssues = deptIssues.length;
+    const pendingIssues = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') === -1).length;
+    const resolvedIssues = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') !== -1).length;
+    const efficiency = totalIssues > 0 ? Math.round((resolvedIssues / totalIssues) * 100) : 0;
+    const username = getDepartmentUsername(dept.id);
+    return `<div class="dept-stat-card" style="border-right:4px solid var(--algeria-green);">
+      <div class="dept-name">${dept.name}</div>
+      <div style="font-size:14px; color:var(--text-dim); margin-bottom:6px;">${dept.manager} | ${dept.type}</div>
+      <div style="font-size:13px; color:var(--algeria-green); background:var(--bg-card-2); padding:4px 12px; border-radius:8px; display:inline-block; margin-bottom:8px;">
+        <i class="fa-solid fa-user"></i> اسم المستخدم: ${username}
+      </div>
+      <div class="dept-stats">
+        <div class="stat-item"><div class="num">${totalIssues}</div><div class="label">الكل</div></div>
+        <div class="stat-item"><div class="num">${pendingIssues}</div><div class="label">قيد المعالجة</div></div>
+        <div class="stat-item"><div class="num">${resolvedIssues}</div><div class="label">تم الحل</div></div>
+        <div class="stat-item"><div class="num">${efficiency}%</div><div class="label">الكفاءة</div></div>
+      </div>
+      <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn-mini" onclick="editDepartment('${dept.id}')"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn-mini danger" onclick="deleteDepartment('${dept.id}')"><i class="fa-solid fa-trash"></i></button>
+        <span style="font-size:13px; color:var(--text-dim);"><i class="fa-solid fa-key"></i> كلمة السر: ${dept.password}</span>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function getDepartmentUsername(deptId) {
+  for (const [username, cred] of Object.entries(DEPARTMENT_CREDENTIALS)) {
+    if (cred.departmentId === deptId) return username;
+  }
+  return 'غير محدد';
+}
+
+function renderDeptDashboard() {
+  const container = document.getElementById('deptStatsContainer');
+  if (!container) return;
+  
+  populateDeptFilters();
+  
+  container.innerHTML = `<div class="dept-stats-grid">${departments.map(dept => {
+    const deptIssues = activeIssues.filter(i => i.department === dept.id);
+    const totalIssues = deptIssues.length;
+    const pendingIssues = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') === -1).length;
+    const resolvedIssues = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') !== -1).length;
+    const efficiency = totalIssues > 0 ? Math.round((resolvedIssues / totalIssues) * 100) : 0;
+    const username = getDepartmentUsername(dept.id);
+    return `<div class="dept-stat-card" style="border-right:4px solid var(--algeria-green);">
+      <div class="dept-name">${dept.name}</div>
+      <div style="font-size:14px; color:var(--text-dim); margin-bottom:6px;">${dept.manager} | ${dept.type}</div>
+      <div style="font-size:13px; color:var(--algeria-green); background:var(--bg-card-2); padding:4px 12px; border-radius:8px; display:inline-block; margin-bottom:8px;">
+        <i class="fa-solid fa-user"></i> اسم المستخدم: ${username}
+      </div>
+      <div class="dept-stats">
+        <div class="stat-item"><div class="num">${totalIssues}</div><div class="label">الكل</div></div>
+        <div class="stat-item"><div class="num">${pendingIssues}</div><div class="label">قيد المعالجة</div></div>
+        <div class="stat-item"><div class="num">${resolvedIssues}</div><div class="label">تم الحل</div></div>
+        <div class="stat-item"><div class="num">${efficiency}%</div><div class="label">الكفاءة</div></div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+  
+  updateDeptChart();
+}
+
+function updateDeptChart() {
+  const ctx = document.getElementById('deptChart');
+  if (!ctx) return;
+  const canvas = ctx.getContext('2d');
+  
+  const labels = departments.map(d => d.name.length > 15 ? d.name.substring(0, 15) + '...' : d.name);
+  const data = departments.map(dept => {
+    return activeIssues.filter(i => i.department === dept.id).length;
+  });
+  
+  if (deptChartInstance) {
+    deptChartInstance.destroy();
+  }
+  
+  deptChartInstance = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'عدد الإنشغالات',
+        data: data,
+        backgroundColor: '#006633',
+        borderRadius: 8,
+        maxBarThickness: 40
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: 'توزيع الإنشغالات حسب المصلحة', color: '#6c757d', font: { family: 'Cairo', size: 16 } }
+      },
+      scales: {
+        x: { ticks: { color: '#6c757d', font: { family: 'Cairo', weight: '700', size: 12 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+        y: { beginAtZero: true, ticks: { color: '#6c757d', font: { family: 'Cairo', size: 12 } }, grid: { color: 'rgba(0,0,0,0.04)' } }
+      }
+    }
+  });
+}
+
+function populateDeptFilters() {
+  const select1 = document.getElementById('list-dept-filter');
+  const select2 = document.getElementById('archive-dept-filter');
+  const options = '<option value="">كل المصالح</option>' + departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+  if (select1) select1.innerHTML = options;
+  if (select2) select2.innerHTML = options;
+}
+
+function openAddDepartment() {
+  const typeSelect = document.getElementById('newDeptType');
+  typeSelect.innerHTML = fileTypes.map(t => `<option value="${t}">${t}</option>`).join('');
+  document.getElementById('newDeptUsername').value = '';
+  document.getElementById('newDeptName').value = '';
+  document.getElementById('newDeptPassword').value = Math.floor(1000 + Math.random() * 9000).toString();
+  document.getElementById('newDeptManager').value = '';
+  document.getElementById('addDeptModal').classList.add('open');
+}
+
+function closeAddDepartment() {
+  document.getElementById('addDeptModal').classList.remove('open');
+}
+
+function addDepartment() {
+  const username = document.getElementById('newDeptUsername').value.trim();
+  const name = document.getElementById('newDeptName').value.trim();
+  const type = document.getElementById('newDeptType').value;
+  const password = document.getElementById('newDeptPassword').value.trim();
+  const manager = document.getElementById('newDeptManager').value.trim();
+  
+  if (!username) { alert('يرجى إدخال اسم المستخدم للمصلحة'); return; }
+  if (!name || !type || !password) { alert('يرجى تعبئة جميع الحقول الأساسية'); return; }
+  
+  // التحقق من عدم تكرار اسم المستخدم
+  if (DEPARTMENT_CREDENTIALS[username]) {
+    alert('اسم المستخدم هذا مستخدم بالفعل! يرجى اختيار اسم آخر.');
+    return;
+  }
+  
+  const newDept = {
+    id: 'dept_' + Date.now(),
+    name: name,
+    type: type,
+    password: password || '1234',
+    manager: manager || 'مسؤول المصلحة'
+  };
+  
+  departments.push(newDept);
+  
+  // إضافة بيانات الاعتماد للمصلحة الجديدة
+  DEPARTMENT_CREDENTIALS[username] = {
+    password: password,
+    departmentId: newDept.id
+  };
+  
+  saveCredentials();
+  saveToFirebase();
+  closeAddDepartment();
+  renderDepartmentsList();
+  renderDeptDashboard();
+  populateDeptFilters();
+  showToast('✅ تم الإضافة', `تم إضافة المصلحة ${name} باسم مستخدم "${username}" بنجاح`);
+}
+
+function editDepartment(id) {
+  const dept = departments.find(d => d.id === id);
+  if (!dept) return;
+  
+  // البحث عن اسم المستخدم الحالي
+  let currentUsername = '';
+  for (const [user, cred] of Object.entries(DEPARTMENT_CREDENTIALS)) {
+    if (cred.departmentId === id) {
+      currentUsername = user;
+      break;
+    }
+  }
+  
+  const newUsername = prompt('تعديل اسم المستخدم (اترك فارغاً للإبقاء على الحالي):', currentUsername);
+  if (newUsername !== null && newUsername.trim() !== '' && newUsername.trim() !== currentUsername) {
+    // التحقق من عدم تكرار اسم المستخدم الجديد
+    if (DEPARTMENT_CREDENTIALS[newUsername.trim()]) {
+      alert('اسم المستخدم هذا مستخدم بالفعل!');
+      return;
+    }
+    // نقل بيانات الاعتماد إلى اسم المستخدم الجديد
+    const cred = DEPARTMENT_CREDENTIALS[currentUsername];
+    delete DEPARTMENT_CREDENTIALS[currentUsername];
+    DEPARTMENT_CREDENTIALS[newUsername.trim()] = cred;
+    saveCredentials();
+  }
+  
+  const newName = prompt('تعديل اسم المصلحة:', dept.name);
+  if (newName && newName.trim()) dept.name = newName.trim();
+  const newManager = prompt('تعديل اسم المسؤول:', dept.manager);
+  if (newManager && newManager.trim()) dept.manager = newManager.trim();
+  const newPassword = prompt('تعديل كلمة السر:', dept.password);
+  if (newPassword && newPassword.trim()) {
+    dept.password = newPassword.trim();
+    // تحديث كلمة السر في بيانات الاعتماد
+    for (const [user, cred] of Object.entries(DEPARTMENT_CREDENTIALS)) {
+      if (cred.departmentId === id) {
+        cred.password = newPassword.trim();
+        break;
+      }
+    }
+    saveCredentials();
+  }
+  
+  saveToFirebase();
+  renderDepartmentsList();
+  renderDeptDashboard();
+  populateDeptFilters();
+  showToast('✅ تم التعديل', 'تم تعديل بيانات المصلحة بنجاح');
+}
+
+function deleteDepartment(id) {
+  if (!confirm('هل أنت متأكد من حذف هذه المصلحة؟')) return;
+  
+  // حذف بيانات الاعتماد المرتبطة
+  for (const [user, cred] of Object.entries(DEPARTMENT_CREDENTIALS)) {
+    if (cred.departmentId === id) {
+      delete DEPARTMENT_CREDENTIALS[user];
+      break;
+    }
+  }
+  saveCredentials();
+  
+  departments = departments.filter(d => d.id !== id);
+  activeIssues.forEach(i => { if (i.department === id) i.department = ''; });
+  saveToFirebase();
+  renderDepartmentsList();
+  renderDeptDashboard();
+  populateDeptFilters();
+  showToast('🗑️ تم الحذف', 'تم حذف المصلحة بنجاح');
+}
+
+function updateDepartmentSuggestion() {
+  const type = document.getElementById('add-form-type').value;
+  const dept = departments.find(d => d.type === type);
+  const suggestedField = document.getElementById('add-form-suggested-dept');
+  if (dept) {
+    suggestedField.value = dept.name + ' (تلقائي)';
+    suggestedField.style.color = 'var(--algeria-green)';
+  } else {
+    suggestedField.value = 'لا توجد مصلحة مختصة حالياً';
+    suggestedField.style.color = 'var(--text-dim)';
+  }
+}
+
+function getDepartmentForType(type) {
+  return departments.find(d => d.type === type);
+}
+
+// ============================================================
+// 📋 LIST FUNCTIONS
+// ============================================================
+let currentListTab = 'all';
+
+function switchListTab(tab) {
+  currentListTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.tab-btn[onclick="switchListTab('${tab}')"]`)?.classList.add('active');
+  renderList();
+}
+
+function priorityPillHtml(p) {
+  if (p === 'مستعجل جداً') return `<span class="pill pill-urgent">مستعجل جداً 🔴</span>`;
+  if (p === 'متوسط') return `<span class="pill pill-medium">متوسط 🟡</span>`;
+  return `<span class="pill pill-normal">عادي 🟢</span>`;
+}
+
+function sourceBadgeHtml(source) {
+  if (source === 'directorate') return `<span style="color:var(--algeria-green); font-weight:800; font-size:14px;">المديرية</span>`;
+  return `<span style="color:var(--algeria-red); font-weight:800; font-size:14px;">مركز</span>`;
+}
+
+function hasUnreadMessages(code) {
+  const msgs = getChatMessages(code);
+  if (msgs.length === 0) return false;
+  const last = msgs[msgs.length - 1];
+  if (currentRole === 'department') {
+    return last.sender !== 'department' && !last.read;
+  }
+  return last.sender !== currentRole && !last.read;
+}
+
+function hasAttachment(issue) { return issue.attachments && issue.attachments.length > 0; }
+
+function getTimeAgo(timestamp) {
+  const diff = Date.now() - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (days > 0) return `منذ ${days} يوم`;
+  if (hours > 0) return `منذ ${hours} ساعة`;
+  if (minutes > 0) return `منذ ${minutes} دقيقة`;
+  return 'الآن';
+}
+
+function getDepartmentName(id) {
+  if (!id) return 'غير محددة';
+  const dept = departments.find(d => d.id === id);
+  return dept ? dept.name : 'غير محددة';
+}
+
+function renderList() {
+  const search = (document.getElementById('list-search')?.value || '').trim().toLowerCase();
+  const priorityFilter = document.getElementById('list-priority-filter')?.value || '';
+  const sourceFilter = document.getElementById('list-source-filter')?.value || '';
+  const deptFilter = document.getElementById('list-dept-filter')?.value || '';
+  const tbody = document.getElementById('listTableBody');
+  if (!tbody) return;
+  
+  let filtered = [];
+  if (currentListTab === 'archived_center') {
+    filtered = centerArchived.filter(issue => {
+      const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
+      const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
+      return matchesSearch && matchesPriority;
+    });
+  } else {
+    filtered = activeIssues.filter(issue => {
+      if (currentListTab === 'directorate' && issue.source !== 'directorate') return false;
+      if (currentListTab === 'centers' && issue.source !== 'center') return false;
+      const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
+      const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
+      const matchesSource = !sourceFilter || issue.source === sourceFilter;
+      const matchesDept = !deptFilter || issue.department === deptFilter;
+      return matchesSearch && matchesPriority && matchesSource && matchesDept;
+    });
+  }
+  
+  if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="12" class="empty-msg">${currentListTab === 'archived_center' ? 'لا توجد إنشغالات مرسلة من المراكز في الأرشيف.' : 'لا توجد إنشغالات مطابقة حالياً.'}</td></tr>`; return; }
+  
+  tbody.innerHTML = filtered.map(issue => {
+    const unread = currentListTab !== 'archived_center' && hasUnreadMessages(issue.code);
+    const hasAttach = hasAttachment(issue);
+    const timeAgo = getTimeAgo(issue.createdAt);
+    const isArchived = currentListTab === 'archived_center';
+    const isBroadcast = issue.isBroadcast || false;
+    const deptName = getDepartmentName(issue.department);
+    return `<tr class="${unread ? 'row-unread' : ''}">
+      <td><strong style="font-size:16px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo} ${isBroadcast ? '📢' : ''}</span></td>
+      <td style="font-size:16px;">${escapeHtml(issue.center)}</td>
+      <td style="font-size:16px;">${escapeHtml(issue.type)}</td>
+      <td style="font-size:14px; font-weight:700;">${escapeHtml(deptName)}</td>
+      <td>${priorityPillHtml(issue.priority)}</td>
+      <td style="font-size:16px;">${escapeHtml(issue.author)}</td>
+      <td>${sourceBadgeHtml(issue.source)}</td>
+      <td><button class="btn-mini view-btn" onclick="openDetails('${issue.code}', ${isArchived ? 'true' : 'false'})"><i class="fa-solid fa-eye"></i></button></td>
+      <td>${hasAttach ? '<span style="color:var(--algeria-green);"><i class="fa-solid fa-paperclip"></i></span>' : '<span style="color:var(--text-dim);">-</span>'}</td>
+      <td>${isArchived ? '<span class="status-resolved">مؤرشف 📦</span>' : `<select class="status-select" onchange="toggleStatus('${issue.code}', this.value)"><option value="pending" ${issue.status && issue.status.indexOf('قيد المعالجة') !== -1 ? 'selected' : ''}>قيد المعالجة</option><option value="resolved" ${issue.status && issue.status.indexOf('تم الحل') !== -1 ? 'selected' : ''}>تم الحل</option></select>`}</td>
+      <td>${isArchived ? '<span style="color:var(--text-dim);">-</span>' : `<button class="btn-chat ${unread ? 'new-msg' : ''}" onclick="openChat('${issue.code}', '${currentRole}')">${unread ? '<i class="fa-solid fa-bell"></i>' : '<i class="fa-solid fa-comments"></i>'}</button>`}</td>
+      <td>${isArchived ? `<button class="btn-mini success" onclick="restoreFromCenterArchive('${issue.code}')"><i class="fa-solid fa-rotate-left"></i></button><button class="btn-mini danger" onclick="deleteFromCenterArchive('${issue.code}')"><i class="fa-solid fa-trash"></i></button>` : `
+        <button class="btn-mini" onclick="openTransfer('${issue.code}')" title="تحويل إلى مصلحة أخرى" style="border-color:var(--gold); color:var(--gold);"><i class="fa-solid fa-arrow-left"></i></button>
+        ${issue.source === 'center' ? `<button class="btn-mini" onclick="archiveCenterIssue('${issue.code}')" style="border-color:var(--gold); color:var(--gold);"><i class="fa-solid fa-box-archive"></i></button>` : ''}
+        <button class="btn-mini danger" onclick="deleteIssue('${issue.code}')"><i class="fa-solid fa-trash"></i></button>
+      `}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openTransfer(code) {
+  const issue = activeIssues.find(i => i.code === code);
+  if (!issue) { showToast('⚠️ خطأ', 'لم يتم العثور على الإنشغال'); return; }
+  document.getElementById('transferCodeDisplay').textContent = code;
+  const select = document.getElementById('transferDeptSelect');
+  select.innerHTML = departments.map(d => `<option value="${d.id}" ${d.id === issue.department ? 'selected' : ''}>${d.name}</option>`).join('');
+  document.getElementById('transferReason').value = '';
+  document.getElementById('transferModal').classList.add('open');
+}
+
+function closeTransfer() {
+  document.getElementById('transferModal').classList.remove('open');
+}
+
+function confirmTransfer() {
+  const code = document.getElementById('transferCodeDisplay').textContent;
+  const deptId = document.getElementById('transferDeptSelect').value;
+  const reason = document.getElementById('transferReason').value.trim();
+  
+  if (!deptId) { alert('يرجى اختيار المصلحة المستهدفة'); return; }
+  
+  const issue = activeIssues.find(i => i.code === code);
+  if (!issue) { showToast('⚠️ خطأ', 'لم يتم العثور على الإنشغال'); return; }
+  
+  issue.department = deptId;
+  issue.transferHistory = issue.transferHistory || [];
+  issue.transferHistory.push({
+    from: getDepartmentName(issue.department),
+    to: getDepartmentName(deptId),
+    reason: reason || 'تحويل',
+    date: Date.now()
+  });
+  
+  const msgs = getChatMessages(code);
+  msgs.push({
+    sender: 'system',
+    text: `🔄 تم تحويل الإنشغال إلى ${getDepartmentName(deptId)} ${reason ? ' (سبب: ' + reason + ')' : ''}`,
+    time: Date.now(),
+    read: false
+  });
+  saveChatMessages(code, msgs);
+  
+  saveToFirebase();
+  closeTransfer();
+  renderList();
+  renderDeptDashboard();
+  showToast('✅ تم التحويل', `تم تحويل الإنشغال ${code} إلى ${getDepartmentName(deptId)}`);
+}
+
+function archiveCenterIssue(code) {
+  if (!confirm("هل تريد أرشفة هذا الإنشغال من المراكز؟")) return;
+  const idx = activeIssues.findIndex(i => i.code === code && i.source === 'center');
+  if (idx === -1) return;
+  const issue = activeIssues[idx];
+  activeIssues.splice(idx, 1);
+  centerArchived.push(issue);
+  saveToFirebase();
+  renderList(); renderKPIs(); updateChart();
+  showToast("📦 تم الأرشفة", `تم أرشفة الإنشغال ${code} من المراكز.`);
+}
+
+function toggleStatus(code, value) {
+  if (value === 'resolved') {
+    const idx = activeIssues.findIndex(i => i.code === code);
+    if (idx === -1) { showToast("⚠️ خطأ", "لم يتم العثور على الإنشغال"); return; }
+    const issue = activeIssues[idx];
+    issue.status = "تم الحل ✅";
+    activeIssues.splice(idx, 1);
+    archivedIssues.unshift(issue);
+    saveToFirebase();
+    renderKPIs();
+    updateChart();
+    renderList();
+    renderArchive();
+    const centerIdx = centerIssues.findIndex(i => i.code === code);
+    if (centerIdx !== -1) { centerIssues[centerIdx].status = "تم الحل ✅"; saveToFirebase(); }
+    showToast("✅ تم الحل", `تم تسوية الإنشغال ${code} ونقله إلى الأرشيف`);
+  }
+}
+
+function deleteIssue(code) {
+  if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
+  activeIssues = activeIssues.filter(i => i.code !== code);
+  saveToFirebase();
+  renderKPIs(); updateChart(); renderList();
+}
+
+// ============================================================
+// 📦 ARCHIVE FUNCTIONS
+// ============================================================
+function renderArchive() {
+  const search = (document.getElementById('archive-search')?.value || '').trim().toLowerCase();
+  const sourceFilter = document.getElementById('archive-source-filter')?.value || '';
+  const deptFilter = document.getElementById('archive-dept-filter')?.value || '';
+  const tbody = document.getElementById('archiveTableBody');
+  if (!tbody) return;
+  
+  let filtered = archivedIssues.filter(issue => {
+    const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
+    const matchesSource = !sourceFilter || issue.source === sourceFilter;
+    const matchesDept = !deptFilter || issue.department === deptFilter;
+    return matchesSearch && matchesSource && matchesDept;
+  });
+  
+  if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="11" class="empty-msg">لا توجد إنشغالات في الأرشيف.</td></tr>`; return; }
+  
+  tbody.innerHTML = filtered.map(issue => {
+    const hasAttach = hasAttachment(issue);
+    const timeAgo = getTimeAgo(issue.createdAt);
+    const deptName = getDepartmentName(issue.department);
+    return `<tr>
+      <td><strong style="font-size:16px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo}</span></td>
+      <td style="font-size:16px;">${escapeHtml(issue.center)}</td>
+      <td style="font-size:16px;">${escapeHtml(issue.type)}</td>
+      <td style="font-size:14px; font-weight:700;">${escapeHtml(deptName)}</td>
+      <td>${priorityPillHtml(issue.priority)}</td>
+      <td style="font-size:16px;">${escapeHtml(issue.author)}</td>
+      <td>${sourceBadgeHtml(issue.source)}</td>
+      <td><button class="btn-mini view-btn" onclick="openDetails('${issue.code}', true)"><i class="fa-solid fa-eye"></i></button></td>
+      <td>${hasAttach ? '<span style="color:var(--algeria-green);"><i class="fa-solid fa-paperclip"></i></span>' : '<span style="color:var(--text-dim);">-</span>'}</td>
+      <td><span class="status-resolved">تم الحل ✅</span></td>
+      <td style="white-space:nowrap;"><button class="btn-mini" onclick="restoreFromArchive('${issue.code}')"><i class="fa-solid fa-rotate-left"></i></button><button class="btn-mini danger" onclick="deleteFromArchive('${issue.code}')"><i class="fa-solid fa-trash"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+function restoreFromArchive(code) {
+  if (!confirm("هل تريد إعادة هذا الإنشغال إلى القائمة النشطة؟")) return;
+  const idx = archivedIssues.findIndex(i => i.code === code);
+  if (idx === -1) return;
+  const issue = archivedIssues[idx];
+  issue.status = "قيد المعالجة 🔄";
+  archivedIssues.splice(idx, 1);
+  activeIssues.unshift(issue);
+  saveToFirebase();
+  renderKPIs(); updateChart(); renderList(); renderArchive();
+}
+
+function deleteFromArchive(code) {
+  if (!confirm("هل أنت متأكد من الحذف النهائي من الأرشيف؟")) return;
+  archivedIssues = archivedIssues.filter(i => i.code !== code);
+  saveToFirebase();
+  renderKPIs(); updateChart(); renderArchive();
+}
+
+// ============================================================
+// 🏢 DEPARTMENT SPECIFIC FUNCTIONS
+// ============================================================
+function renderDeptIssuesForDepartment() {
+  const mainWorkspace = document.getElementById('mainWorkspace');
+  
+  let deptPage = document.getElementById('page-dept-issues');
+  if (!deptPage) {
+    deptPage = document.createElement('section');
+    deptPage.id = 'page-dept-issues';
+    deptPage.className = 'page hidden';
+    deptPage.innerHTML = `
+      <div class="page-header"><h2><i class="fa-solid fa-list-check"></i> إنشغالات المصلحة</h2></div>
+      <div class="filter-bar">
+        <input type="text" id="dept-issues-search" placeholder="بحث..." onkeyup="renderDeptIssuesForDepartment()">
+        <select id="dept-issues-priority" onchange="renderDeptIssuesForDepartment()"><option value="">كل الأولويات</option><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select>
+        <select id="dept-issues-status" onchange="renderDeptIssuesForDepartment()"><option value="">كل الحالات</option><option value="pending">قيد المعالجة</option><option value="resolved">تم الحل</option></select>
+      </div>
+      <div class="table-wrap">
+        <div class="table-scroll"><table><thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>الأولوية</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>الشات</th></tr></thead><tbody id="deptIssuesTableBody"></tbody></table></div>
+      </div>
+    `;
+    mainWorkspace.appendChild(deptPage);
+  }
+  
+  renderDeptIssuesTable();
+}
+
+function renderDeptIssuesTable() {
+  const tbody = document.getElementById('deptIssuesTableBody');
+  if (!tbody) return;
+  
+  const search = (document.getElementById('dept-issues-search')?.value || '').trim().toLowerCase();
+  const priorityFilter = document.getElementById('dept-issues-priority')?.value || '';
+  const statusFilter = document.getElementById('dept-issues-status')?.value || '';
+  
+  let deptIssues = activeIssues.filter(i => i.department === currentDepartment);
+  
+  if (search) {
+    deptIssues = deptIssues.filter(i => i.code.toLowerCase().includes(search) || i.center.toLowerCase().includes(search) || i.type.toLowerCase().includes(search));
+  }
+  if (priorityFilter) {
+    deptIssues = deptIssues.filter(i => i.priority === priorityFilter);
+  }
+  if (statusFilter) {
+    if (statusFilter === 'pending') deptIssues = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') === -1);
+    if (statusFilter === 'resolved') deptIssues = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') !== -1);
+  }
+  
+  if (deptIssues.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" class="empty-msg">لا توجد إنشغالات لهذه المصلحة</td></tr>`;
+    return;
+  }
+  
+  tbody.innerHTML = deptIssues.map(issue => {
+    const unread = hasUnreadMessages(issue.code);
+    const hasAttach = hasAttachment(issue);
+    const timeAgo = getTimeAgo(issue.createdAt);
+    return `<tr class="${unread ? 'row-unread' : ''}">
+      <td><strong style="font-size:16px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo}</span></td>
+      <td style="font-size:16px;">${escapeHtml(issue.center)}</td>
+      <td style="font-size:16px;">${escapeHtml(issue.type)}</td>
+      <td>${priorityPillHtml(issue.priority)}</td>
+      <td>${sourceBadgeHtml(issue.source)}</td>
+      <td><button class="btn-mini view-btn" onclick="openDetails('${issue.code}', false)"><i class="fa-solid fa-eye"></i></button></td>
+      <td>${hasAttach ? '<span style="color:var(--algeria-green);"><i class="fa-solid fa-paperclip"></i></span>' : '<span style="color:var(--text-dim);">-</span>'}</td>
+      <td>${issue.status && issue.status.indexOf('تم الحل') !== -1 ? '<span class="status-resolved">تم الحل ✅</span>' : '<span class="status-pending">قيد المعالجة 🔄</span>'}</td>
+      <td><button class="btn-chat ${unread ? 'new-msg' : ''}" onclick="openChat('${issue.code}', 'department')">${unread ? '<i class="fa-solid fa-bell"></i>' : '<i class="fa-solid fa-comments"></i>'}</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderDeptKPIs() {
+  const deptIssues = activeIssues.filter(i => i.department === currentDepartment);
+  const total = deptIssues.length;
+  const pending = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') === -1).length;
+  const resolved = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') !== -1).length;
+  const efficiency = total > 0 ? Math.round((resolved / total) * 100) : 0;
+  
+  const container = document.getElementById('deptStatsContainer');
+  if (container && currentRole === 'department') {
+    container.innerHTML = `
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-total"><div class="kpi-icon"><i class="fa-solid fa-layer-group"></i></div><div class="kpi-label">إجمالي الإنشغالات</div><div class="kpi-value">${total}</div></div>
+        <div class="kpi-card kpi-pending"><div class="kpi-icon"><i class="fa-solid fa-hourglass-half"></i></div><div class="kpi-label">قيد المعالجة</div><div class="kpi-value">${pending}</div></div>
+        <div class="kpi-card kpi-done"><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div><div class="kpi-label">تم الحل</div><div class="kpi-value">${resolved}</div></div>
+        <div class="kpi-card kpi-efficiency"><div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div><div class="kpi-label">معدل الكفاءة</div><div class="kpi-value">${efficiency}%</div></div>
+      </div>
+    `;
+  }
+}
+
+// ============================================================
+// 📝 SUBMIT NEW ISSUE
+// ============================================================
+function submitNewIssue() {
+  const center = document.getElementById('add-form-center').value;
+  const type = document.getElementById('add-form-type').value;
+  const priority = document.getElementById('add-form-priority').value;
+  const author = document.getElementById('add-form-author').value.trim();
+  const details = document.getElementById('add-form-details').value.trim();
+  if (!center || !type || !details) { alert("يرجى تعبئة كل الحقول الأساسية قبل الحفظ."); return; }
+  
+  const dept = getDepartmentForType(type);
+  const deptId = dept ? dept.id : '';
+  
+  const newIssue = { 
+    code: generateRefCode(), 
+    center, 
+    type, 
+    priority, 
+    author: author || "غير محدد", 
+    details, 
+    status: "قيد المعالجة 🔄", 
+    createdAt: Date.now(), 
+    source: 'directorate', 
+    attachments: [],
+    department: deptId,
+    transferHistory: []
+  };
+  activeIssues.unshift(newIssue);
+  saveToFirebase();
+  showToast("✅ تم الحفظ", `تم تدوين الإنشغال ${newIssue.code} بنجاح! ${dept ? 'تم توجيهه إلى ' + dept.name : ''}`);
+  document.getElementById('add-form-author').value = '';
+  document.getElementById('add-form-details').value = '';
+  renderKPIs();
+  updateChart();
+  renderList();
+  renderDeptDashboard();
+  switchTab('list');
+}
+
+function generateRefCode() {
+  const now = new Date();
+  return `REF-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
+// ============================================================
+// 📦 SEND FROM CENTER
+// ============================================================
+function setupPasteFeature() {
+  window.addEventListener('paste', function(e) {
+    const sendPage = document.getElementById('page-send-panel');
+    if (!sendPage || sendPage.classList.contains('hidden')) return;
+    const items = (e.clipboardData || window.clipboardData).items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const blob = items[i].getAsFile();
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          pendingCenterFile = { data: ev.target.result, type: 'image', name: 'لقطة شاشة.png' };
+          const zone = document.getElementById('pasteZone');
+          if (zone) { zone.classList.add('captured'); zone.textContent = '📸 تم التقاط الصورة وجاهزة للإرسال!'; }
+        };
+        reader.readAsDataURL(blob);
+        e.preventDefault();
+        break;
+      }
+    }
+  });
+}
+
+function handleCenterFileSelection(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const fileType = file.type === 'application/pdf' ? 'pdf' : 'image';
+    pendingCenterFile = { data: ev.target.result, type: fileType, name: file.name };
+    const zone = document.getElementById('pasteZone');
+    if (zone) { zone.classList.add('captured'); zone.textContent = fileType === 'pdf' ? '📄 تم اختيار ملف PDF جاهز للإرسال!' : '📸 تم اختيار صورة جاهزة للإرسال!'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+function sendFromCenter() {
+  const details = document.getElementById('form-details').value.trim();
+  if (!details) { alert("يرجى كتابة الشرح الدقيق للمشكلة أو الإنشغال قبل الإرسال."); return; }
+  const type = document.getElementById('form-type').value;
+  const priority = document.getElementById('form-priority').value;
+  const reporter = document.getElementById('form-reporter').value.trim() || "غير محدد";
+  const center = getCenterName();
+  const code = generateRefCode();
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الإرسال...';
+  
+  const dept = getDepartmentForType(type);
+  const deptId = dept ? dept.id : '';
+  
+  const attachments = [];
+  if (pendingCenterFile) { 
+    attachments.push({ 
+      name: pendingCenterFile.name || (pendingCenterFile.type === 'image' ? 'صورة_مرفقة.png' : 'مرفق.pdf'), 
+      type: pendingCenterFile.type === 'image' ? 'image/png' : 'application/pdf', 
+      data: pendingCenterFile.data 
+    }); 
+  }
+  
+  const payload = { 
+    code, center, type, priority, reporter, details, 
+    status: "قيد المعالجة 🔄", 
+    attachments, 
+    source: 'center', 
+    createdAt: Date.now(),
+    department: deptId,
+    transferHistory: []
+  };
+  centerIssues.unshift(payload);
+  
+  const activeCopy = { 
+    code, center, type, priority, 
+    author: reporter, details, 
+    status: "قيد المعالجة 🔄", 
+    createdAt: Date.now(), 
+    source: 'center', 
+    attachments: attachments.length > 0 ? attachments : [],
+    department: deptId,
+    transferHistory: []
+  };
+  activeIssues.unshift(activeCopy);
+  saveToFirebase();
+  showToast("✅ تم الإرسال", `تم إرسال الإنشغال ${code} بنجاح! ${dept ? 'تم توجيهه إلى ' + dept.name : ''}`);
+  document.getElementById('form-details').value = '';
+  document.getElementById('form-reporter').value = '';
+  document.getElementById('form-file').value = '';
+  document.getElementById('form-priority').selectedIndex = 0;
+  resetPasteZone();
+  renderChatHub();
+  renderList();
+  renderKPIs();
+  updateChart();
+  renderDeptDashboard();
+  btn.disabled = false;
+  btn.textContent = 'بث وإرسال الإنشغال 📡';
+}
+
+function resetPasteZone() {
+  pendingCenterFile = null;
+  const zone = document.getElementById('pasteZone');
+  if (zone) { zone.classList.remove('captured'); zone.textContent = '📸 اضغط هنا ثم Ctrl+V للصق لقطة شاشة'; }
+}
+
+// ============================================================
+// 💬 CHAT SYSTEM
+// ============================================================
+function getChatMessages(code) {
+  return JSON.parse(localStorage.getItem('chat_messages_' + code) || "[]");
+}
+
+function saveChatMessages(code, msgs) {
+  localStorage.setItem('chat_messages_' + code, JSON.stringify(msgs));
+  const chatData = {};
+  chatData[code] = msgs;
+  database.ref('chats').update(chatData);
+}
+
+function listenToChats() {
+  database.ref('chats').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      Object.keys(data).forEach(code => {
+        const existing = getChatMessages(code);
+        const newMsgs = data[code];
+        if (newMsgs && newMsgs.length > existing.length) {
+          saveChatMessages(code, newMsgs);
+          if (currentChatCode === code) {
+            renderChatMessages(currentRole);
+          } else {
+            const lastMsg = newMsgs[newMsgs.length - 1];
+            if (lastMsg.sender && lastMsg.sender !== currentRole && lastMsg.sender !== 'system') {
+              const msgKey = code + '_' + lastMsg.time;
+              if (!notifiedMessages.has(msgKey)) {
+                notifiedMessages.add(msgKey);
+                showToastWithAction(lastMsg.text || '(مرفق)', `📩 رسالة جديدة من ${lastMsg.sender} - ${code}`, () => { openChat(code, currentRole); });
+              }
+            }
+          }
+          if (currentRole === 'directorate' || currentRole === 'department') renderList();
+          else renderChatHub();
+          if (currentRole === 'department') renderDeptIssuesTable();
+        }
+      });
+    }
+  });
+}
+
+function openChat(code, role) {
+  const allIssues = [...activeIssues, ...archivedIssues, ...centerIssues, ...centerArchived];
+  const issue = allIssues.find(i => i.code === code);
+  if (!issue) { showToast("⚠️ خطأ", "لم يتم العثور على الإنشغال"); return; }
+  currentChatCode = code;
+  document.getElementById('chatTitle').textContent = '💬 غرفة الشات الفوري';
+  document.getElementById('chatSubtitle').textContent = `${issue.center || 'مركز'} — ${code}`;
+  const msgs = getChatMessages(code);
+  let changed = false;
+  msgs.forEach(m => { if (m.sender && m.sender !== role && !m.read && m.sender !== 'system') { m.read = true; changed = true; } });
+  if (changed) saveChatMessages(code, msgs);
+  notifiedMessages.delete(code);
+  const sendBtn = document.getElementById('chatSendBtn');
+  if (role === 'directorate' || role === 'department') {
+    sendBtn.className = 'chat-icon-btn send';
+  } else {
+    sendBtn.className = 'chat-icon-btn send-accent';
+  }
+  renderChatMessages(role);
+  document.getElementById('chatModal').classList.add('open');
+  removeAttachment();
+}
+
+function closeChat() { document.getElementById('chatModal').classList.remove('open'); currentChatCode = null; }
+
+function renderChatMessages(role) {
+  const container = document.getElementById('chatMessages');
+  const msgs = getChatMessages(currentChatCode);
+  const htmlContent = msgs.map(m => {
+    let attachHtml = '';
+    if (m.attachment) {
+      if (m.attachment.type && m.attachment.type.startsWith('image/')) {
+        attachHtml = `<img class="chat-attach-img" src="${m.attachment.data}" onclick="openLightbox('${m.attachment.data}')">`;
+      } else {
+        attachHtml = `<a class="chat-attach-file" href="${m.attachment.data}" download="${escapeHtml(m.attachment.name)}"><i class="fa-solid fa-file"></i> ${escapeHtml(m.attachment.name)}</a>`;
+      }
+    }
+    const timeStr = new Date(m.time).toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
+    let bubbleClass = '', senderLabel = '';
+    if (m.sender === 'system') {
+      bubbleClass = 'directorate-msg';
+      senderLabel = '⚙️ النظام';
+    } else if (m.sender === 'directorate' || m.sender === 'department') {
+      bubbleClass = 'directorate-msg';
+      senderLabel = m.sender === 'department' ? 'المصلحة' : 'المديرية';
+    } else {
+      bubbleClass = 'center-msg';
+      senderLabel = 'المركز';
+    }
+    return `<div class="chat-bubble ${bubbleClass}"><span class="chat-sender-label">${senderLabel}</span>${m.text ? escapeHtml(m.text) : ''}${attachHtml}<span class="chat-time">${timeStr}</span></div>`;
+  }).join('');
+  container.innerHTML = htmlContent || '<div style="color:var(--text-dim); text-align:center; padding:40px; font-size:18px;">لا توجد رسائل بعد</div>';
+  container.scrollTop = container.scrollHeight;
+}
+
+function handleChatFileAttach(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 4 * 1024 * 1024) { alert("⚠️ حجم الملف يتجاوز الحد الأقصى المسموح به (4 ميغابايت)."); e.target.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    pendingAttachment = { name: file.name, type: file.type, data: ev.target.result };
+    document.getElementById('chatAttachName').textContent = file.name;
+    document.getElementById('chatAttachPreview').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeAttachment() {
+  pendingAttachment = null;
+  document.getElementById('chatAttachPreview').style.display = 'none';
+  document.getElementById('chatFileInput').value = '';
+}
+
+function sendChatMessage() {
+  if (!currentChatCode) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text && !pendingAttachment) return;
+  const msgs = getChatMessages(currentChatCode);
+  const senderName = currentRole === 'directorate' ? 'directorate' : 
+                     currentRole === 'department' ? 'department' : 'center';
+  msgs.push({ sender: senderName, text, attachment: pendingAttachment, time: Date.now(), read: false });
+  saveChatMessages(currentChatCode, msgs);
+  input.value = '';
+  removeAttachment();
+  renderChatMessages(currentRole);
+}
+
+// ============================================================
+// 💬 INTER-INSTITUTION CHAT
+// ============================================================
+function populateInterChatRecipients() {
+  const select = document.getElementById('interChatRecipient');
+  if (!select) return;
+  select.innerHTML = '<option value="all">الجميع</option>';
+  INSTITUTIONS_DATA.forEach(inst => { select.innerHTML += `<option value="${inst.name}">${inst.name}</option>`; });
+  select.innerHTML += `<option value="directorate">المديرية</option>`;
+  departments.forEach(dept => { select.innerHTML += `<option value="${dept.name}">${dept.name}</option>`; });
+  select.onchange = function() {
+    const badge = document.getElementById('recipientBadge');
+    if (this.value === 'all') { badge.textContent = 'الجميع'; badge.style.background = 'var(--algeria-green)'; }
+    else if (this.value === 'directorate') { badge.textContent = 'المديرية'; badge.style.background = 'var(--algeria-red)'; }
+    else { badge.textContent = this.value.length > 20 ? this.value.substring(0, 20) + '...' : this.value; badge.style.background = 'var(--algeria-green)'; }
+  };
+}
+
+function openInterChat() {
+  populateInterChatRecipients();
+  renderInterChatMessages();
+  document.getElementById('interChatModal').classList.add('open');
+}
+
+function closeInterChat() { document.getElementById('interChatModal').classList.remove('open'); }
+
+function getInterChatMessages() {
+  return JSON.parse(localStorage.getItem(LS_KEYS.interChat) || "[]");
+}
+
+function saveInterChatMessages(msgs) {
+  localStorage.setItem(LS_KEYS.interChat, JSON.stringify(msgs));
+  database.ref('interChat').set(msgs);
+}
+
+function renderInterChatMessages() {
+  const container = document.getElementById('interChatMessages');
+  const msgs = getInterChatMessages();
+  const htmlContent = msgs.map(m => {
+    const timeStr = new Date(m.time).toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
+    const isMe = m.sender === getCenterName() || m.sender === 'المديرية' || departments.some(d => d.name === m.sender);
+    const bubbleClass = isMe ? 'center-msg' : 'directorate-msg';
+    const senderLabel = m.sender || 'غير معروف';
+    const recipientLabel = m.recipient ? ` → ${m.recipient}` : '';
+    let attachHtml = '';
+    if (m.attachment) {
+      if (m.attachment.type && m.attachment.type.startsWith('image/')) {
+        attachHtml = `<img class="chat-attach-img" src="${m.attachment.data}" onclick="openLightbox('${m.attachment.data}')">`;
+      } else {
+        attachHtml = `<a class="chat-attach-file" href="${m.attachment.data}" download="${escapeHtml(m.attachment.name)}"><i class="fa-solid fa-file"></i> ${escapeHtml(m.attachment.name)}</a>`;
+      }
+    }
+    return `<div class="chat-bubble ${bubbleClass}"><span class="chat-sender-label">${escapeHtml(senderLabel)}${recipientLabel}</span>${m.text ? escapeHtml(m.text) : ''}${attachHtml}<span class="chat-time">${timeStr}</span></div>`;
+  }).join('');
+  container.innerHTML = htmlContent || '<div style="color:var(--text-dim); text-align:center; padding:40px; font-size:18px;">لا توجد رسائل في غرفة المؤسسات</div>';
+  container.scrollTop = container.scrollHeight;
+}
+
+function handleInterChatFileAttach(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 4 * 1024 * 1024) { alert("⚠️ حجم الملف يتجاوز الحد الأقصى المسموح به (4 ميغابايت)."); e.target.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    interChatPendingAttachment = { name: file.name, type: file.type, data: ev.target.result };
+    showToast("📎 مرفق", `تم إرفاق ${file.name}`);
+  };
+  reader.readAsDataURL(file);
+}
+
+function sendInterChatMessage() {
+  const input = document.getElementById('interChatInput');
+  const text = input.value.trim();
+  const recipient = document.getElementById('interChatRecipient').value;
+  const recipientLabel = recipient === 'all' ? 'الجميع' : 
+                         recipient === 'directorate' ? 'المديرية' : 
+                         INSTITUTIONS_DATA.find(i => i.name === recipient)?.name || 
+                         departments.find(d => d.name === recipient)?.name || recipient;
+  if (!text && !interChatPendingAttachment) return;
+  const senderName = currentRole === 'directorate' ? 'المديرية' : 
+                     currentRole === 'department' ? departments.find(d => d.id === currentDepartment)?.name || 'مصلحة' :
+                     getCenterName();
+  const msgs = getInterChatMessages();
+  msgs.push({ sender: senderName, recipient: recipientLabel, text, attachment: interChatPendingAttachment, time: Date.now() });
+  saveInterChatMessages(msgs);
+  interChatPendingAttachment = null;
+  input.value = '';
+  renderInterChatMessages();
+  document.getElementById('interChatFileInput').value = '';
+}
+
+// ============================================================
+// 📋 CENTER CHAT HUB
+// ============================================================
+function renderChatHub() {
+  const container = document.getElementById('chatHubContainer');
+  if (!container) return;
+  const centerName = getCenterName();
+  const myIssues = centerIssues.filter(issue => issue.center === centerName);
+  
+  if (myIssues.length === 0) { 
+    container.innerHTML = `<div class="chat-hub-table-wrap"><div class="empty-msg">لا توجد بلاغات مرسلة من مركزكم للمتابعة.</div></div>`; 
+    return; 
+  }
+  let rows = myIssues.map(issue => {
+    const isResolved = issue.status && issue.status.indexOf('تم الحل') !== -1;
+    const hasAttach = issue.attachments && issue.attachments.length > 0;
+    const msgs = getChatMessages(issue.code);
+    const hasUnread = msgs.length > 0 && msgs[msgs.length - 1].sender && msgs[msgs.length - 1].sender !== 'center' && !msgs[msgs.length - 1].read;
+    const timeAgo = getTimeAgo(issue.createdAt || Date.now());
+    const preview = issue.details ? issue.details.substring(0, 60) + (issue.details.length > 60 ? '...' : '') : '';
+    const deptName = getDepartmentName(issue.department);
+    return `<tr class="${hasUnread ? 'row-unread' : ''}" onclick="openChat('${issue.code}', 'center')">
+      <td><strong style="font-size:17px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo}</span></td>
+      <td style="font-size:17px;">${escapeHtml(issue.type)}</td>
+      <td style="font-size:14px; font-weight:700;">${escapeHtml(deptName)}</td>
+      <td><span class="status-badge ${isResolved ? 'resolved' : 'pending'}">${isResolved ? '✅ تم الحل' : '🔄 قيد المعالجة'}</span></td>
+      <td style="font-size:16px; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(preview)}</td>
+      <td>${hasAttach ? '<span class="attach-badge"><i class="fa-solid fa-paperclip"></i> مرفق</span>' : ''}${hasUnread ? '<span class="unread-badge"><i class="fa-solid fa-bell"></i> جديد</span>' : ''}</td>
+      <td style="font-size:16px; color:var(--text-dim);"><i class="fa-regular fa-comment"></i> ${msgs.length}</td>
+    </tr>`;
+  }).join('');
+  container.innerHTML = `<div class="chat-hub-table-wrap"><div class="table-scroll"><table><thead><tr><th style="min-width:160px;">الرمز المرجعي</th><th style="min-width:150px;">المصلحة</th><th style="min-width:150px;">المصلحة المسؤولة</th><th style="min-width:130px;">الحالة</th><th style="min-width:220px;">ملخص الإنشغال</th><th style="min-width:150px;">المرفقات</th><th style="min-width:90px;">الرسائل</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+
+// ============================================================
+// 🔔 CHECK FOR NEW MESSAGES
+// ============================================================
+function checkForNewMessages() {
+  const allCodes = new Set();
+  [...activeIssues, ...archivedIssues, ...centerIssues, ...centerArchived].forEach(i => allCodes.add(i.code));
+  allCodes.forEach(code => {
+    const msgs = getChatMessages(code);
+    if (msgs.length === 0) return;
+    const last = msgs[msgs.length - 1];
+    const chatOpenOnThis = currentChatCode === code && document.getElementById('chatModal').classList.contains('open');
+    if (chatOpenOnThis && last.sender && last.sender !== currentRole && last.sender !== 'system') {
+      let changed = false;
+      msgs.forEach(m => { if (m.sender && m.sender !== currentRole && !m.read && m.sender !== 'system') { m.read = true; changed = true; } });
+      if (changed) saveChatMessages(code, msgs);
+      renderChatMessages(currentRole);
+    } else if (last.sender && last.sender !== currentRole && !last.read && last.sender !== 'system') {
+      const msgKey = code + '_' + last.time;
+      if (!notifiedMessages.has(msgKey)) {
+        notifiedMessages.add(msgKey);
+        let senderName = last.sender;
+        if (last.sender === 'directorate') senderName = 'المديرية';
+        else if (last.sender === 'department') senderName = 'المصلحة';
+        else senderName = 'المركز';
+        showToastWithAction(last.text || '(مرفق)', `📩 رسالة جديدة من ${senderName} - ${code}`, () => { openChat(code, currentRole); });
+        if (currentRole === 'directorate' || currentRole === 'department') renderList();
+        else renderChatHub();
+        if (currentRole === 'department') renderDeptIssuesTable();
+      }
+    }
+  });
+}
+
+// ============================================================
+// 🍞 TOAST
+// ============================================================
+function showToastWithAction(title, text, action) {
+  const area = document.getElementById('toast-area');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<div><div class="toast-title">${escapeHtml(title)}</div><div class="toast-text">${escapeHtml(text)}</div><div class="toast-action"><i class="fa-solid fa-hand-pointer"></i> اضغط لعرض الرسالة</div></div>`;
+  toast.onclick = function() { toast.remove(); if (action) action(); };
+  area.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 8000);
+  return toast;
+}
+
+function showToast(title, text) {
+  const area = document.getElementById('toast-area');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<div><div class="toast-title">${escapeHtml(title)}</div><div class="toast-text">${escapeHtml(text)}</div></div>`;
+  toast.onclick = function() { toast.remove(); };
+  area.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
+}
+
+// ============================================================
+// 📌 CENTER UTILITIES
+// ============================================================
+function getCenterName() { return localStorage.getItem(LS_KEYS.centerName) || "مركز تكويني"; }
+function setCenterName(name) { localStorage.setItem(LS_KEYS.centerName, name); }
+
+function refreshCenterUI() {
+  const name = getCenterName();
+  document.getElementById('centerBadgeName').textContent = name;
+  const sidebarName = document.getElementById('profileName');
+  if (sidebarName) sidebarName.textContent = name;
+}
+
+// ============================================================
+// 📋 DROPDOWNS
 // ============================================================
 function populateDropdowns() {
   const centerSel = document.getElementById('add-form-center');
   const typeSel = document.getElementById('add-form-type');
   const formType = document.getElementById('form-type');
+  const newDeptType = document.getElementById('newDeptType');
+  
   if (centerSel) centerSel.innerHTML = INSTITUTIONS_DATA.map(i => `<option value="${escapeHtml(i.name)}">${escapeHtml(i.name)}</option>`).join('');
+  
   const typeOptions = fileTypes.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
   if (typeSel) typeSel.innerHTML = typeOptions;
   if (formType) formType.innerHTML = typeOptions;
+  if (newDeptType) newDeptType.innerHTML = typeOptions;
 }
 
 // ============================================================
-// INSTITUTIONS & FILE TYPES - محفوظ
+// 📋 INSTITUTIONS & FILE TYPES
 // ============================================================
 function renderInstitutionsList() {
   const ul = document.getElementById('institutionsList');
@@ -1162,12 +2464,11 @@ function deleteFileType(idx) {
 
 function saveNotes() { 
   localStorage.setItem(LS_KEYS.notes, document.getElementById('strategicNotes').value);
-  // حفظ في Firebase
   database.ref('notes').set(document.getElementById('strategicNotes').value);
 }
 
 // ============================================================
-// TOKENS - محفوظ
+// 🔑 TOKENS
 // ============================================================
 function filterTokens() { renderTokensGrid(); }
 
@@ -1190,7 +2491,7 @@ function renderTokensGrid() {
 function copyToken(token) { navigator.clipboard.writeText(token).then(() => showToast("✅ تم النسخ", "تم نسخ كلمة السر إلى الحافظة.")); }
 
 // ============================================================
-// BROADCAST - محفوظ
+// 📢 BROADCAST
 // ============================================================
 function selectBroadcastTarget(target) {
   broadcastTarget = target;
@@ -1222,7 +2523,21 @@ function sendBroadcast() {
   if (targets.length === 0) { alert("لا توجد مؤسسات في الفئة المحددة."); return; }
   const code = generateRefCode();
   targets.forEach(inst => {
-    const issue = { code: code + '-' + inst.code, center: inst.name, type: "تعميم", priority: priority, author: "المديرية (تعميم)", details: `📢 **${title}**\n\n${content}\n\n📌 هذا التعميم مرسل إلى: ${inst.name}`, status: "قيد المعالجة 🔄", createdAt: Date.now(), source: 'directorate', attachments: [], isBroadcast: true };
+    const issue = { 
+      code: code + '-' + inst.code, 
+      center: inst.name, 
+      type: "تعميم", 
+      priority: priority, 
+      author: "المديرية (تعميم)", 
+      details: `📢 **${title}**\n\n${content}\n\n📌 هذا التعميم مرسل إلى: ${inst.name}`, 
+      status: "قيد المعالجة 🔄", 
+      createdAt: Date.now(), 
+      source: 'directorate', 
+      attachments: [], 
+      isBroadcast: true,
+      department: '',
+      transferHistory: []
+    };
     activeIssues.unshift(issue);
   });
   saveToFirebase();
@@ -1235,361 +2550,7 @@ function sendBroadcast() {
 }
 
 // ============================================================
-// GENERATE REF CODE - محفوظ
-// ============================================================
-function generateRefCode() {
-  const now = new Date();
-  return `REF-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
-}
-
-// ============================================================
-// SUBMIT NEW ISSUE - محفوظ مع Firebase
-// ============================================================
-function submitNewIssue() {
-  const center = document.getElementById('add-form-center').value;
-  const type = document.getElementById('add-form-type').value;
-  const priority = document.getElementById('add-form-priority').value;
-  const author = document.getElementById('add-form-author').value.trim();
-  const details = document.getElementById('add-form-details').value.trim();
-  if (!center || !type || !details) { alert("يرجى تعبئة كل الحقول الأساسية قبل الحفظ."); return; }
-  const newIssue = { code: generateRefCode(), center, type, priority, author: author || "غير محدد", details, status: "قيد المعالجة 🔄", createdAt: Date.now(), source: 'directorate', attachments: [] };
-  activeIssues.unshift(newIssue);
-  saveToFirebase();
-  showToast("✅ تم الحفظ", `تم تدوين الإنشغال ${newIssue.code} بنجاح!`);
-  document.getElementById('add-form-author').value = '';
-  document.getElementById('add-form-details').value = '';
-  renderKPIs();
-  updateChart();
-  renderList();
-  switchTab('list');
-}
-
-// ============================================================
-// SEND FROM CENTER - محفوظ مع Firebase
-// ============================================================
-function setupPasteFeature() {
-  window.addEventListener('paste', function(e) {
-    const sendPage = document.getElementById('page-send-panel');
-    if (!sendPage || sendPage.classList.contains('hidden')) return;
-    const items = (e.clipboardData || window.clipboardData).items;
-    if (!items) return;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf('image') !== -1) {
-        const blob = items[i].getAsFile();
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-          pendingCenterFile = { data: ev.target.result, type: 'image', name: 'لقطة شاشة.png' };
-          const zone = document.getElementById('pasteZone');
-          if (zone) { zone.classList.add('captured'); zone.textContent = '📸 تم التقاط الصورة وجاهزة للإرسال!'; }
-        };
-        reader.readAsDataURL(blob);
-        e.preventDefault();
-        break;
-      }
-    }
-  });
-}
-
-function resetPasteZone() {
-  pendingCenterFile = null;
-  const zone = document.getElementById('pasteZone');
-  if (zone) { zone.classList.remove('captured'); zone.textContent = '📸 اضغط هنا ثم Ctrl+V للصق لقطة شاشة'; }
-}
-
-function handleCenterFileSelection(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    const fileType = file.type === 'application/pdf' ? 'pdf' : 'image';
-    pendingCenterFile = { data: ev.target.result, type: fileType, name: file.name };
-    const zone = document.getElementById('pasteZone');
-    if (zone) { zone.classList.add('captured'); zone.textContent = fileType === 'pdf' ? '📄 تم اختيار ملف PDF جاهز للإرسال!' : '📸 تم اختيار صورة جاهزة للإرسال!'; }
-  };
-  reader.readAsDataURL(file);
-}
-
-function sendFromCenter() {
-  const details = document.getElementById('form-details').value.trim();
-  if (!details) { alert("يرجى كتابة الشرح الدقيق للمشكلة أو الإنشغال قبل الإرسال."); return; }
-  const type = document.getElementById('form-type').value;
-  const priority = document.getElementById('form-priority').value;
-  const reporter = document.getElementById('form-reporter').value.trim() || "غير محدد";
-  const center = getCenterName();
-  const code = generateRefCode();
-  const btn = document.getElementById('sendBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ جاري الإرسال...';
-  const attachments = [];
-  if (pendingCenterFile) { 
-    attachments.push({ 
-      name: pendingCenterFile.name || (pendingCenterFile.type === 'image' ? 'صورة_مرفقة.png' : 'مرفق.pdf'), 
-      type: pendingCenterFile.type === 'image' ? 'image/png' : 'application/pdf', 
-      data: pendingCenterFile.data 
-    }); 
-  }
-  const payload = { code, center, type, priority, reporter, details, status: "قيد المعالجة 🔄", attachments, source: 'center', createdAt: Date.now() };
-  centerIssues.unshift(payload);
-  const activeCopy = { 
-    code, center, type, priority, 
-    author: reporter, details, status: "قيد المعالجة 🔄", 
-    createdAt: Date.now(), source: 'center', 
-    attachments: attachments.length > 0 ? attachments : [] 
-  };
-  activeIssues.unshift(activeCopy);
-  saveToFirebase();
-  showToast("✅ تم الإرسال", `تم إرسال الإنشغال ${code} بنجاح!`);
-  document.getElementById('form-details').value = '';
-  document.getElementById('form-reporter').value = '';
-  document.getElementById('form-file').value = '';
-  document.getElementById('form-priority').selectedIndex = 0;
-  resetPasteZone();
-  renderChatHub();
-  renderList();
-  renderKPIs();
-  updateChart();
-  btn.disabled = false;
-  btn.textContent = 'بث وإرسال الإنشغال 📡';
-}
-
-function getCenterName() { return localStorage.getItem(LS_KEYS.centerName) || "مركز تكويني"; }
-function setCenterName(name) { localStorage.setItem(LS_KEYS.centerName, name); }
-
-function refreshCenterUI() {
-  const name = getCenterName();
-  document.getElementById('centerBadgeName').textContent = name;
-  const sidebarName = document.getElementById('profileName');
-  if (sidebarName) sidebarName.textContent = name;
-}
-
-// ============================================================
-// KPIs & CHART - محفوظ
-// ============================================================
-function renderKPIs() {
-  const total = activeIssues.length + archivedIssues.length;
-  const pending = activeIssues.length;
-  const done = archivedIssues.length;
-  const efficiency = total > 0 ? Math.round((done / total) * 100) : 0;
-  document.getElementById('kpi-total').textContent = total;
-  document.getElementById('kpi-pending').textContent = pending;
-  document.getElementById('kpi-done').textContent = done;
-  document.getElementById('kpi-efficiency').textContent = efficiency + '%';
-}
-
-function initChart() {
-  const ctx = document.getElementById('analyticsChart').getContext('2d');
-  analyticsChartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: { labels: ['الإجمالي', 'قيد المعالجة', 'المسواة'], datasets: [{ label: 'عدد الإنشغالات', data: [activeIssues.length + archivedIssues.length, activeIssues.length, archivedIssues.length], backgroundColor: ['#006633', '#ffc107', '#28a745'], borderRadius: 8, maxBarThickness: 50 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#6c757d', font: { family: 'Cairo', weight: '700', size: 14 } }, grid: { color: 'rgba(0,0,0,0.04)' } }, y: { beginAtZero: true, ticks: { color: '#6c757d', font: { family: 'Cairo', size: 14 } }, grid: { color: 'rgba(0,0,0,0.04)' } } } }
-  });
-}
-
-function updateChart() {
-  if (!analyticsChartInstance) return;
-  const total = activeIssues.length + archivedIssues.length;
-  analyticsChartInstance.data.datasets[0].data = [total, activeIssues.length, archivedIssues.length];
-  analyticsChartInstance.update();
-}
-
-// ============================================================
-// LIST FUNCTIONS - محفوظ مع Firebase
-// ============================================================
-let currentListTab = 'all';
-
-function switchListTab(tab) {
-  currentListTab = tab;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.tab-btn[onclick="switchListTab('${tab}')"]`)?.classList.add('active');
-  renderList();
-}
-
-function priorityPillHtml(p) {
-  if (p === 'مستعجل جداً') return `<span class="pill pill-urgent">مستعجل جداً 🔴</span>`;
-  if (p === 'متوسط') return `<span class="pill pill-medium">متوسط 🟡</span>`;
-  return `<span class="pill pill-normal">عادي 🟢</span>`;
-}
-
-function sourceBadgeHtml(source) {
-  if (source === 'directorate') return `<span style="color:var(--algeria-green); font-weight:800; font-size:14px;">المديرية</span>`;
-  return `<span style="color:var(--algeria-red); font-weight:800; font-size:14px;">مركز</span>`;
-}
-
-function hasUnreadMessages(code) {
-  const msgs = getChatMessages(code);
-  if (msgs.length === 0) return false;
-  return msgs[msgs.length - 1].sender === 'center' && !msgs[msgs.length - 1].read;
-}
-
-function hasAttachment(issue) { return issue.attachments && issue.attachments.length > 0; }
-
-function getTimeAgo(timestamp) {
-  const diff = Date.now() - timestamp;
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  if (days > 0) return `منذ ${days} يوم`;
-  if (hours > 0) return `منذ ${hours} ساعة`;
-  if (minutes > 0) return `منذ ${minutes} دقيقة`;
-  return 'الآن';
-}
-
-function archiveCenterIssue(code) {
-  if (!confirm("هل تريد أرشفة هذا الإنشغال من المراكز؟")) return;
-  const idx = activeIssues.findIndex(i => i.code === code && i.source === 'center');
-  if (idx === -1) return;
-  const issue = activeIssues[idx];
-  activeIssues.splice(idx, 1);
-  centerArchived.push(issue);
-  saveToFirebase();
-  renderList(); renderKPIs(); updateChart();
-  showToast("📦 تم الأرشفة", `تم أرشفة الإنشغال ${code} من المراكز.`);
-}
-
-function renderList() {
-  const search = (document.getElementById('list-search')?.value || '').trim().toLowerCase();
-  const priorityFilter = document.getElementById('list-priority-filter')?.value || '';
-  const sourceFilter = document.getElementById('list-source-filter')?.value || '';
-  const tbody = document.getElementById('listTableBody');
-  if (!tbody) return;
-  let filtered = [];
-  if (currentListTab === 'archived_center') {
-    filtered = centerArchived.filter(issue => {
-      const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
-      const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
-      return matchesSearch && matchesPriority;
-    });
-  } else {
-    filtered = activeIssues.filter(issue => {
-      if (currentListTab === 'directorate' && issue.source !== 'directorate') return false;
-      if (currentListTab === 'centers' && issue.source !== 'center') return false;
-      const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
-      const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
-      const matchesSource = !sourceFilter || issue.source === sourceFilter;
-      return matchesSearch && matchesPriority && matchesSource;
-    });
-  }
-  if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="11" class="empty-msg">${currentListTab === 'archived_center' ? 'لا توجد إنشغالات مرسلة من المراكز في الأرشيف.' : 'لا توجد إنشغالات مطابقة حالياً.'}</td></tr>`; return; }
-  tbody.innerHTML = filtered.map(issue => {
-    const unread = currentListTab !== 'archived_center' && hasUnreadMessages(issue.code);
-    const hasAttach = hasAttachment(issue);
-    const timeAgo = getTimeAgo(issue.createdAt);
-    const isArchived = currentListTab === 'archived_center';
-    const isBroadcast = issue.isBroadcast || false;
-    return `<tr class="${unread ? 'row-unread' : ''}">
-      <td><strong style="font-size:16px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo} ${isBroadcast ? '📢' : ''}</span></td>
-      <td style="font-size:16px;">${escapeHtml(issue.center)}</td>
-      <td style="font-size:16px;">${escapeHtml(issue.type)}</td>
-      <td>${priorityPillHtml(issue.priority)}</td>
-      <td style="font-size:16px;">${escapeHtml(issue.author)}</td>
-      <td>${sourceBadgeHtml(issue.source)}</td>
-      <td><button class="btn-mini view-btn" onclick="openDetails('${issue.code}', ${isArchived ? 'true' : 'false'})"><i class="fa-solid fa-eye"></i></button></td>
-      <td>${hasAttach ? '<span style="color:var(--algeria-green);"><i class="fa-solid fa-paperclip"></i></span>' : '<span style="color:var(--text-dim);">-</span>'}</td>
-      <td>${isArchived ? '<span class="status-resolved">مؤرشف 📦</span>' : `<select class="status-select" onchange="toggleStatus('${issue.code}', this.value)"><option value="pending" ${issue.status.indexOf('قيد المعالجة') !== -1 ? 'selected' : ''}>قيد المعالجة</option><option value="resolved">تم الحل</option></select>`}</td>
-      <td>${isArchived ? '<span style="color:var(--text-dim);">-</span>' : `<button class="btn-chat ${unread ? 'new-msg' : ''}" onclick="openChat('${issue.code}', 'directorate')">${unread ? '<i class="fa-solid fa-bell"></i>' : '<i class="fa-solid fa-comments"></i>'}</button>`}</td>
-      <td>${isArchived ? `<button class="btn-mini success" onclick="restoreFromCenterArchive('${issue.code}')"><i class="fa-solid fa-rotate-left"></i></button><button class="btn-mini danger" onclick="deleteFromCenterArchive('${issue.code}')"><i class="fa-solid fa-trash"></i></button>` : issue.source === 'center' ? `<button class="btn-mini" onclick="archiveCenterIssue('${issue.code}')" style="border-color:var(--gold); color:var(--gold);"><i class="fa-solid fa-box-archive"></i></button><button class="btn-mini danger" onclick="deleteIssue('${issue.code}')"><i class="fa-solid fa-trash"></i></button>` : `<button class="btn-mini danger" onclick="deleteIssue('${issue.code}')"><i class="fa-solid fa-trash"></i></button>`}</td>
-    </tr>`;
-  }).join('');
-}
-
-function restoreFromCenterArchive(code) {
-  const idx = centerArchived.findIndex(i => i.code === code);
-  if (idx === -1) return;
-  const issue = centerArchived[idx];
-  issue.status = "قيد المعالجة 🔄";
-  centerArchived.splice(idx, 1);
-  activeIssues.push(issue);
-  saveToFirebase();
-  renderList(); renderKPIs(); updateChart();
-  showToast("✅ تم الاسترجاع", `تم استرجاع الإنشغال ${code} من أرشيف المراكز.`);
-}
-
-function deleteFromCenterArchive(code) {
-  if (!confirm("هل أنت متأكد من الحذف النهائي من أرشيف المراكز؟")) return;
-  centerArchived = centerArchived.filter(i => i.code !== code);
-  saveToFirebase();
-  renderList();
-}
-
-function toggleStatus(code, value) {
-  if (value === 'resolved') {
-    const idx = activeIssues.findIndex(i => i.code === code);
-    if (idx === -1) { showToast("⚠️ خطأ", "لم يتم العثور على الإنشغال"); return; }
-    const issue = activeIssues[idx];
-    issue.status = "تم الحل ✅";
-    activeIssues.splice(idx, 1);
-    archivedIssues.unshift(issue);
-    saveToFirebase();
-    renderKPIs();
-    updateChart();
-    renderList();
-    renderArchive();
-    const centerIdx = centerIssues.findIndex(i => i.code === code);
-    if (centerIdx !== -1) { centerIssues[centerIdx].status = "تم الحل ✅"; saveToFirebase(); }
-    showToast("✅ تم الحل", `تم تسوية الإنشغال ${code} ونقله إلى الأرشيف`);
-  }
-}
-
-function deleteIssue(code) {
-  if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
-  activeIssues = activeIssues.filter(i => i.code !== code);
-  saveToFirebase();
-  renderKPIs(); updateChart(); renderList();
-}
-
-// ============================================================
-// ARCHIVE - محفوظ مع Firebase
-// ============================================================
-function renderArchive() {
-  const search = (document.getElementById('archive-search')?.value || '').trim().toLowerCase();
-  const sourceFilter = document.getElementById('archive-source-filter')?.value || '';
-  const tbody = document.getElementById('archiveTableBody');
-  if (!tbody) return;
-  let filtered = archivedIssues.filter(issue => {
-    const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
-    const matchesSource = !sourceFilter || issue.source === sourceFilter;
-    return matchesSearch && matchesSource;
-  });
-  if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="10" class="empty-msg">لا توجد إنشغالات في الأرشيف.</td></tr>`; return; }
-  tbody.innerHTML = filtered.map(issue => {
-    const hasAttach = hasAttachment(issue);
-    const timeAgo = getTimeAgo(issue.createdAt);
-    return `<tr>
-      <td><strong style="font-size:16px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo}</span></td>
-      <td style="font-size:16px;">${escapeHtml(issue.center)}</td>
-      <td style="font-size:16px;">${escapeHtml(issue.type)}</td>
-      <td>${priorityPillHtml(issue.priority)}</td>
-      <td style="font-size:16px;">${escapeHtml(issue.author)}</td>
-      <td>${sourceBadgeHtml(issue.source)}</td>
-      <td><button class="btn-mini view-btn" onclick="openDetails('${issue.code}', true)"><i class="fa-solid fa-eye"></i></button></td>
-      <td>${hasAttach ? '<span style="color:var(--algeria-green);"><i class="fa-solid fa-paperclip"></i></span>' : '<span style="color:var(--text-dim);">-</span>'}</td>
-      <td><span class="status-resolved">تم الحل ✅</span></td>
-      <td style="white-space:nowrap;"><button class="btn-mini" onclick="restoreFromArchive('${issue.code}')"><i class="fa-solid fa-rotate-left"></i></button><button class="btn-mini danger" onclick="deleteFromArchive('${issue.code}')"><i class="fa-solid fa-trash"></i></button></td>
-    </tr>`;
-  }).join('');
-}
-
-function restoreFromArchive(code) {
-  if (!confirm("هل تريد إعادة هذا الإنشغال إلى القائمة النشطة؟")) return;
-  const idx = archivedIssues.findIndex(i => i.code === code);
-  if (idx === -1) return;
-  const issue = archivedIssues[idx];
-  issue.status = "قيد المعالجة 🔄";
-  archivedIssues.splice(idx, 1);
-  activeIssues.unshift(issue);
-  saveToFirebase();
-  renderKPIs(); updateChart(); renderList(); renderArchive();
-}
-
-function deleteFromArchive(code) {
-  if (!confirm("هل أنت متأكد من الحذف النهائي من الأرشيف؟")) return;
-  archivedIssues = archivedIssues.filter(i => i.code !== code);
-  saveToFirebase();
-  renderKPIs(); updateChart(); renderArchive();
-}
-
-// ============================================================
-// DETAILS MODAL - محفوظ
+// 📋 DETAILS MODAL
 // ============================================================
 function openDetails(code, fromArchive) {
   let source = fromArchive ? archivedIssues : activeIssues;
@@ -1597,11 +2558,22 @@ function openDetails(code, fromArchive) {
   if (!issue) { issue = centerArchived.find(i => i.code === code); if (!issue) return; }
   document.getElementById('detailsTitle').textContent = `📋 تفاصيل الإنشغال - ${issue.code}`;
   const timeStr = new Date(issue.createdAt).toLocaleString('ar-DZ', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const deptName = getDepartmentName(issue.department);
+  let transferHistoryHtml = '';
+  if (issue.transferHistory && issue.transferHistory.length > 0) {
+    transferHistoryHtml = '<div class="detail-section"><span class="label">📋 سجل التحويلات</span><div class="value" style="font-size:15px;">';
+    issue.transferHistory.forEach(h => {
+      transferHistoryHtml += `<div>🔄 من ${h.from} → إلى ${h.to} ${h.reason ? ' (سبب: ' + h.reason + ')' : ''}</div>`;
+    });
+    transferHistoryHtml += '</div></div>';
+  }
   let html = `<div class="detail-section"><span class="label">📌 المؤسسة المعنية</span><div class="value">${escapeHtml(issue.center)}</div></div>
     <div class="detail-section"><span class="label">📂 تصنيف الإنشغال</span><div class="value">${escapeHtml(issue.type)}</div></div>
+    <div class="detail-section"><span class="label">🏢 المصلحة المسؤولة</span><div class="value">${escapeHtml(deptName)}</div></div>
     <div class="detail-section"><span class="label">⚡ درجة الأولوية</span><div class="value">${escapeHtml(issue.priority)}</div></div>
     <div class="detail-section"><span class="label">✍️ المحرر</span><div class="value">${escapeHtml(issue.author)}</div></div>
     <div class="detail-section"><span class="label">📅 تاريخ الإنشاء</span><div class="value">${timeStr}</div></div>
+    ${transferHistoryHtml}
     <div class="detail-section"><span class="label">📝 التفاصيل الكاملة</span><div class="value" style="white-space:pre-wrap;">${escapeHtml(issue.details)}</div></div>`;
   document.getElementById('detailsContent').innerHTML = html;
   const attachDiv = document.getElementById('detailsAttachment');
@@ -1620,298 +2592,7 @@ function openDetails(code, fromArchive) {
 function closeDetails() { document.getElementById('detailsModal').classList.remove('open'); }
 
 // ============================================================
-// CHAT SYSTEM - محفوظ مع Firebase
-// ============================================================
-function getChatMessages(code) {
-  return JSON.parse(localStorage.getItem('chat_messages_' + code) || "[]");
-}
-
-function saveChatMessages(code, msgs) {
-  localStorage.setItem('chat_messages_' + code, JSON.stringify(msgs));
-  // حفظ في Firebase
-  const chatData = {};
-  chatData[code] = msgs;
-  database.ref('chats').update(chatData);
-}
-
-function listenToChats() {
-  database.ref('chats').on('value', (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      Object.keys(data).forEach(code => {
-        const existing = getChatMessages(code);
-        const newMsgs = data[code];
-        if (newMsgs && newMsgs.length > existing.length) {
-          saveChatMessages(code, newMsgs);
-          if (currentChatCode === code) {
-            renderChatMessages(currentRole);
-          } else {
-            const lastMsg = newMsgs[newMsgs.length - 1];
-            if (lastMsg.sender !== currentRole) {
-              const msgKey = code + '_' + lastMsg.time;
-              if (!notifiedMessages.has(msgKey)) {
-                notifiedMessages.add(msgKey);
-                showToastWithAction(lastMsg.text || '(مرفق)', `📩 رسالة جديدة من ${lastMsg.sender} - ${code}`, () => { openChat(code, currentRole); });
-              }
-            }
-          }
-          if (currentRole === 'directorate') renderList();
-          else renderChatHub();
-        }
-      });
-    }
-  });
-}
-
-function openChat(code, role) {
-  const allIssues = [...activeIssues, ...archivedIssues, ...centerIssues, ...centerArchived];
-  const issue = allIssues.find(i => i.code === code);
-  if (!issue) { showToast("⚠️ خطأ", "لم يتم العثور على الإنشغال"); return; }
-  currentChatCode = code;
-  document.getElementById('chatTitle').textContent = '💬 غرفة الشات الفوري';
-  document.getElementById('chatSubtitle').textContent = `${issue.center || 'مركز'} — ${code}`;
-  const msgs = getChatMessages(code);
-  let changed = false;
-  msgs.forEach(m => { if (!m.read) { m.read = true; changed = true; } });
-  if (changed) saveChatMessages(code, msgs);
-  notifiedMessages.delete(code);
-  const sendBtn = document.getElementById('chatSendBtn');
-  sendBtn.className = role === 'directorate' ? 'chat-icon-btn send' : 'chat-icon-btn send-accent';
-  renderChatMessages(role);
-  document.getElementById('chatModal').classList.add('open');
-  removeAttachment();
-}
-
-function closeChat() { document.getElementById('chatModal').classList.remove('open'); currentChatCode = null; }
-
-function renderChatMessages(role) {
-  const container = document.getElementById('chatMessages');
-  const msgs = getChatMessages(currentChatCode);
-  const htmlContent = msgs.map(m => {
-    let attachHtml = '';
-    if (m.attachment) {
-      if (m.attachment.type && m.attachment.type.startsWith('image/')) {
-        attachHtml = `<img class="chat-attach-img" src="${m.attachment.data}" onclick="openLightbox('${m.attachment.data}')">`;
-      } else {
-        attachHtml = `<a class="chat-attach-file" href="${m.attachment.data}" download="${escapeHtml(m.attachment.name)}"><i class="fa-solid fa-file"></i> ${escapeHtml(m.attachment.name)}</a>`;
-      }
-    }
-    const timeStr = new Date(m.time).toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
-    let bubbleClass = '', senderLabel = '';
-    if (m.sender === 'directorate') { bubbleClass = 'directorate-msg'; senderLabel = 'المديرية'; }
-    else { bubbleClass = 'center-msg'; senderLabel = 'المركز'; }
-    return `<div class="chat-bubble ${bubbleClass}"><span class="chat-sender-label">${senderLabel}</span>${m.text ? escapeHtml(m.text) : ''}${attachHtml}<span class="chat-time">${timeStr}</span></div>`;
-  }).join('');
-  container.innerHTML = htmlContent || '<div style="color:var(--text-dim); text-align:center; padding:40px; font-size:18px;">لا توجد رسائل بعد</div>';
-  container.scrollTop = container.scrollHeight;
-}
-
-function handleChatFileAttach(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  if (file.size > 4 * 1024 * 1024) { alert("⚠️ حجم الملف يتجاوز الحد الأقصى المسموح به (4 ميغابايت)."); e.target.value = ''; return; }
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    pendingAttachment = { name: file.name, type: file.type, data: ev.target.result };
-    document.getElementById('chatAttachName').textContent = file.name;
-    document.getElementById('chatAttachPreview').style.display = 'flex';
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeAttachment() {
-  pendingAttachment = null;
-  document.getElementById('chatAttachPreview').style.display = 'none';
-  document.getElementById('chatFileInput').value = '';
-}
-
-function sendChatMessage() {
-  if (!currentChatCode) return;
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text && !pendingAttachment) return;
-  const msgs = getChatMessages(currentChatCode);
-  msgs.push({ sender: currentRole, text, attachment: pendingAttachment, time: Date.now(), read: false });
-  saveChatMessages(currentChatCode, msgs);
-  input.value = '';
-  removeAttachment();
-  renderChatMessages(currentRole);
-}
-
-// ============================================================
-// INTER-INSTITUTION CHAT - محفوظ مع Firebase
-// ============================================================
-function populateInterChatRecipients() {
-  const select = document.getElementById('interChatRecipient');
-  if (!select) return;
-  select.innerHTML = '<option value="all">الجميع</option>';
-  INSTITUTIONS_DATA.forEach(inst => { select.innerHTML += `<option value="${inst.name}">${inst.name}</option>`; });
-  select.innerHTML += `<option value="directorate">المديرية</option>`;
-  select.onchange = function() {
-    const badge = document.getElementById('recipientBadge');
-    if (this.value === 'all') { badge.textContent = 'الجميع'; badge.style.background = 'var(--algeria-green)'; }
-    else if (this.value === 'directorate') { badge.textContent = 'المديرية'; badge.style.background = 'var(--algeria-red)'; }
-    else { badge.textContent = this.value.length > 20 ? this.value.substring(0, 20) + '...' : this.value; badge.style.background = 'var(--algeria-green)'; }
-  };
-}
-
-function openInterChat() {
-  populateInterChatRecipients();
-  renderInterChatMessages();
-  document.getElementById('interChatModal').classList.add('open');
-}
-
-function closeInterChat() { document.getElementById('interChatModal').classList.remove('open'); }
-
-function getInterChatMessages() {
-  return JSON.parse(localStorage.getItem(LS_KEYS.interChat) || "[]");
-}
-
-function saveInterChatMessages(msgs) {
-  localStorage.setItem(LS_KEYS.interChat, JSON.stringify(msgs));
-  database.ref('interChat').set(msgs);
-}
-
-function renderInterChatMessages() {
-  const container = document.getElementById('interChatMessages');
-  const msgs = getInterChatMessages();
-  const htmlContent = msgs.map(m => {
-    const timeStr = new Date(m.time).toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
-    const isMe = m.sender === getCenterName() || m.sender === 'المديرية';
-    const bubbleClass = isMe ? 'center-msg' : 'directorate-msg';
-    const senderLabel = m.sender || 'غير معروف';
-    const recipientLabel = m.recipient ? ` → ${m.recipient}` : '';
-    let attachHtml = '';
-    if (m.attachment) {
-      if (m.attachment.type && m.attachment.type.startsWith('image/')) {
-        attachHtml = `<img class="chat-attach-img" src="${m.attachment.data}" onclick="openLightbox('${m.attachment.data}')">`;
-      } else {
-        attachHtml = `<a class="chat-attach-file" href="${m.attachment.data}" download="${escapeHtml(m.attachment.name)}"><i class="fa-solid fa-file"></i> ${escapeHtml(m.attachment.name)}</a>`;
-      }
-    }
-    return `<div class="chat-bubble ${bubbleClass}"><span class="chat-sender-label">${escapeHtml(senderLabel)}${recipientLabel}</span>${m.text ? escapeHtml(m.text) : ''}${attachHtml}<span class="chat-time">${timeStr}</span></div>`;
-  }).join('');
-  container.innerHTML = htmlContent || '<div style="color:var(--text-dim); text-align:center; padding:40px; font-size:18px;">لا توجد رسائل في غرفة المؤسسات</div>';
-  container.scrollTop = container.scrollHeight;
-}
-
-function handleInterChatFileAttach(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  if (file.size > 4 * 1024 * 1024) { alert("⚠️ حجم الملف يتجاوز الحد الأقصى المسموح به (4 ميغابايت)."); e.target.value = ''; return; }
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    interChatPendingAttachment = { name: file.name, type: file.type, data: ev.target.result };
-    showToast("📎 مرفق", `تم إرفاق ${file.name}`);
-  };
-  reader.readAsDataURL(file);
-}
-
-function sendInterChatMessage() {
-  const input = document.getElementById('interChatInput');
-  const text = input.value.trim();
-  const recipient = document.getElementById('interChatRecipient').value;
-  const recipientLabel = recipient === 'all' ? 'الجميع' : recipient === 'directorate' ? 'المديرية' : INSTITUTIONS_DATA.find(i => i.name === recipient)?.name || recipient;
-  if (!text && !interChatPendingAttachment) return;
-  const senderName = currentRole === 'directorate' ? 'المديرية' : getCenterName();
-  const msgs = getInterChatMessages();
-  msgs.push({ sender: senderName, recipient: recipientLabel, text, attachment: interChatPendingAttachment, time: Date.now() });
-  saveInterChatMessages(msgs);
-  interChatPendingAttachment = null;
-  input.value = '';
-  renderInterChatMessages();
-  document.getElementById('interChatFileInput').value = '';
-}
-
-// ============================================================
-// CENTER: CHAT HUB - محفوظ
-// ============================================================
-function renderChatHub() {
-  const container = document.getElementById('chatHubContainer');
-  if (!container) return;
-  const centerName = getCenterName();
-  const myIssues = centerIssues.filter(issue => issue.center === centerName);
-  
-  if (myIssues.length === 0) { 
-    container.innerHTML = `<div class="chat-hub-table-wrap"><div class="empty-msg">لا توجد بلاغات مرسلة من مركزكم للمتابعة.</div></div>`; 
-    return; 
-  }
-  let rows = myIssues.map(issue => {
-    const isResolved = issue.status && issue.status.indexOf('تم الحل') !== -1;
-    const hasAttach = issue.attachments && issue.attachments.length > 0;
-    const msgs = getChatMessages(issue.code);
-    const hasUnread = msgs.length > 0 && msgs[msgs.length - 1].sender === 'directorate' && !msgs[msgs.length - 1].read;
-    const timeAgo = getTimeAgo(issue.createdAt || Date.now());
-    const preview = issue.details ? issue.details.substring(0, 60) + (issue.details.length > 60 ? '...' : '') : '';
-    return `<tr class="${hasUnread ? 'row-unread' : ''}" onclick="openChat('${issue.code}', 'center')">
-      <td><strong style="font-size:17px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo}</span></td>
-      <td style="font-size:17px;">${escapeHtml(issue.type)}</td>
-      <td><span class="status-badge ${isResolved ? 'resolved' : 'pending'}">${isResolved ? '✅ تم الحل' : '🔄 قيد المعالجة'}</span></td>
-      <td style="font-size:16px; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(preview)}</td>
-      <td>${hasAttach ? '<span class="attach-badge"><i class="fa-solid fa-paperclip"></i> مرفق</span>' : ''}${hasUnread ? '<span class="unread-badge"><i class="fa-solid fa-bell"></i> جديد</span>' : ''}</td>
-      <td style="font-size:16px; color:var(--text-dim);"><i class="fa-regular fa-comment"></i> ${msgs.length}</td>
-    </tr>`;
-  }).join('');
-  container.innerHTML = `<div class="chat-hub-table-wrap"><div class="table-scroll"><table><thead><tr><th style="min-width:160px;">الرمز المرجعي</th><th style="min-width:150px;">المصلحة</th><th style="min-width:130px;">الحالة</th><th style="min-width:220px;">ملخص الإنشغال</th><th style="min-width:150px;">المرفقات</th><th style="min-width:90px;">الرسائل</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
-}
-
-// ============================================================
-// CHECK FOR NEW MESSAGES - محفوظ
-// ============================================================
-function checkForNewMessages() {
-  const allCodes = new Set();
-  [...activeIssues, ...archivedIssues, ...centerIssues, ...centerArchived].forEach(i => allCodes.add(i.code));
-  allCodes.forEach(code => {
-    const msgs = getChatMessages(code);
-    if (msgs.length === 0) return;
-    const last = msgs[msgs.length - 1];
-    const otherSide = currentRole === 'directorate' ? 'center' : 'directorate';
-    if (last.sender === otherSide && !last.read) {
-      const chatOpenOnThis = currentChatCode === code && document.getElementById('chatModal').classList.contains('open');
-      if (chatOpenOnThis) {
-        let changed = false;
-        msgs.forEach(m => { if (m.sender === otherSide && !m.read) { m.read = true; changed = true; } });
-        if (changed) saveChatMessages(code, msgs);
-        renderChatMessages(currentRole);
-      } else {
-        const msgKey = code + '_' + last.time;
-        if (!notifiedMessages.has(msgKey)) {
-          notifiedMessages.add(msgKey);
-          const senderName = currentRole === 'directorate' ? 'المركز' : 'المديرية';
-          showToastWithAction(last.text || '(مرفق)', `📩 رسالة جديدة من ${senderName} - ${code}`, () => { openChat(code, currentRole); });
-          if (currentRole === 'directorate') renderList(); else renderChatHub();
-        }
-      }
-    }
-  });
-}
-
-// ============================================================
-// TOAST - محفوظ
-// ============================================================
-function showToastWithAction(title, text, action) {
-  const area = document.getElementById('toast-area');
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.innerHTML = `<div><div class="toast-title">${escapeHtml(title)}</div><div class="toast-text">${escapeHtml(text)}</div><div class="toast-action"><i class="fa-solid fa-hand-pointer"></i> اضغط لعرض الرسالة</div></div>`;
-  toast.onclick = function() { toast.remove(); if (action) action(); };
-  area.appendChild(toast);
-  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 8000);
-  return toast;
-}
-
-function showToast(title, text) {
-  const area = document.getElementById('toast-area');
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.innerHTML = `<div><div class="toast-title">${escapeHtml(title)}</div><div class="toast-text">${escapeHtml(text)}</div></div>`;
-  toast.onclick = function() { toast.remove(); };
-  area.appendChild(toast);
-  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
-}
-
-// ============================================================
-// SCROLL DRAG - محفوظ
+// 📜 SCROLL DRAG
 // ============================================================
 function initScrollDrag(scrollId, trackId, thumbId) {
   const scrollEl = document.getElementById(scrollId);
@@ -1961,13 +2642,13 @@ function initScrollDrag(scrollId, trackId, thumbId) {
 }
 
 // ============================================================
-// LIGHTBOX - محفوظ
+// 💡 LIGHTBOX
 // ============================================================
 function openLightbox(src) { document.getElementById('lightboxImg').src = src; document.getElementById('lightboxOverlay').classList.add('open'); }
 function closeLightbox() { document.getElementById('lightboxOverlay').classList.remove('open'); document.getElementById('lightboxImg').src = ''; }
 
 // ============================================================
-// LOGOUT - محفوظ
+// 🚪 LOGOUT
 // ============================================================
 function logout() {
   if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
@@ -1975,14 +2656,16 @@ function logout() {
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('loginError').style.display = 'none';
     currentRole = null;
+    currentDepartment = null;
     localStorage.removeItem(LS_KEYS.remember);
     document.getElementById('loginUser').value = '';
     document.getElementById('loginPass').value = '';
     document.getElementById('loginCenterSelect').value = '';
     document.getElementById('loginCenterPass').value = '';
     document.getElementById('loginCenterSearch').value = '';
+    document.getElementById('loginDeptUser').value = '';
+    document.getElementById('loginDeptPass').value = '';
     notifiedMessages.clear();
-    // إزالة المستمعين
     database.ref('data').off();
     database.ref('chats').off();
     database.ref('interChat').off();
@@ -1990,7 +2673,7 @@ function logout() {
 }
 
 // ============================================================
-// UTILS - محفوظ
+// 🔧 UTILS
 // ============================================================
 function escapeHtml(str) {
   if (str === undefined || str === null) return '';
@@ -1998,27 +2681,29 @@ function escapeHtml(str) {
 }
 
 // ============================================================
-// WINDOW ONLOAD - محفوظ
+// 🌐 WINDOW ONLOAD
 // ============================================================
 window.onload = function() {
   loadTheme();
   selectLoginRole('directorate');
   loadRemembered();
-  // بدء الاستماع للمحادثات
   listenToChats();
 };
 
-// استماع للتغييرات في localStorage للتحديث بين النوافذ
 window.addEventListener('storage', function(e) {
-  const watchedKeys = [LS_KEYS.core, LS_KEYS.resolved, LS_KEYS.centerIssues, LS_KEYS.centerArchived];
+  const watchedKeys = [LS_KEYS.core, LS_KEYS.resolved, LS_KEYS.centerIssues, LS_KEYS.centerArchived, LS_KEYS.departments];
   if (watchedKeys.includes(e.key)) {
-    if (currentRole === 'directorate') { renderKPIs(); updateChart(); renderList(); renderArchive(); }
+    if (currentRole === 'directorate') { renderKPIs(); updateChart(); renderList(); renderArchive(); renderDepartmentsList(); renderDeptDashboard(); }
+    else if (currentRole === 'department') { renderDeptIssuesTable(); renderDeptKPIs(); }
     else { renderChatHub(); }
   }
 });
 
 console.log('🚀 منصة التنسيق الرقمي - تعمل مع Firebase');
 console.log('📡 تحديث فوري بين جميع الأجهزة!');
+console.log('🏢 نظام المصالح (المكاتب) مفعل!');
+console.log('🔐 يتم الدخول للمصالح باستخدام اسم مستخدم وكلمة مرور');
+console.log('➕ يمكن إضافة مصالح جديدة مع اسم مستخدم مخصص');
 console.log('🔥 Firebase متصل: ' + firebaseConfig.databaseURL);
 </script>
 </body>
