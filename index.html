@@ -338,6 +338,9 @@ tbody tr:hover { background: var(--table-hover); }
 .dept-stat-card .stat-item .num { font-size: 24px; font-weight: 900; color: var(--algeria-green); }
 .dept-stat-card .stat-item .label { font-size: 13px; color: var(--text-dim); }
 
+.center-dept-select { width: 100%; padding: 18px 24px; background: var(--input-bg); border: 3px solid var(--input-border); border-radius: 14px; color: var(--text); font-size: 20px; transition: var(--transition); font-family: inherit; }
+.center-dept-select:focus { border-color: var(--algeria-green); box-shadow: 0 0 0 4px rgba(0, 102, 51, 0.10); outline: none; }
+
 @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .form-grid { grid-template-columns: 1fr; } .notes-grid { grid-template-columns: 1fr; } }
 @media (max-width: 768px) { .app-flex { flex-direction: column; } .sidebar { width: 100%; height: auto; position: relative; border-left: none; border-bottom: 2px solid var(--border); } .main-workspace { padding: 16px; } .login-card { padding: 24px 18px; } .kpi-grid { grid-template-columns: 1fr; } .modal-box { max-width: 100%; margin: 10px; } .tabs-container { flex-direction: column; } .role-selector { grid-template-columns: 1fr; } .page-header h2 { font-size: 24px; } .theme-toggle { bottom: 15px; left: 15px; width: 50px; height: 50px; font-size: 20px; } .login-fields-row { flex-direction: column; } .login-fields-row .login-field { min-width: 100%; } }
 </style>
@@ -382,14 +385,29 @@ tbody tr:hover { background: var(--table-hover); }
         </div>
       </div>
 
-      <!-- حقول المصلحة -->
+      <!-- حقول المصلحة (مع قائمة منسدلة) -->
       <div id="departmentFields" style="display:none;">
         <div class="login-fields-row">
-          <div class="login-field"><label><i class="fa-solid fa-user"></i> اسم المستخدم</label><input type="text" id="loginDeptUser" placeholder="اسم المستخدم الخاص بالمصلحة" onkeyup="if(event.key==='Enter')handleLogin()"></div>
-          <div class="login-field"><label><i class="fa-solid fa-key"></i> كلمة المرور</label><input type="password" id="loginDeptPass" placeholder="كلمة المرور" onkeyup="if(event.key==='Enter')handleLogin()"></div>
+          <div class="login-field">
+            <label><i class="fa-solid fa-building"></i> اختر المصلحة</label>
+            <select id="loginDeptSelect" onchange="updateDeptPasswordField()">
+              <option value="">-- اختر المصلحة --</option>
+              <option value="suivi_formation">مصلحة متابعة التكوين والتعليم المهنيين</option>
+              <option value="suivi_investissement">مكتب متابعة مشاريع الإستثمار</option>
+              <option value="suivi_presentiel">مصلحة متابعة التكوين الحضوري</option>
+              <option value="suivi_themeen">مصلحة متابعة التمهين</option>
+              <option value="suivi_certificats">مصلحة متابعة الشهادات</option>
+              <option value="admin_finance">مصلحة الإدارة والمالية والوسائل</option>
+              <option value="secretariat_directeur">مكتب أمانة المدير</option>
+            </select>
+          </div>
+          <div class="login-field">
+            <label><i class="fa-solid fa-key"></i> كلمة المرور</label>
+            <input type="password" id="loginDeptPass" placeholder="كلمة المرور" onkeyup="if(event.key==='Enter')handleLogin()">
+          </div>
         </div>
         <div style="font-size:14px; color:var(--text-dim); padding:8px 12px; background:var(--bg-card-2); border-radius:10px; margin-bottom:10px; text-align:center;">
-          <i class="fa-solid fa-info-circle"></i> يتم توفير اسم المستخدم وكلمة المرور من قبل المديرية
+          <i class="fa-solid fa-info-circle"></i> اختر المصلحة من القائمة المنسدلة
         </div>
       </div>
 
@@ -422,7 +440,7 @@ tbody tr:hover { background: var(--table-hover); }
     <div class="profile-card">
       <div class="profile-avatar" id="profileAvatar"><i class="fa-solid fa-user-tie"></i></div>
       <h3 id="profileName">المديرية</h3>
-      <p id="profileTitle">رئيس مصلحة التنسيق</p>
+      <p id="profileTitle">المسؤول عن الرقمنة: بلحاج</p>
       <span class="role-badge directorate" id="profileRoleBadge">المديرية</span>
     </div>
     <ul class="nav-list" id="navList"></ul>
@@ -464,7 +482,7 @@ tbody tr:hover { background: var(--table-hover); }
     <section class="page hidden" id="page-departments">
       <div class="page-header">
         <h2><i class="fa-solid fa-users-gear"></i> إدارة المصالح</h2>
-        <button class="btn-primary btn-sm" onclick="openAddDepartment()"><i class="fa-solid fa-plus"></i> إضافة مصلحة</button>
+        <span style="font-size:16px; color:var(--text-dim);"><i class="fa-solid fa-info-circle"></i> يمكن تعديل اسم المصلحة والمكلف بها فقط</span>
       </div>
       <div id="departmentsListContainer"></div>
     </section>
@@ -558,6 +576,11 @@ tbody tr:hover { background: var(--table-hover); }
       <div class="form-card">
         <div class="form-grid">
           <div class="form-field"><label>تصنيف الإنشغال</label><select id="form-type"></select></div>
+          <div class="form-field"><label>إلى أي مصلحة تريد إرسال الإنشغال؟</label>
+            <select id="form-target-dept" class="center-dept-select">
+              <option value="">-- اختر المصلحة المستهدفة --</option>
+            </select>
+          </div>
           <div class="form-field"><label>درجة الأهمية</label><select id="form-priority"><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select></div>
           <div class="form-field"><label>اسم محرر الإنشغال (إختياري)</label><input type="text" id="form-reporter" placeholder="مثال: مراح فارس..."></div>
           <div class="form-field"><label>إرفاق ملف / صورة</label><input type="file" id="form-file" accept="image/*,application/pdf" onchange="handleCenterFileSelection(event)"></div>
@@ -604,20 +627,6 @@ tbody tr:hover { background: var(--table-hover); }
       <div class="form-field"><label>كلمة السر الجديدة</label><input type="password" id="newPass" placeholder="أدخل كلمة السر الجديدة"></div>
       <div class="form-field"><label>تأكيد كلمة السر الجديدة</label><input type="password" id="confirmPass" placeholder="أعد كتابة كلمة السر الجديدة"></div>
       <button class="btn-primary" style="width:100%; justify-content:center;" onclick="changePassword()"><i class="fa-solid fa-save"></i> تغيير كلمة السر</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="addDeptModal" onclick="if(event.target===this)closeAddDepartment()">
-  <div class="modal-box" style="max-width:550px;">
-    <div class="modal-head"><div><h3>➕ إضافة مصلحة جديدة</h3></div><button class="btn-close-modal" onclick="closeAddDepartment()"><i class="fa-solid fa-xmark"></i></button></div>
-    <div class="modal-body">
-      <div class="form-field"><label><i class="fa-solid fa-user"></i> اسم المستخدم</label><input type="text" id="newDeptUsername" placeholder="اسم المستخدم للدخول إلى المصلحة (مثال: maintenance)" value=""></div>
-      <div class="form-field"><label><i class="fa-solid fa-building"></i> اسم المصلحة</label><input type="text" id="newDeptName" placeholder="مثال: مصلحة الصيانة"></div>
-      <div class="form-field"><label><i class="fa-solid fa-tag"></i> نوع الإنشغال المختص به</label><select id="newDeptType"></select></div>
-      <div class="form-field"><label><i class="fa-solid fa-key"></i> كلمة السر</label><input type="text" id="newDeptPassword" placeholder="أدخل كلمة سر للمصلحة" value="1234"></div>
-      <div class="form-field"><label><i class="fa-solid fa-user-tie"></i> اسم المسؤول</label><input type="text" id="newDeptManager" placeholder="اسم مسؤول المصلحة"></div>
-      <button class="btn-primary" style="width:100%; justify-content:center;" onclick="addDepartment()"><i class="fa-solid fa-save"></i> إضافة المصلحة</button>
     </div>
   </div>
 </div>
@@ -691,24 +700,37 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 // ============================================================
-// 💾 بيانات اعتماد المصالح (مخزنة مسبقاً)
-// سيتم تحديثها ديناميكياً عند إضافة مصالح جديدة
+// 💾 بيانات اعتماد المصالح الثابتة (كلمات السر ثابتة)
 // ============================================================
-let DEPARTMENT_CREDENTIALS = {
-  // اسم المستخدم: { password: كلمة المرور, departmentId: معرف المصلحة }
-  "maintenance": { password: "1234", departmentId: "dept1" },
-  "pedagogy": { password: "5678", departmentId: "dept2" },
-  "digital": { password: "9012", departmentId: "dept3" },
-  "hr": { password: "3456", departmentId: "dept4" },
-  "networks": { password: "7890", departmentId: "dept5" }
+const DEPARTMENT_CREDENTIALS = {
+  "suivi_formation": { password: "878789", departmentId: "dept1", name: "مصلحة متابعة التكوين والتعليم المهنيين" },
+  "suivi_investissement": { password: "5678", departmentId: "dept2", name: "مكتب متابعة مشاريع الإستثمار" },
+  "suivi_presentiel": { password: "9012", departmentId: "dept3", name: "مصلحة متابعة التكوين الحضوري" },
+  "suivi_themeen": { password: "3456", departmentId: "dept4", name: "مصلحة متابعة التمهين" },
+  "suivi_certificats": { password: "7890", departmentId: "dept5", name: "مصلحة متابعة الشهادات" },
+  "admin_finance": { password: "1111", departmentId: "dept6", name: "مصلحة الإدارة والمالية والوسائل" },
+  "secretariat_directeur": { password: "20262026", departmentId: "dept7", name: "مكتب أمانة المدير" }
 };
+
+// ============================================================
+// 💾 المصالح الأساسية (القائمة الثابتة)
+// ============================================================
+const DEPARTMENTS_BASE = [
+  { id: "dept1", name: "مصلحة متابعة التكوين والتعليم المهنيين", type: "متابعة التكوين", manager: "مسؤول التكوين" },
+  { id: "dept2", name: "مكتب متابعة مشاريع الإستثمار", type: "مشاريع الإستثمار", manager: "مسؤول الإستثمار" },
+  { id: "dept3", name: "مصلحة متابعة التكوين الحضوري", type: "التكوين الحضوري", manager: "مسؤول التكوين الحضوري" },
+  { id: "dept4", name: "مصلحة متابعة التمهين", type: "التمهين", manager: "مسؤول التمهين" },
+  { id: "dept5", name: "مصلحة متابعة الشهادات", type: "الشهادات", manager: "مسؤول الشهادات" },
+  { id: "dept6", name: "مصلحة الإدارة والمالية والوسائل", type: "الإدارة والمالية", manager: "مسؤول الإدارة" },
+  { id: "dept7", name: "مكتب أمانة المدير", type: "الأمانة", manager: "أمين المدير" }
+];
 
 // ============================================================
 // 💾 البيانات الأساسية
 // ============================================================
 let MASTER_PASSWORD = "1996";
 let currentRole = null;
-let currentDepartment = null; // معرف المصلحة الحالية
+let currentDepartment = null;
 let activeIssues = [];
 let archivedIssues = [];
 let fileTypes = [];
@@ -740,19 +762,10 @@ const LS_KEYS = {
   interChat: "inter_institution_chat",
   masterPass: "hassan_master_pass",
   lastSync: "hassan_last_sync",
-  departments: "hassan_departments",
-  deptCredentials: "hassan_dept_credentials"
+  departments: "hassan_departments"
 };
 
 const DEFAULT_FILE_TYPES = ["منظومة الرقمنة والأرضية الرقمية","مصلحة المتابعة البيداغوجية والبرامج","الهياكل والشبكات وتكنولوجيا المعلومات","الموارد البشرية والتكوين","الصيانة والتجهيزات"];
-
-const DEFAULT_DEPARTMENTS = [
-  { id: "dept1", name: "مصلحة الصيانة والتجهيزات", type: "الصيانة والتجهيزات", password: "1234", manager: "مسؤول الصيانة" },
-  { id: "dept2", name: "مصلحة البيداغوجيا والبرامج", type: "المتابعة البيداغوجية والبرامج", password: "5678", manager: "مسؤول البيداغوجيا" },
-  { id: "dept3", name: "مصلحة الرقمنة والمعلوماتية", type: "منظومة الرقمنة والأرضية الرقمية", password: "9012", manager: "مسؤول الرقمنة" },
-  { id: "dept4", name: "مصلحة الموارد البشرية", type: "الموارد البشرية والتكوين", password: "3456", manager: "مسؤول الموارد البشرية" },
-  { id: "dept5", name: "مصلحة الهياكل والشبكات", type: "الهياكل والشبكات وتكنولوجيا المعلومات", password: "7890", manager: "مسؤول الهياكل" }
-];
 
 const INSTITUTIONS_DATA = [
   { name: "المعهد الوطني المتخصص في التكوين المهني ب .ب.ع 01", code: "INSFP001", password: "789012", type: "center" },
@@ -836,23 +849,28 @@ function loadDB() {
   centerIssues = JSON.parse(localStorage.getItem(LS_KEYS.centerIssues) || "[]");
   centerArchived = JSON.parse(localStorage.getItem(LS_KEYS.centerArchived) || "[]");
   interChatMessages = JSON.parse(localStorage.getItem(LS_KEYS.interChat) || "[]");
-  departments = JSON.parse(localStorage.getItem(LS_KEYS.departments) || "null") || DEFAULT_DEPARTMENTS.slice();
   
-  // تحميل بيانات الاعتماد المحفوظة
-  const savedCreds = localStorage.getItem(LS_KEYS.deptCredentials);
-  if (savedCreds) {
+  // تحميل المصالح من localStorage أو استخدام القاعدة
+  const savedDepts = localStorage.getItem(LS_KEYS.departments);
+  if (savedDepts) {
     try {
-      DEPARTMENT_CREDENTIALS = JSON.parse(savedCreds);
-    } catch(e) {}
+      departments = JSON.parse(savedDepts);
+      // التأكد من أن جميع المصالح الأساسية موجودة
+      DEPARTMENTS_BASE.forEach(base => {
+        if (!departments.find(d => d.id === base.id)) {
+          departments.push({...base});
+        }
+      });
+    } catch(e) {
+      departments = DEPARTMENTS_BASE.slice();
+    }
+  } else {
+    departments = DEPARTMENTS_BASE.slice();
   }
   
   const savedPass = localStorage.getItem(LS_KEYS.masterPass);
   if (savedPass) MASTER_PASSWORD = savedPass;
   lastSyncTimestamp = parseInt(localStorage.getItem(LS_KEYS.lastSync) || "0");
-}
-
-function saveCredentials() {
-  localStorage.setItem(LS_KEYS.deptCredentials, JSON.stringify(DEPARTMENT_CREDENTIALS));
 }
 
 function saveToFirebase() {
@@ -864,7 +882,6 @@ function saveToFirebase() {
     interChat: interChatMessages,
     fileTypes: fileTypes,
     departments: departments,
-    deptCredentials: DEPARTMENT_CREDENTIALS,
     timestamp: Date.now()
   };
   database.ref('data').set(data).catch(err => console.log('Save error:', err));
@@ -883,8 +900,16 @@ function listenToFirebase() {
       if (data.centerArchived) { centerArchived = data.centerArchived; changed = true; }
       if (data.interChat) { interChatMessages = data.interChat; changed = true; }
       if (data.fileTypes) { fileTypes = data.fileTypes; changed = true; }
-      if (data.departments) { departments = data.departments; changed = true; }
-      if (data.deptCredentials) { DEPARTMENT_CREDENTIALS = data.deptCredentials; saveCredentials(); changed = true; }
+      if (data.departments) { 
+        departments = data.departments;
+        // التأكد من وجود جميع المصالح الأساسية
+        DEPARTMENTS_BASE.forEach(base => {
+          if (!departments.find(d => d.id === base.id)) {
+            departments.push({...base});
+          }
+        });
+        changed = true; 
+      }
       
       if (changed) {
         localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
@@ -921,8 +946,14 @@ function forceSync() {
       if (data.centerArchived) centerArchived = data.centerArchived;
       if (data.interChat) interChatMessages = data.interChat;
       if (data.fileTypes) fileTypes = data.fileTypes;
-      if (data.departments) departments = data.departments;
-      if (data.deptCredentials) { DEPARTMENT_CREDENTIALS = data.deptCredentials; saveCredentials(); }
+      if (data.departments) {
+        departments = data.departments;
+        DEPARTMENTS_BASE.forEach(base => {
+          if (!departments.find(d => d.id === base.id)) {
+            departments.push({...base});
+          }
+        });
+      }
       updateUI();
       showToast('✅ تم التحديث', 'تم جلب أحدث البيانات بنجاح');
     }
@@ -947,12 +978,14 @@ function updateUI() {
     renderDepartmentsList();
     renderDeptDashboard();
     populateDeptFilters();
+    populateCenterTargetDepts();
   } else if (currentRole === 'department') {
     renderDepartmentIssues();
     renderDeptKPIs();
   } else {
     renderChatHub();
     refreshCenterUI();
+    populateCenterTargetDepts();
   }
 }
 
@@ -975,10 +1008,22 @@ function selectLoginRole(role) {
     document.getElementById('directorateFields').style.display = 'block';
   } else if (role === 'department') {
     document.getElementById('departmentFields').style.display = 'block';
+    updateDeptPasswordField();
   } else {
     document.getElementById('centerFields').style.display = 'block';
     document.getElementById('centerHint').style.display = 'block';
     populateCenterSelect();
+  }
+}
+
+function updateDeptPasswordField() {
+  const select = document.getElementById('loginDeptSelect');
+  const passField = document.getElementById('loginDeptPass');
+  const selected = select.value;
+  if (selected && DEPARTMENT_CREDENTIALS[selected]) {
+    passField.value = DEPARTMENT_CREDENTIALS[selected].password;
+  } else {
+    passField.value = '';
   }
 }
 
@@ -1021,25 +1066,39 @@ function handleLogin() {
       err.textContent = '⚠️ بيانات الدخول غير صحيحة!';
     }
   } else if (selectedLoginRole === 'department') {
-    const username = document.getElementById('loginDeptUser').value.trim();
+    const username = document.getElementById('loginDeptSelect').value;
     const pass = document.getElementById('loginDeptPass').value.trim();
     
-    // التحقق من بيانات الاعتماد المخزنة
+    if (!username) {
+      err.style.display = 'block';
+      err.textContent = '⚠️ يرجى اختيار المصلحة من القائمة!';
+      return;
+    }
+    
     const cred = DEPARTMENT_CREDENTIALS[username];
     if (cred && cred.password === pass) {
-      // العثور على المصلحة المقابلة
-      const dept = departments.find(d => d.id === cred.departmentId);
+      // البحث عن المصلحة في قائمة المصالح
+      let dept = departments.find(d => d.id === cred.departmentId);
+      if (!dept) {
+        // إذا لم توجد، نضيفها من البيانات الأساسية
+        const baseDept = DEPARTMENTS_BASE.find(d => d.id === cred.departmentId);
+        if (baseDept) {
+          departments.push({...baseDept});
+          localStorage.setItem(LS_KEYS.departments, JSON.stringify(departments));
+          dept = departments.find(d => d.id === cred.departmentId);
+        }
+      }
       if (dept) {
         currentRole = 'department';
         currentDepartment = dept.id;
         initApp();
       } else {
         err.style.display = 'block';
-        err.textContent = '⚠️ المصلحة غير موجودة في النظام!';
+        err.textContent = '⚠️ المصلحة غير موجودة في النظام! يرجى الاتصال بالمديرية.';
       }
     } else {
       err.style.display = 'block';
-      err.textContent = '⚠️ اسم المستخدم أو كلمة المرور غير صحيحة! يرجى الاتصال بالمديرية.';
+      err.textContent = '⚠️ كلمة المرور غير صحيحة! يرجى الاتصال بالمديرية.';
     }
   } else {
     const center = document.getElementById('loginCenterSelect').value;
@@ -1066,9 +1125,9 @@ function toggleRemember() {
       const pass = document.getElementById('loginPass').value;
       if (user && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, user, pass }));
     } else if (role === 'department') {
-      const user = document.getElementById('loginDeptUser').value;
+      const dept = document.getElementById('loginDeptSelect').value;
       const pass = document.getElementById('loginDeptPass').value;
-      if (user && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, user, pass }));
+      if (dept && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, dept, pass }));
     } else {
       const center = document.getElementById('loginCenterSelect').value;
       const pass = document.getElementById('loginCenterPass').value;
@@ -1089,9 +1148,10 @@ function loadRemembered() {
         document.getElementById('rememberMe').checked = true;
       } else if (parsed.role === 'department') {
         selectLoginRole('department');
-        document.getElementById('loginDeptUser').value = parsed.user || '';
+        document.getElementById('loginDeptSelect').value = parsed.dept || '';
         document.getElementById('loginDeptPass').value = parsed.pass || '';
         document.getElementById('rememberMe').checked = true;
+        updateDeptPasswordField();
       } else if (parsed.role === 'center') {
         selectLoginRole('center');
         document.getElementById('loginCenterSelect').value = parsed.center || '';
@@ -1150,8 +1210,14 @@ function initApp() {
       if (data.centerArchived) centerArchived = data.centerArchived;
       if (data.interChat) interChatMessages = data.interChat;
       if (data.fileTypes) fileTypes = data.fileTypes;
-      if (data.departments) departments = data.departments;
-      if (data.deptCredentials) { DEPARTMENT_CREDENTIALS = data.deptCredentials; saveCredentials(); }
+      if (data.departments) {
+        departments = data.departments;
+        DEPARTMENTS_BASE.forEach(base => {
+          if (!departments.find(d => d.id === base.id)) {
+            departments.push({...base});
+          }
+        });
+      }
     }
     setupInterface();
   });
@@ -1165,6 +1231,7 @@ function setupInterface() {
   renderTokensGrid();
   updateBroadcastCount();
   populateInterChatRecipients();
+  populateCenterTargetDepts();
   document.getElementById('strategicNotes').value = localStorage.getItem(LS_KEYS.notes) || "";
   
   if (currentRole === 'directorate') {
@@ -1218,7 +1285,7 @@ function setupSidebar() {
   if (currentRole === 'directorate') {
     avatar.innerHTML = '<i class="fa-solid fa-user-tie"></i>';
     name.textContent = 'المديرية';
-    title.textContent = 'رئيس مصلحة التنسيق';
+    title.textContent = 'المسؤول عن الرقمنة: بلحاج';
     badge.textContent = 'المديرية';
     badge.className = 'role-badge directorate';
     navList.innerHTML = `
@@ -1322,10 +1389,21 @@ function renderDepartmentsList() {
     const pendingIssues = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') === -1).length;
     const resolvedIssues = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') !== -1).length;
     const efficiency = totalIssues > 0 ? Math.round((resolvedIssues / totalIssues) * 100) : 0;
-    const username = getDepartmentUsername(dept.id);
+    
+    // البحث عن اسم المستخدم
+    let username = '';
+    for (const [user, cred] of Object.entries(DEPARTMENT_CREDENTIALS)) {
+      if (cred.departmentId === dept.id) {
+        username = user;
+        break;
+      }
+    }
+    
+    const cred = DEPARTMENT_CREDENTIALS[username];
+    
     return `<div class="dept-stat-card" style="border-right:4px solid var(--algeria-green);">
       <div class="dept-name">${dept.name}</div>
-      <div style="font-size:14px; color:var(--text-dim); margin-bottom:6px;">${dept.manager} | ${dept.type}</div>
+      <div style="font-size:14px; color:var(--text-dim); margin-bottom:6px;">المكلف: ${dept.manager}</div>
       <div style="font-size:13px; color:var(--algeria-green); background:var(--bg-card-2); padding:4px 12px; border-radius:8px; display:inline-block; margin-bottom:8px;">
         <i class="fa-solid fa-user"></i> اسم المستخدم: ${username}
       </div>
@@ -1336,19 +1414,79 @@ function renderDepartmentsList() {
         <div class="stat-item"><div class="num">${efficiency}%</div><div class="label">الكفاءة</div></div>
       </div>
       <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn-mini" onclick="editDepartment('${dept.id}')"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn-mini danger" onclick="deleteDepartment('${dept.id}')"><i class="fa-solid fa-trash"></i></button>
-        <span style="font-size:13px; color:var(--text-dim);"><i class="fa-solid fa-key"></i> كلمة السر: ${dept.password}</span>
+        <button class="btn-mini" onclick="editDepartmentInfo('${dept.id}')"><i class="fa-solid fa-pen"></i> تعديل الاسم والمكلف</button>
+        <span style="font-size:13px; color:var(--text-dim);"><i class="fa-solid fa-key"></i> كلمة السر: ${cred?.password || 'غير محدد'}</span>
       </div>
     </div>`;
   }).join('')}</div>`;
+  
+  // تحديث القوائم المنسدلة بعد تحديث المصالح
+  refreshAllDropdowns();
 }
 
-function getDepartmentUsername(deptId) {
-  for (const [username, cred] of Object.entries(DEPARTMENT_CREDENTIALS)) {
-    if (cred.departmentId === deptId) return username;
+// دالة جديدة لتحديث جميع القوائم المنسدلة التي تعتمد على المصالح
+function refreshAllDropdowns() {
+  populateDeptFilters();
+  populateCenterTargetDepts();
+  updateDepartmentSuggestion();
+  
+  // تحديث قائمة المصالح في نافذة تحويل الإنشغال إذا كانت مفتوحة
+  const transferSelect = document.getElementById('transferDeptSelect');
+  if (transferSelect) {
+    const currentValue = transferSelect.value;
+    transferSelect.innerHTML = departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+    if (currentValue && departments.some(d => d.id === currentValue)) {
+      transferSelect.value = currentValue;
+    }
   }
-  return 'غير محدد';
+  
+  // تحديث قائمة المصالح في شات المؤسسات
+  const interChatSelect = document.getElementById('interChatRecipient');
+  if (interChatSelect) {
+    const currentValue = interChatSelect.value;
+    // الاحتفاظ بخيار "الجميع" و "المديرية"
+    const deptOptions = departments.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
+    // إعادة بناء القائمة مع الاحتفاظ بالخيارات الأساسية
+    interChatSelect.innerHTML = `<option value="all">الجميع</option><option value="directorate">المديرية</option>${deptOptions}`;
+    if (currentValue && (currentValue === 'all' || currentValue === 'directorate' || departments.some(d => d.name === currentValue))) {
+      interChatSelect.value = currentValue;
+    }
+    // تحديث الـ badge
+    if (interChatSelect.value) {
+      const badge = document.getElementById('recipientBadge');
+      if (interChatSelect.value === 'all') { badge.textContent = 'الجميع'; badge.style.background = 'var(--algeria-green)'; }
+      else if (interChatSelect.value === 'directorate') { badge.textContent = 'المديرية'; badge.style.background = 'var(--algeria-red)'; }
+      else { badge.textContent = interChatSelect.value.length > 20 ? interChatSelect.value.substring(0, 20) + '...' : interChatSelect.value; badge.style.background = 'var(--algeria-green)'; }
+    }
+  }
+}
+
+function editDepartmentInfo(id) {
+  const dept = departments.find(d => d.id === id);
+  if (!dept) return;
+  
+  const newName = prompt('تعديل اسم المصلحة:', dept.name);
+  if (newName && newName.trim()) {
+    dept.name = newName.trim();
+  }
+  
+  const newManager = prompt('تعديل اسم المكلف بتسيير المصلحة:', dept.manager);
+  if (newManager && newManager.trim()) {
+    dept.manager = newManager.trim();
+  }
+  
+  saveToFirebase();
+  localStorage.setItem(LS_KEYS.departments, JSON.stringify(departments));
+  renderDepartmentsList();
+  renderDeptDashboard();
+  refreshAllDropdowns(); // تحديث القوائم المنسدلة
+  
+  // تحديث اسم المصلحة والمكلف في الـ sidebar إذا كانت المصلحة الحالية
+  if (currentRole === 'department' && currentDepartment === id) {
+    document.getElementById('profileName').textContent = dept.name;
+    document.getElementById('profileTitle').textContent = dept.manager;
+  }
+  showToast('✅ تم التعديل', 'تم تعديل بيانات المصلحة بنجاح');
 }
 
 function renderDeptDashboard() {
@@ -1363,10 +1501,18 @@ function renderDeptDashboard() {
     const pendingIssues = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') === -1).length;
     const resolvedIssues = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') !== -1).length;
     const efficiency = totalIssues > 0 ? Math.round((resolvedIssues / totalIssues) * 100) : 0;
-    const username = getDepartmentUsername(dept.id);
+    
+    let username = '';
+    for (const [user, cred] of Object.entries(DEPARTMENT_CREDENTIALS)) {
+      if (cred.departmentId === dept.id) {
+        username = user;
+        break;
+      }
+    }
+    
     return `<div class="dept-stat-card" style="border-right:4px solid var(--algeria-green);">
       <div class="dept-name">${dept.name}</div>
-      <div style="font-size:14px; color:var(--text-dim); margin-bottom:6px;">${dept.manager} | ${dept.type}</div>
+      <div style="font-size:14px; color:var(--text-dim); margin-bottom:6px;">المكلف: ${dept.manager}</div>
       <div style="font-size:13px; color:var(--algeria-green); background:var(--bg-card-2); padding:4px 12px; border-radius:8px; display:inline-block; margin-bottom:8px;">
         <i class="fa-solid fa-user"></i> اسم المستخدم: ${username}
       </div>
@@ -1426,136 +1572,23 @@ function updateDeptChart() {
 function populateDeptFilters() {
   const select1 = document.getElementById('list-dept-filter');
   const select2 = document.getElementById('archive-dept-filter');
+  // الحفاظ على القيمة المحددة إذا كانت موجودة
+  const val1 = select1 ? select1.value : '';
+  const val2 = select2 ? select2.value : '';
   const options = '<option value="">كل المصالح</option>' + departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
-  if (select1) select1.innerHTML = options;
-  if (select2) select2.innerHTML = options;
+  if (select1) { select1.innerHTML = options; if (val1 && departments.some(d => d.id === val1)) select1.value = val1; }
+  if (select2) { select2.innerHTML = options; if (val2 && departments.some(d => d.id === val2)) select2.value = val2; }
 }
 
-function openAddDepartment() {
-  const typeSelect = document.getElementById('newDeptType');
-  typeSelect.innerHTML = fileTypes.map(t => `<option value="${t}">${t}</option>`).join('');
-  document.getElementById('newDeptUsername').value = '';
-  document.getElementById('newDeptName').value = '';
-  document.getElementById('newDeptPassword').value = Math.floor(1000 + Math.random() * 9000).toString();
-  document.getElementById('newDeptManager').value = '';
-  document.getElementById('addDeptModal').classList.add('open');
-}
-
-function closeAddDepartment() {
-  document.getElementById('addDeptModal').classList.remove('open');
-}
-
-function addDepartment() {
-  const username = document.getElementById('newDeptUsername').value.trim();
-  const name = document.getElementById('newDeptName').value.trim();
-  const type = document.getElementById('newDeptType').value;
-  const password = document.getElementById('newDeptPassword').value.trim();
-  const manager = document.getElementById('newDeptManager').value.trim();
-  
-  if (!username) { alert('يرجى إدخال اسم المستخدم للمصلحة'); return; }
-  if (!name || !type || !password) { alert('يرجى تعبئة جميع الحقول الأساسية'); return; }
-  
-  // التحقق من عدم تكرار اسم المستخدم
-  if (DEPARTMENT_CREDENTIALS[username]) {
-    alert('اسم المستخدم هذا مستخدم بالفعل! يرجى اختيار اسم آخر.');
-    return;
+function populateCenterTargetDepts() {
+  const select = document.getElementById('form-target-dept');
+  if (!select) return;
+  const currentValue = select.value;
+  select.innerHTML = '<option value="">-- اختر المصلحة المستهدفة --</option>' + 
+    departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+  if (currentValue && departments.some(d => d.id === currentValue)) {
+    select.value = currentValue;
   }
-  
-  const newDept = {
-    id: 'dept_' + Date.now(),
-    name: name,
-    type: type,
-    password: password || '1234',
-    manager: manager || 'مسؤول المصلحة'
-  };
-  
-  departments.push(newDept);
-  
-  // إضافة بيانات الاعتماد للمصلحة الجديدة
-  DEPARTMENT_CREDENTIALS[username] = {
-    password: password,
-    departmentId: newDept.id
-  };
-  
-  saveCredentials();
-  saveToFirebase();
-  closeAddDepartment();
-  renderDepartmentsList();
-  renderDeptDashboard();
-  populateDeptFilters();
-  showToast('✅ تم الإضافة', `تم إضافة المصلحة ${name} باسم مستخدم "${username}" بنجاح`);
-}
-
-function editDepartment(id) {
-  const dept = departments.find(d => d.id === id);
-  if (!dept) return;
-  
-  // البحث عن اسم المستخدم الحالي
-  let currentUsername = '';
-  for (const [user, cred] of Object.entries(DEPARTMENT_CREDENTIALS)) {
-    if (cred.departmentId === id) {
-      currentUsername = user;
-      break;
-    }
-  }
-  
-  const newUsername = prompt('تعديل اسم المستخدم (اترك فارغاً للإبقاء على الحالي):', currentUsername);
-  if (newUsername !== null && newUsername.trim() !== '' && newUsername.trim() !== currentUsername) {
-    // التحقق من عدم تكرار اسم المستخدم الجديد
-    if (DEPARTMENT_CREDENTIALS[newUsername.trim()]) {
-      alert('اسم المستخدم هذا مستخدم بالفعل!');
-      return;
-    }
-    // نقل بيانات الاعتماد إلى اسم المستخدم الجديد
-    const cred = DEPARTMENT_CREDENTIALS[currentUsername];
-    delete DEPARTMENT_CREDENTIALS[currentUsername];
-    DEPARTMENT_CREDENTIALS[newUsername.trim()] = cred;
-    saveCredentials();
-  }
-  
-  const newName = prompt('تعديل اسم المصلحة:', dept.name);
-  if (newName && newName.trim()) dept.name = newName.trim();
-  const newManager = prompt('تعديل اسم المسؤول:', dept.manager);
-  if (newManager && newManager.trim()) dept.manager = newManager.trim();
-  const newPassword = prompt('تعديل كلمة السر:', dept.password);
-  if (newPassword && newPassword.trim()) {
-    dept.password = newPassword.trim();
-    // تحديث كلمة السر في بيانات الاعتماد
-    for (const [user, cred] of Object.entries(DEPARTMENT_CREDENTIALS)) {
-      if (cred.departmentId === id) {
-        cred.password = newPassword.trim();
-        break;
-      }
-    }
-    saveCredentials();
-  }
-  
-  saveToFirebase();
-  renderDepartmentsList();
-  renderDeptDashboard();
-  populateDeptFilters();
-  showToast('✅ تم التعديل', 'تم تعديل بيانات المصلحة بنجاح');
-}
-
-function deleteDepartment(id) {
-  if (!confirm('هل أنت متأكد من حذف هذه المصلحة؟')) return;
-  
-  // حذف بيانات الاعتماد المرتبطة
-  for (const [user, cred] of Object.entries(DEPARTMENT_CREDENTIALS)) {
-    if (cred.departmentId === id) {
-      delete DEPARTMENT_CREDENTIALS[user];
-      break;
-    }
-  }
-  saveCredentials();
-  
-  departments = departments.filter(d => d.id !== id);
-  activeIssues.forEach(i => { if (i.department === id) i.department = ''; });
-  saveToFirebase();
-  renderDepartmentsList();
-  renderDeptDashboard();
-  populateDeptFilters();
-  showToast('🗑️ تم الحذف', 'تم حذف المصلحة بنجاح');
 }
 
 function updateDepartmentSuggestion() {
@@ -2011,14 +2044,19 @@ function sendFromCenter() {
   const type = document.getElementById('form-type').value;
   const priority = document.getElementById('form-priority').value;
   const reporter = document.getElementById('form-reporter').value.trim() || "غير محدد";
+  const targetDeptId = document.getElementById('form-target-dept').value;
   const center = getCenterName();
   const code = generateRefCode();
   const btn = document.getElementById('sendBtn');
   btn.disabled = true;
   btn.textContent = '⏳ جاري الإرسال...';
   
-  const dept = getDepartmentForType(type);
-  const deptId = dept ? dept.id : '';
+  // استخدام المصلحة التي اختارها المستخدم، أو البحث عن المصلحة المناسبة حسب التصنيف
+  let deptId = targetDeptId;
+  if (!deptId) {
+    const dept = getDepartmentForType(type);
+    deptId = dept ? dept.id : '';
+  }
   
   const attachments = [];
   if (pendingCenterFile) { 
@@ -2052,11 +2090,13 @@ function sendFromCenter() {
   };
   activeIssues.unshift(activeCopy);
   saveToFirebase();
-  showToast("✅ تم الإرسال", `تم إرسال الإنشغال ${code} بنجاح! ${dept ? 'تم توجيهه إلى ' + dept.name : ''}`);
+  const deptName = getDepartmentName(deptId);
+  showToast("✅ تم الإرسال", `تم إرسال الإنشغال ${code} بنجاح! ${deptName ? 'تم توجيهه إلى ' + deptName : ''}`);
   document.getElementById('form-details').value = '';
   document.getElementById('form-reporter').value = '';
   document.getElementById('form-file').value = '';
   document.getElementById('form-priority').selectedIndex = 0;
+  document.getElementById('form-target-dept').value = '';
   resetPasteZone();
   renderChatHub();
   renderList();
@@ -2212,16 +2252,28 @@ function sendChatMessage() {
 function populateInterChatRecipients() {
   const select = document.getElementById('interChatRecipient');
   if (!select) return;
+  const currentValue = select.value;
   select.innerHTML = '<option value="all">الجميع</option>';
   INSTITUTIONS_DATA.forEach(inst => { select.innerHTML += `<option value="${inst.name}">${inst.name}</option>`; });
   select.innerHTML += `<option value="directorate">المديرية</option>`;
   departments.forEach(dept => { select.innerHTML += `<option value="${dept.name}">${dept.name}</option>`; });
+  if (currentValue && (currentValue === 'all' || currentValue === 'directorate' || 
+      INSTITUTIONS_DATA.some(i => i.name === currentValue) || departments.some(d => d.name === currentValue))) {
+    select.value = currentValue;
+  }
   select.onchange = function() {
     const badge = document.getElementById('recipientBadge');
     if (this.value === 'all') { badge.textContent = 'الجميع'; badge.style.background = 'var(--algeria-green)'; }
     else if (this.value === 'directorate') { badge.textContent = 'المديرية'; badge.style.background = 'var(--algeria-red)'; }
     else { badge.textContent = this.value.length > 20 ? this.value.substring(0, 20) + '...' : this.value; badge.style.background = 'var(--algeria-green)'; }
   };
+  // تحديث الـ badge فوراً
+  if (select.value) {
+    const badge = document.getElementById('recipientBadge');
+    if (select.value === 'all') { badge.textContent = 'الجميع'; badge.style.background = 'var(--algeria-green)'; }
+    else if (select.value === 'directorate') { badge.textContent = 'المديرية'; badge.style.background = 'var(--algeria-red)'; }
+    else { badge.textContent = select.value.length > 20 ? select.value.substring(0, 20) + '...' : select.value; badge.style.background = 'var(--algeria-green)'; }
+  }
 }
 
 function openInterChat() {
@@ -2408,14 +2460,12 @@ function populateDropdowns() {
   const centerSel = document.getElementById('add-form-center');
   const typeSel = document.getElementById('add-form-type');
   const formType = document.getElementById('form-type');
-  const newDeptType = document.getElementById('newDeptType');
   
   if (centerSel) centerSel.innerHTML = INSTITUTIONS_DATA.map(i => `<option value="${escapeHtml(i.name)}">${escapeHtml(i.name)}</option>`).join('');
   
   const typeOptions = fileTypes.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
   if (typeSel) typeSel.innerHTML = typeOptions;
   if (formType) formType.innerHTML = typeOptions;
-  if (newDeptType) newDeptType.innerHTML = typeOptions;
 }
 
 // ============================================================
@@ -2663,7 +2713,7 @@ function logout() {
     document.getElementById('loginCenterSelect').value = '';
     document.getElementById('loginCenterPass').value = '';
     document.getElementById('loginCenterSearch').value = '';
-    document.getElementById('loginDeptUser').value = '';
+    document.getElementById('loginDeptSelect').value = '';
     document.getElementById('loginDeptPass').value = '';
     notifiedMessages.clear();
     database.ref('data').off();
@@ -2701,9 +2751,10 @@ window.addEventListener('storage', function(e) {
 
 console.log('🚀 منصة التنسيق الرقمي - تعمل مع Firebase');
 console.log('📡 تحديث فوري بين جميع الأجهزة!');
-console.log('🏢 نظام المصالح (المكاتب) مفعل!');
-console.log('🔐 يتم الدخول للمصالح باستخدام اسم مستخدم وكلمة مرور');
-console.log('➕ يمكن إضافة مصالح جديدة مع اسم مستخدم مخصص');
+console.log('🏢 نظام المصالح (المكاتب) مفعل مع قائمة منسدلة!');
+console.log('🔐 كلمات السر ثابتة لكل مصلحة');
+console.log('✏️ يمكن تعديل اسم المصلحة والمكلف بها فقط من المديرية');
+console.log('🏛️ المراكز يمكنها اختيار المصلحة المستهدفة عند الإرسال');
 console.log('🔥 Firebase متصل: ' + firebaseConfig.databaseURL);
 </script>
 </body>
