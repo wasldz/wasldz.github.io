@@ -154,6 +154,9 @@ body::before {
   backdrop-filter: blur(10px);
 }
 @keyframes slideInRight { from { transform: translateX(130%) scale(0.9); opacity: 0; } to { transform: translateX(0) scale(1); opacity: 1; } }
+@keyframes quoteSlideUp { from { opacity: 0; transform: translateX(-50%) translateY(30px) scale(0.95); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+@keyframes quoteFadeOut { from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } to { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.95); } }
+#quoteContainer { animation: quoteSlideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .toast .toast-title { font-size: 20px; font-weight: 800; color: var(--algeria-green); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
 .toast .toast-text { font-size: 17px; color: var(--text); line-height: 1.7; }
 .toast .toast-action { margin-top: 6px; font-size: 15px; color: var(--algeria-green); font-weight: 700; }
@@ -499,7 +502,31 @@ tbody tr:hover { background: var(--table-hover); }
 @keyframes haloSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .form-grid { grid-template-columns: 1fr; } .notes-grid { grid-template-columns: 1fr; } }
-@media (max-width: 768px) { .app-flex { flex-direction: column; } .sidebar { width: 100%; height: auto; position: relative; border-left: none; border-bottom: 1px solid var(--border); } .main-workspace { padding: 16px; } .login-card { padding: 24px 18px; } .kpi-grid { grid-template-columns: 1fr; } .modal-box { max-width: 100%; margin: 10px; } .tabs-container { flex-direction: column; } .role-selector { grid-template-columns: 1fr; } .page-header h2 { font-size: 24px; } .theme-toggle { bottom: 15px; left: 15px; width: 50px; height: 50px; font-size: 20px; } .login-fields-row { flex-direction: column; } .login-fields-row .login-field { min-width: 100%; } }
+@media (max-width: 900px) { .filter-bar { flex-direction: column; } .filter-bar input, .filter-bar select { width: 100%; min-width: 0; } .page-header { flex-direction: column; align-items: flex-start; gap: 10px; } .header-actions { width: 100%; flex-wrap: wrap; } }
+@media (max-width: 768px) {
+  .app-flex { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: relative; border-left: none; border-bottom: 1px solid var(--border); }
+  .main-workspace { padding: 16px; }
+  .login-card { padding: 24px 18px; }
+  .kpi-grid { grid-template-columns: 1fr; }
+  .modal-box { max-width: 100%; margin: 10px; max-height: 92vh; }
+  .tabs-container { flex-direction: column; }
+  .role-selector { grid-template-columns: 1fr; }
+  .page-header h2 { font-size: 20px; }
+  .theme-toggle { bottom: 15px; left: 15px; width: 46px; height: 46px; font-size: 18px; }
+  #muteToggleBtn { left: 71px !important; }
+  .login-fields-row { flex-direction: column; }
+  .login-fields-row .login-field { min-width: 100%; }
+  .table-scroll table { font-size: 13px; }
+  .table-scroll td, .table-scroll th { padding: 8px 10px !important; white-space: nowrap; }
+  .chart-card { height: 240px !important; }
+  .nav-list { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 6px; }
+  .nav-list li { flex: 0 0 auto; }
+}
+@media (max-width: 480px) {
+  .kpi-value { font-size: 22px; }
+  .btn-mini, .btn-primary, .btn-gold { font-size: 14px; padding: 8px 12px; }
+}
 </style>
 </head>
 <body>
@@ -517,6 +544,10 @@ tbody tr:hover { background: var(--table-hover); }
 
 <button class="theme-toggle" onclick="toggleTheme()" title="تبديل الثيم">
   <i class="fa-solid fa-moon" id="themeIcon"></i>
+</button>
+
+<button class="theme-toggle" id="muteToggleBtn" onclick="toggleMute()" title="كتم/تفعيل صوت الإشعارات" style="left:95px;">
+  <i class="fa-solid fa-bell" id="muteIcon"></i>
 </button>
 
 <div id="toast-area"></div>
@@ -587,7 +618,7 @@ tbody tr:hover { background: var(--table-hover); }
       </div>
 
       <button class="btn-login" onclick="handleLogin()"><i class="fa-solid fa-lock"></i> دخول آمن للنظام</button>
-      <div class="login-error" id="loginError">⚠️ بيانات الدخول غير صحيحة!</div>
+      <div class="login-error" id="loginError" onclick="this.style.display='none'" style="cursor:pointer;">⚠️ بيانات الدخول غير صحيحة!</div>
       <div class="login-info"><span class="fares-logo">✦ FARES ✦</span><span style="display:block; font-size:14px; color:var(--text-dim); margin-top:4px;">نظام التنسيق الرقمي المتكامل - النسخة الوطنية 🇩🇿</span></div>
     </div>
   </div>
@@ -633,6 +664,10 @@ tbody tr:hover { background: var(--table-hover); }
         <div class="kpi-card kpi-efficiency"><div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div><div class="kpi-label">معدل الكفاءة</div><div class="kpi-value" id="kpi-efficiency">0%</div></div>
       </div>
       <div class="chart-card"><canvas id="analyticsChart"></canvas></div>
+      <div class="chart-card" style="margin-top:20px; height:300px;">
+        <h3 style="margin:0 0 12px; font-size:18px; color:var(--text-dim);"><i class="fa-solid fa-chart-line"></i> اتجاه الإنشغالات خلال آخر 14 يوماً</h3>
+        <canvas id="trendChart"></canvas>
+      </div>
     </section>
 
     <!-- DEPT DASHBOARD -->
@@ -652,6 +687,17 @@ tbody tr:hover { background: var(--table-hover); }
         <span style="font-size:16px; color:var(--text-dim);"><i class="fa-solid fa-info-circle"></i> يمكن تعديل اسم المصلحة والمكلف بها فقط</span>
       </div>
       <div id="departmentsListContainer"></div>
+    </section>
+
+    <!-- AUDIT LOG -->
+    <section class="page hidden" id="page-audit-log">
+      <div class="page-header">
+        <h2><i class="fa-solid fa-shield-halved"></i> سجل التدقيق</h2>
+        <span style="font-size:16px; color:var(--text-dim);"><i class="fa-solid fa-info-circle"></i> يسجل من قام بأي إجراء ومتى (تحويل، حذف، تسوية، أرشفة)</span>
+      </div>
+      <div class="table-wrap">
+        <div class="table-scroll"><table><thead><tr><th>الوقت</th><th>الإجراء</th><th>الرمز</th><th>التفاصيل</th></tr></thead><tbody id="auditLogTableBody"></tbody></table></div>
+      </div>
     </section>
 
     <!-- ADD ISSUE -->
@@ -694,7 +740,12 @@ tbody tr:hover { background: var(--table-hover); }
 
     <!-- LIST -->
     <section class="page hidden" id="page-list">
-      <div class="page-header"><h2><i class="fa-solid fa-list-check"></i> متابعة الإنشغالات</h2></div>
+      <div class="page-header">
+        <h2><i class="fa-solid fa-list-check"></i> متابعة الإنشغالات</h2>
+        <div class="header-actions">
+          <button class="btn-mini" onclick="exportListToCSV()"><i class="fa-solid fa-file-csv"></i> تصدير Excel/CSV</button>
+        </div>
+      </div>
       <div class="tabs-container">
         <button class="tab-btn active" onclick="switchListTab('all')">جميع الإنشغالات</button>
         <button class="tab-btn" onclick="switchListTab('directorate')">من المديرية</button>
@@ -702,10 +753,13 @@ tbody tr:hover { background: var(--table-hover); }
         <button class="tab-btn" onclick="switchListTab('archived_center')">📦 أرشيف المراكز</button>
       </div>
       <div class="filter-bar">
-        <input type="text" id="list-search" placeholder="بحث..." onkeyup="renderList()">
+        <input type="text" id="list-search" placeholder="بحث..." oninput="debouncedRenderList()">
         <select id="list-priority-filter" onchange="renderList()"><option value="">كل الأولويات</option><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select>
+        <select id="list-status-filter" onchange="renderList()"><option value="">كل الحالات</option><option value="pending">قيد المعالجة</option><option value="resolved">تم الحل</option></select>
         <select id="list-source-filter" onchange="renderList()"><option value="">كل المصادر</option><option value="directorate">المديرية</option><option value="center">المراكز</option></select>
         <select id="list-dept-filter" onchange="renderList()"><option value="">كل المصالح</option></select>
+        <input type="date" id="list-date-from" onchange="renderList()" title="من تاريخ">
+        <input type="date" id="list-date-to" onchange="renderList()" title="إلى تاريخ">
       </div>
       <div class="table-wrap">
         <div class="table-scroll" id="listTableScroll"><table><thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>المصلحة</th><th>الأولوية</th><th>المحرر</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>الشات</th><th>إجراءات</th></tr></thead><tbody id="listTableBody"></tbody></table></div>
@@ -715,11 +769,18 @@ tbody tr:hover { background: var(--table-hover); }
 
     <!-- ARCHIVE -->
     <section class="page hidden" id="page-archive">
-      <div class="page-header"><h2><i class="fa-solid fa-box-archive"></i> الأرشيف</h2></div>
+      <div class="page-header">
+        <h2><i class="fa-solid fa-box-archive"></i> الأرشيف</h2>
+        <div class="header-actions">
+          <button class="btn-mini" onclick="exportArchiveToCSV()"><i class="fa-solid fa-file-csv"></i> تصدير Excel/CSV</button>
+        </div>
+      </div>
       <div class="filter-bar">
-        <input type="text" id="archive-search" placeholder="بحث..." onkeyup="renderArchive()">
+        <input type="text" id="archive-search" placeholder="بحث..." oninput="debouncedRenderArchive()">
         <select id="archive-source-filter" onchange="renderArchive()"><option value="">كل المصادر</option><option value="directorate">المديرية</option><option value="center">المراكز</option></select>
         <select id="archive-dept-filter" onchange="renderArchive()"><option value="">كل المصالح</option></select>
+        <input type="date" id="archive-date-from" onchange="renderArchive()" title="من تاريخ">
+        <input type="date" id="archive-date-to" onchange="renderArchive()" title="إلى تاريخ">
       </div>
       <div class="table-wrap">
         <div class="table-scroll" id="archiveTableScroll"><table><thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>المصلحة</th><th>الأولوية</th><th>المحرر</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="archiveTableBody"></tbody></table></div>
@@ -806,6 +867,19 @@ tbody tr:hover { background: var(--table-hover); }
       <div class="form-field"><label>إلى المصلحة</label><select id="transferDeptSelect"></select></div>
       <div class="form-field"><label>سبب التحويل</label><input type="text" id="transferReason" placeholder="سبب التحويل..."></div>
       <button class="btn-gold" style="width:100%; justify-content:center;" onclick="confirmTransfer()"><i class="fa-solid fa-arrow-left"></i> تحويل الإنشغال</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="archiveTransferModal" onclick="if(event.target===this)closeArchiveTransfer()">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-head"><div><h3>📤 تحويل من الأرشيف إلى مصلحة</h3></div><button class="btn-close-modal" onclick="closeArchiveTransfer()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <p style="margin-bottom:12px; color:var(--text-dim);">تحويل الإنشغال <strong id="archiveTransferCodeDisplay"></strong> إلى:</p>
+      <input type="hidden" id="archiveTransferCode">
+      <div class="form-field"><label>إلى المصلحة</label><select id="archiveTransferDeptSelect"></select></div>
+      <div class="form-field"><label>سبب التحويل</label><input type="text" id="archiveTransferReason" placeholder="سبب التحويل..."></div>
+      <button class="btn-gold" style="width:100%; justify-content:center;" onclick="confirmArchiveTransfer()"><i class="fa-solid fa-arrow-left"></i> تحويل الإنشغال</button>
     </div>
   </div>
 </div>
@@ -915,6 +989,153 @@ let notifiedMessages = new Set();
 let broadcastTarget = 'all';
 let isSyncing = false;
 let lastSyncTimestamp = 0;
+let auditLog = [];
+let isMuted = false;
+let trendChartInstance = null;
+
+// دالة تأخير التنفيذ (لتحسين الأداء عند البحث)
+function debounce(fn, delay) {
+  let timer = null;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+// ============================================================
+// 🕵️ سجل التدقيق (Audit Log)
+// ============================================================
+function addAuditLog(action, code, details) {
+  auditLog.unshift({
+    action,
+    code: code || '-',
+    details: details || '',
+    actor: (currentRole === 'directorate') ? 'المديرية' : (currentRole === 'department' ? (getDepartmentName(currentDepartment) || 'مصلحة') : (getCenterName() || 'مركز')),
+    time: Date.now()
+  });
+  if (auditLog.length > 500) auditLog = auditLog.slice(0, 500);
+  localStorage.setItem(LS_KEYS.auditLog, JSON.stringify(auditLog));
+}
+
+function renderAuditLog() {
+  const tbody = document.getElementById('auditLogTableBody');
+  if (!tbody) return;
+  if (auditLog.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="empty-msg">لا توجد إجراءات مسجلة بعد.</td></tr>`; return; }
+  tbody.innerHTML = auditLog.map(entry => `<tr>
+    <td style="font-size:15px;">${getTimeAgo(entry.time)}</td>
+    <td style="font-size:15px; font-weight:700;">${escapeHtml(entry.action)}</td>
+    <td style="font-size:15px;">${escapeHtml(entry.code)}</td>
+    <td style="font-size:15px; color:var(--text-dim);">${escapeHtml(entry.details)} — ${escapeHtml(entry.actor)}</td>
+  </tr>`).join('');
+}
+
+// ============================================================
+// 🔇 كتم/تشغيل إشعارات الصوت
+// ============================================================
+function toggleMute() {
+  isMuted = !isMuted;
+  localStorage.setItem(LS_KEYS.mute, isMuted ? "1" : "0");
+  updateMuteIcon();
+  showToast(isMuted ? '🔇 تم كتم الإشعارات' : '🔔 تم تفعيل الإشعارات', isMuted ? 'لن يصدر صوت عند الإشعارات الجديدة' : 'سيصدر صوت عند الإشعارات الجديدة');
+}
+
+function updateMuteIcon() {
+  const icon = document.getElementById('muteIcon');
+  if (icon) icon.className = isMuted ? 'fa-solid fa-bell-slash' : 'fa-solid fa-bell';
+}
+
+// ============================================================
+// 📤 تصدير البيانات إلى CSV
+// ============================================================
+function exportToCSV(rows, headers, filename) {
+  if (!rows || rows.length === 0) { showToast('⚠️ تنبيه', 'لا توجد بيانات لتصديرها'); return; }
+  const escapeCsv = (val) => {
+    const s = (val === null || val === undefined) ? '' : String(val);
+    return '"' + s.replace(/"/g, '""') + '"';
+  };
+  const lines = [headers.map(escapeCsv).join(',')];
+  rows.forEach(row => { lines.push(row.map(escapeCsv).join(',')); });
+  const csvContent = '\uFEFF' + lines.join('\r\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  showToast('✅ تم التصدير', `تم تصدير الملف ${filename}`);
+}
+
+function exportListToCSV() {
+  const headers = ['الرمز', 'المؤسسة', 'التصنيف', 'المصلحة', 'الأولوية', 'المحرر', 'المصدر', 'الحالة', 'التاريخ'];
+  const rows = activeIssues.map(i => [i.code, i.center, i.type, getDepartmentName(i.department), i.priority, i.author, i.source, i.status, new Date(i.createdAt).toLocaleString('ar-DZ')]);
+  exportToCSV(rows, headers, `الانشغالات_النشطة_${Date.now()}.csv`);
+}
+
+function exportArchiveToCSV() {
+  const headers = ['الرمز', 'المؤسسة', 'التصنيف', 'المصلحة', 'الأولوية', 'المحرر', 'المصدر', 'التاريخ'];
+  const rows = archivedIssues.map(i => [i.code, i.center, i.type, getDepartmentName(i.department), i.priority, i.author, i.source, new Date(i.createdAt).toLocaleString('ar-DZ')]);
+  exportToCSV(rows, headers, `أرشيف_الانشغالات_${Date.now()}.csv`);
+}
+
+// المقولات الدينية (100 مقولة)
+const religiousQuotes = [
+  "لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ",
+  "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", "الحمد لله رب العالمين", "سبحان الله وبحمده، سبحان الله العظيم",
+  "لا حول ولا قوة إلا بالله العلي العظيم", "لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ",
+  "إلَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ", "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ", "وَعَسَىٰ أَن تَكْرَهُوا شَيْئًا وَهُوَ خَيْرٌ لَّكُمْ",
+  "إِنَّ مَعَ الْعُسْرِ يُسْرًا", "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا", "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
+  "لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ", "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الشَّرِّ كُلِّهِ", "سَلَامٌ عَلَيْكُم وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ",
+  "يا كافي يا غني يا ذا القوة المتين", "يا ذا الجلال والإكرام", "يا عزيز يا حكيم", "يا رحمن يا رحيم", "يا قهار يا جبار",
+  "وَقُلْ رَبِّ زِدْنِي عِلْمًا", "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا", "رَبَّنَا اغْفِرْ لَنَا وَلِإِخْوَانِنَا الَّذِينَ سَبَقُونَا بِالْإِيمَانِ",
+  "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً", "سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَٰهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ",
+  "لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير", "أشهد أن لا إله إلا الله وأشهد أن محمداً رسول الله",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم استجب دعاءنا وتقبل منا", "اللهم اهدنا إلى صراطك المستقيم",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمدً",
+  "اللهم اشرح لنا صدورنا ويسر لنا أمرنا", "رب اشرح لي صدري ويسر لي أمري واحلل عقدة من لساني",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمدُ",
+  "وَإِن تَعُدُّوا نِعْمَةَ اللَّهِ لَا تُحْصُوهَا", "اللهم صل وسلم وبارك على سيدنا محمد", "فَاذْكُرُونِ أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد",
+  "وَاصْبِرْ وَمَا صَبْرُكَ إِلَّا بِاللَّهِ", "إِنَّ اللَّهَ مَعَ الَّذِينَ اتَّقَوا وَالَّذِينَ هُم مُّحْسِنُونَ", "اللهم صل وسلم وبارك على سيدنا محمد",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد",
+  "إاللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد", "الكلمة الطيبة صدقة",
+  "تبسمك في وجه أخيك لك صدقة", "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "يا حي يا قيوم برحمتك أستغيث", "ما شاء الله لا قوة إلا بالله",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "وما بكم من نعمة فمن الله", "والله يرزق من يشاء بغير حساب", "اللهم صل وسلم وبارك على سيدنا محمد",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد", "فاتقوا الله ما استطعتم",
+  "الله لطيف بعباده", "اللهم صل وسلم وبارك على سيدنا محمد", "إن الله لا يخيب رجاء من دعاه",
+  "ويرفع الله الذين آمنوا منكم والذين أوتوا العلم درجات", "اللهم علمنا ما ينفعنا وانفعنا بما علمتنا",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم اغفر للمؤمنين والمؤمنات", "اللهم صل وسلم وبارك على سيدنا محمد",
+  "اللهم اجعلنا ممن يستمعون القول فيتبعون أحسنه", "اللهم صل وسلم وبارك على سيدنا محمد",
+  "اللهم وفقنا لما فيه الخير والصلاح", "سبحانك اللهم وبحمدك أستغفرك وأتوب إليك",
+  "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد", "اللهم صل وسلم وبارك على سيدنا محمد"
+];
+
+// دالة لتشغيل صوت الإشعار
+function playNotificationSound() {
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+    
+    gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.5);
+  } catch(e) {
+    console.log('[v0] Could not play notification sound:', e);
+  }
+}
 
 const LS_KEYS = {
   core: "hassan_core_db",
@@ -930,7 +1151,9 @@ const LS_KEYS = {
   masterPass: "hassan_master_pass",
   lastSync: "hassan_last_sync",
   departments: "hassan_departments",
-  session: "hassan_session"
+  session: "hassan_session",
+  auditLog: "hassan_audit_log",
+  mute: "hassan_mute_notifications"
 };
 
 const DEFAULT_FILE_TYPES = ["منظومة الرقمنة والأرضية الرقمية","مصلحة المتابعة البيداغوجية والبرامج","الهياكل والشبكات وتكنولوجيا المعلومات","الموارد البشرية والتكوين","الصيانة والتجهيزات"];
@@ -1039,6 +1262,8 @@ function loadDB() {
   const savedPass = localStorage.getItem(LS_KEYS.masterPass);
   if (savedPass) MASTER_PASSWORD = savedPass;
   lastSyncTimestamp = parseInt(localStorage.getItem(LS_KEYS.lastSync) || "0");
+  auditLog = JSON.parse(localStorage.getItem(LS_KEYS.auditLog) || "[]");
+  isMuted = localStorage.getItem(LS_KEYS.mute) === "1";
 }
 
 function saveToFirebase() {
@@ -1050,11 +1275,13 @@ function saveToFirebase() {
     interChat: interChatMessages,
     fileTypes: fileTypes,
     departments: departments,
+    auditLog: auditLog,
     timestamp: Date.now()
   };
   
   // حفظ التصنيفات محلياً أيضاً
   localStorage.setItem(LS_KEYS.fileTypes, JSON.stringify(fileTypes));
+  localStorage.setItem(LS_KEYS.auditLog, JSON.stringify(auditLog));
   localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
   localStorage.setItem(LS_KEYS.resolved, JSON.stringify(archivedIssues));
   localStorage.setItem(LS_KEYS.centerIssues, JSON.stringify(centerIssues));
@@ -1098,6 +1325,7 @@ function listenToFirebase() {
         });
         changed = true; 
       }
+      if (data.auditLog) { auditLog = data.auditLog; changed = true; }
       
       if (changed) {
         localStorage.setItem(LS_KEYS.core, JSON.stringify(activeIssues));
@@ -1107,9 +1335,11 @@ function listenToFirebase() {
         localStorage.setItem(LS_KEYS.interChat, JSON.stringify(interChatMessages));
         localStorage.setItem(LS_KEYS.fileTypes, JSON.stringify(fileTypes));
         localStorage.setItem(LS_KEYS.departments, JSON.stringify(departments));
+        localStorage.setItem(LS_KEYS.auditLog, JSON.stringify(auditLog));
         
         const newCount = activeIssues.length + centerIssues.length;
         if (newCount > oldCount) {
+          if (!isMuted) playNotificationSound();
           showToast('📩 إنشغال جديد', 'تم استلام إنشغال جديد من أحد المراكز!');
         }
         updateUI();
@@ -1145,8 +1375,10 @@ function forceSync() {
           }
         });
       }
+      if (data.auditLog) auditLog = data.auditLog;
       // حفظ البيانات محلياً
       localStorage.setItem(LS_KEYS.fileTypes, JSON.stringify(fileTypes));
+      localStorage.setItem(LS_KEYS.auditLog, JSON.stringify(auditLog));
       updateUI();
       showToast('✅ تم التحديث', 'تم جلب أحدث البيانات بنجاح');
     }
@@ -1448,6 +1680,9 @@ function initApp() {
 }
 
 function setupInterface() {
+  // عرض مقولة دينية عشوائية
+  displayRandomQuote();
+  
   setupSidebar();
   populateDropdowns();
   renderInstitutionsList();
@@ -1465,10 +1700,12 @@ function setupInterface() {
     document.getElementById('fileTypeManageRow').style.display = 'flex';
     renderKPIs();
     initChart();
+    initTrendChart();
     renderList();
     renderArchive();
     renderDepartmentsList();
     renderDeptDashboard();
+    renderAuditLog();
     populateDeptFilters();
     document.getElementById('page-dashboard').classList.remove('hidden');
     switchTab('dashboard');
@@ -1521,6 +1758,7 @@ function setupSidebar() {
       <li><button class="nav-btn" data-tab="list" onclick="switchTab('list')"><i class="fa-solid fa-list-check"></i> متابعة الإنشغالات</button></li>
       <li><button class="nav-btn" data-tab="archive" onclick="switchTab('archive')"><i class="fa-solid fa-box-archive"></i> الأرشيف</button></li>
       <li><button class="nav-btn" data-tab="tokens" onclick="switchTab('tokens')"><i class="fa-solid fa-key"></i> كلمات السر</button></li>
+      <li><button class="nav-btn" data-tab="audit-log" onclick="switchTab('audit-log')"><i class="fa-solid fa-shield-halved"></i> سجل التدقيق</button></li>
       <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
     `;
   } else if (currentRole === 'department') {
@@ -1563,6 +1801,7 @@ function switchTab(tab) {
   if (tab === 'departments' && currentRole === 'directorate') renderDepartmentsList();
   if (tab === 'dept-dashboard' && currentRole === 'directorate') renderDeptDashboard();
   if (tab === 'dept-issues' && currentRole === 'department') renderDeptIssuesForDepartment();
+  if (tab === 'audit-log' && currentRole === 'directorate') renderAuditLog();
 }
 
 // ============================================================
@@ -1593,6 +1832,50 @@ function updateChart() {
   const total = activeIssues.length + archivedIssues.length;
   analyticsChartInstance.data.datasets[0].data = [total, activeIssues.length, archivedIssues.length];
   analyticsChartInstance.update();
+  updateTrendChart();
+}
+
+function getTrendData() {
+  const days = 14;
+  const labels = [];
+  const counts = [];
+  const all = [...activeIssues, ...archivedIssues];
+  const dayKeys = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    dayKeys.push(key);
+    labels.push(d.toLocaleDateString('ar-DZ', { day: 'numeric', month: 'short' }));
+  }
+  const byDay = {};
+  dayKeys.forEach(k => byDay[k] = 0);
+  all.forEach(issue => {
+    if (!issue.createdAt) return;
+    const key = new Date(issue.createdAt).toISOString().slice(0, 10);
+    if (byDay.hasOwnProperty(key)) byDay[key]++;
+  });
+  dayKeys.forEach(k => counts.push(byDay[k]));
+  return { labels, counts };
+}
+
+function initTrendChart() {
+  const canvas = document.getElementById('trendChart');
+  if (!canvas) return;
+  const { labels, counts } = getTrendData();
+  trendChartInstance = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: { labels, datasets: [{ label: 'إنشغالات جديدة', data: counts, borderColor: '#007A3D', backgroundColor: 'rgba(0,122,61,0.12)', fill: true, tension: 0.35, pointRadius: 3, pointBackgroundColor: '#C8963E' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#6c757d', font: { family: 'Cairo', size: 12 } }, grid: { display: false } }, y: { beginAtZero: true, ticks: { stepSize: 1, color: '#6c757d', font: { family: 'Cairo', size: 12 } }, grid: { color: 'rgba(0,0,0,0.04)' } } } }
+  });
+}
+
+function updateTrendChart() {
+  if (!trendChartInstance) { initTrendChart(); return; }
+  const { labels, counts } = getTrendData();
+  trendChartInstance.data.labels = labels;
+  trendChartInstance.data.datasets[0].data = counts;
+  trendChartInstance.update();
 }
 
 // ============================================================
@@ -1900,9 +2183,23 @@ function getDepartmentName(id) {
   return dept ? dept.name : 'غير محددة';
 }
 
+const debouncedRenderList = debounce(() => renderList(), 250);
+const debouncedRenderArchive = debounce(() => renderArchive(), 250);
+
+function matchesDateRange(createdAt, fromId, toId) {
+  const fromVal = document.getElementById(fromId)?.value || '';
+  const toVal = document.getElementById(toId)?.value || '';
+  if (!fromVal && !toVal) return true;
+  const d = new Date(createdAt);
+  if (fromVal && d < new Date(fromVal + 'T00:00:00')) return false;
+  if (toVal && d > new Date(toVal + 'T23:59:59')) return false;
+  return true;
+}
+
 function renderList() {
   const search = (document.getElementById('list-search')?.value || '').trim().toLowerCase();
   const priorityFilter = document.getElementById('list-priority-filter')?.value || '';
+  const statusFilter = document.getElementById('list-status-filter')?.value || '';
   const sourceFilter = document.getElementById('list-source-filter')?.value || '';
   const deptFilter = document.getElementById('list-dept-filter')?.value || '';
   const tbody = document.getElementById('listTableBody');
@@ -1913,7 +2210,8 @@ function renderList() {
     filtered = centerArchived.filter(issue => {
       const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
       const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
-      return matchesSearch && matchesPriority;
+      const matchesDate = matchesDateRange(issue.createdAt, 'list-date-from', 'list-date-to');
+      return matchesSearch && matchesPriority && matchesDate;
     });
   } else {
     filtered = activeIssues.filter(issue => {
@@ -1921,9 +2219,12 @@ function renderList() {
       if (currentListTab === 'centers' && issue.source !== 'center') return false;
       const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
       const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
+      const isResolved = !!(issue.status && issue.status.indexOf('تم الحل') !== -1);
+      const matchesStatus = !statusFilter || (statusFilter === 'resolved' ? isResolved : !isResolved);
       const matchesSource = !sourceFilter || issue.source === sourceFilter;
       const matchesDept = !deptFilter || issue.department === deptFilter;
-      return matchesSearch && matchesPriority && matchesSource && matchesDept;
+      const matchesDate = matchesDateRange(issue.createdAt, 'list-date-from', 'list-date-to');
+      return matchesSearch && matchesPriority && matchesStatus && matchesSource && matchesDept && matchesDate;
     });
   }
   
@@ -1998,6 +2299,7 @@ function confirmTransfer() {
     read: false  });
   saveChatMessages(code, msgs);
   
+  addAuditLog('تحويل إنشغال', code, `إلى ${getDepartmentName(deptId)}${reason ? ' — ' + reason : ''}`);
   saveToFirebase();
   closeTransfer();
   renderList();
@@ -2012,6 +2314,7 @@ function archiveCenterIssue(code) {
   const issue = activeIssues[idx];
   activeIssues.splice(idx, 1);
   centerArchived.push(issue);
+  addAuditLog('أرشفة إنشغال مركز', code, issue.center || '');
   saveToFirebase();
   renderList(); renderKPIs(); updateChart();
   showToast("📦 تم الأرشفة", `تم أرشفة الإنشغال ${code} من المراكز.`);
@@ -2025,6 +2328,7 @@ function toggleStatus(code, value) {
     issue.status = "تم الحل ✅";
     activeIssues.splice(idx, 1);
     archivedIssues.unshift(issue);
+    addAuditLog('تسوية إنشغال', code, issue.center || '');
     saveToFirebase();
     renderKPIs();
     updateChart();
@@ -2032,12 +2336,13 @@ function toggleStatus(code, value) {
     renderArchive();
     const centerIdx = centerIssues.findIndex(i => i.code === code);
     if (centerIdx !== -1) { centerIssues[centerIdx].status = "تم الحل ✅"; saveToFirebase(); }
-    showToast("✅ تم الحل", `تم تسوية الإنشغال ${code} ونقله إلى الأرشيف`);
+    showToast("✅ تم الحل", `تم تسوية الإن��غال ${code} ونقله إلى الأرشيف`);
   }
 }
 
 function deleteIssue(code) {
   if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
+  addAuditLog('حذف إنشغال', code, '');
   activeIssues = activeIssues.filter(i => i.code !== code);
   saveToFirebase();
   renderKPIs(); updateChart(); renderList();
@@ -2057,7 +2362,8 @@ function renderArchive() {
     const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
     const matchesSource = !sourceFilter || issue.source === sourceFilter;
     const matchesDept = !deptFilter || issue.department === deptFilter;
-    return matchesSearch && matchesSource && matchesDept;
+    const matchesDate = matchesDateRange(issue.createdAt, 'archive-date-from', 'archive-date-to');
+    return matchesSearch && matchesSource && matchesDept && matchesDate;
   });
   
   if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="11" class="empty-msg">لا توجد إنشغالات في الأرشيف.</td></tr>`; return; }
@@ -2077,7 +2383,7 @@ function renderArchive() {
       <td><button class="btn-mini view-btn" onclick="openDetails('${issue.code}', true)"><i class="fa-solid fa-eye"></i></button></td>
       <td>${hasAttach ? '<span style="color:var(--algeria-green);"><i class="fa-solid fa-paperclip"></i></span>' : '<span style="color:var(--text-dim);">-</span>'}</td>
       <td><span class="status-resolved">تم الحل ✅</span></td>
-      <td style="white-space:nowrap;"><button class="btn-mini" onclick="restoreFromArchive('${issue.code}')"><i class="fa-solid fa-rotate-left"></i></button><button class="btn-mini danger" onclick="deleteFromArchive('${issue.code}')"><i class="fa-solid fa-trash"></i></button></td>
+      <td style="white-space:nowrap;"><button class="btn-mini gold" onclick="openArchiveTransferModal('${issue.code}')"><i class="fa-solid fa-arrow-left"></i></button><button class="btn-mini" onclick="restoreFromArchive('${issue.code}')"><i class="fa-solid fa-rotate-left"></i></button><button class="btn-mini danger" onclick="deleteFromArchive('${issue.code}')"><i class="fa-solid fa-trash"></i></button></td>
     </tr>`;
   }).join('');
 }
@@ -2090,15 +2396,67 @@ function restoreFromArchive(code) {
   issue.status = "قيد المعالجة 🔄";
   archivedIssues.splice(idx, 1);
   activeIssues.unshift(issue);
+  addAuditLog('استعادة من الأرشيف', code, issue.center || '');
   saveToFirebase();
   renderKPIs(); updateChart(); renderList(); renderArchive();
 }
 
 function deleteFromArchive(code) {
   if (!confirm("هل أنت متأكد من الحذف النهائي من الأرشيف؟")) return;
+  addAuditLog('حذف من الأرشيف', code, '');
   archivedIssues = archivedIssues.filter(i => i.code !== code);
   saveToFirebase();
   renderKPIs(); updateChart(); renderArchive();
+}
+
+// فتح نافذة التحويل من الأرشيف إلى مصلحة
+function openArchiveTransferModal(code) {
+  const issue = archivedIssues.find(i => i.code === code);
+  if (!issue) { showToast('⚠️ خطأ', 'لم يتم العثور على الإنشغال'); return; }
+  
+  document.getElementById('archiveTransferCodeDisplay').textContent = code;
+  const select = document.getElementById('archiveTransferDeptSelect');
+  select.innerHTML = departments.map(d => `<option value="${d.id}" ${d.id === issue.department ? 'selected' : ''}>${d.name}</option>`).join('');
+  document.getElementById('archiveTransferReason').value = '';
+  document.getElementById('archiveTransferCode').value = code;
+  document.getElementById('archiveTransferModal').classList.add('open');
+}
+
+function closeArchiveTransfer() {
+  document.getElementById('archiveTransferModal').classList.remove('open');
+}
+
+function confirmArchiveTransfer() {
+  const code = document.getElementById('archiveTransferCode').value;
+  const deptId = document.getElementById('archiveTransferDeptSelect').value;
+  const reason = document.getElementById('archiveTransferReason').value.trim();
+  
+  if (!deptId) { alert('يرجى اختيار المصلحة المستهدفة'); return; }
+  
+  const idx = archivedIssues.findIndex(i => i.code === code);
+  if (idx === -1) { showToast('⚠️ خطأ', 'لم يتم العثور على الإنشغال'); return; }
+  
+  const issue = archivedIssues[idx];
+  const oldDept = issue.department;
+  issue.department = deptId;
+  issue.transferHistory = issue.transferHistory || [];
+  issue.transferHistory.push({
+    from: oldDept,
+    to: deptId,
+    reason: reason,
+    timestamp: new Date().toLocaleString('ar-DZ')
+  });
+  issue.status = "قيد المعالجة 🔄";
+  
+  // نقل الإنشغال من الأرشيف إلى القائمة النشطة
+  archivedIssues.splice(idx, 1);
+  activeIssues.unshift(issue);
+  
+  addAuditLog('تحويل من الأرشيف', code, `إلى ${getDepartmentName(deptId)}${reason ? ' — ' + reason : ''}`);
+  saveToFirebase();
+  closeArchiveTransfer();
+  showToast('✅ تم التحويل', `تم تحويل الإنشغال ${code} إلى المصلحة بنجاح!`);
+  renderKPIs(); updateChart(); renderList(); renderArchive();
 }
 
 // ============================================================
@@ -2107,13 +2465,20 @@ function deleteFromArchive(code) {
 function renderDeptIssuesForDepartment() {
   const mainWorkspace = document.getElementById('mainWorkspace');
   
+  // تحديث اسم المصلحة في الـ header
+  const dept = departments.find(d => d.id === currentDepartment);
+  const deptNameSpan = document.getElementById('deptNameHeader');
+  if (deptNameSpan && dept) {
+    deptNameSpan.textContent = dept.name;
+  }
+  
   let deptPage = document.getElementById('page-dept-issues');
   if (!deptPage) {
     deptPage = document.createElement('section');
     deptPage.id = 'page-dept-issues';
     deptPage.className = 'page hidden';
     deptPage.innerHTML = `
-      <div class="page-header"><h2><i class="fa-solid fa-list-check"></i> إنشغالات المصلحة</h2></div>
+      <div class="page-header"><h2><i class="fa-solid fa-list-check"></i> إنشغالات <span id="deptNameHeader"></span></h2></div>
       <div class="filter-bar">
         <input type="text" id="dept-issues-search" placeholder="بحث..." onkeyup="renderDeptIssuesForDepartment()">
         <select id="dept-issues-priority" onchange="renderDeptIssuesForDepartment()"><option value="">كل الأولويات</option><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select>
@@ -2159,6 +2524,7 @@ function renderDeptIssuesTable() {
     const unread = hasUnreadMessages(issue.code);
     const hasAttach = hasAttachment(issue);
     const timeAgo = getTimeAgo(issue.createdAt);
+    const isResolved = issue.status && issue.status.indexOf('تم الحل') !== -1;
     return `<tr class="${unread ? 'row-unread' : ''}">
       <td><strong style="font-size:16px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:13px; color:var(--text-dim);">${timeAgo}</span></td>
       <td style="font-size:16px;">${escapeHtml(issue.center)}</td>
@@ -2167,10 +2533,33 @@ function renderDeptIssuesTable() {
       <td>${sourceBadgeHtml(issue.source)}</td>
       <td><button class="btn-mini view-btn" onclick="openDetails('${issue.code}', false)"><i class="fa-solid fa-eye"></i></button></td>
       <td>${hasAttach ? '<span style="color:var(--algeria-green);"><i class="fa-solid fa-paperclip"></i></span>' : '<span style="color:var(--text-dim);">-</span>'}</td>
-      <td>${issue.status && issue.status.indexOf('تم الحل') !== -1 ? '<span class="status-resolved">تم الحل ✅</span>' : '<span class="status-pending">قيد المعالجة 🔄</span>'}</td>
+      <td>${isResolved ? '<span class="status-resolved">تم الحل ✅</span>' : '<span class="status-pending">قيد المعالجة 🔄</span>'}</td>
+      <td><button class="btn-mini ${isResolved ? 'success' : 'primary'}" onclick="toggleDeptIssueStatus('${issue.code}')" title="${isResolved ? 'إعادة فتح' : 'تحديد كمحل'}"><i class="fa-solid fa-${isResolved ? 'rotate-left' : 'check'}"></i></button></td>
       <td><button class="btn-chat ${unread ? 'new-msg' : ''}" onclick="openChat('${issue.code}', 'department')">${unread ? '<i class="fa-solid fa-bell"></i>' : '<i class="fa-solid fa-comments"></i>'}</button></td>
     </tr>`;
   }).join('');
+}
+
+// دالة تبديل حالة الإنشغال في المصلحة
+function toggleDeptIssueStatus(code) {
+  const issue = activeIssues.find(i => i.code === code);
+  if (!issue) { showToast('⚠️ خطأ', 'لم يتم العثور على الإنشغال'); return; }
+  
+  const isResolved = issue.status && issue.status.indexOf('تم الحل') !== -1;
+  if (isResolved) {
+    issue.status = 'قيد المعالجة 🔄';
+    addAuditLog('إعادة فتح إنشغال', code, issue.center || '');
+    showToast('✅ تم إعادة الفتح', `تم إعادة فتح الإنشغال ${code}`);
+  } else {
+    issue.status = 'تم الحل ✅';
+    addAuditLog('تسوية إنشغال (من المصلحة)', code, issue.center || '');
+    if (!isMuted) playNotificationSound();
+    showToast('✅ تم التحديث', `تم تحديد الإنشغال ${code} كمحلول`);
+  }
+  
+  saveToFirebase();
+  renderDeptIssuesForDepartment();
+  renderDeptKPIs();
 }
 
 function renderDeptKPIs() {
@@ -2223,6 +2612,7 @@ function submitNewIssue() {
   };
   activeIssues.unshift(newIssue);
   saveToFirebase();
+  if (!isMuted) playNotificationSound();
   showToast("✅ تم الحفظ", `تم تدوين الإنشغال ${newIssue.code} بنجاح! ${dept ? 'تم توجيهه إلى ' + dept.name : ''}`);
   document.getElementById('add-form-author').value = '';
   document.getElementById('add-form-details').value = '';
@@ -2254,7 +2644,7 @@ function setupPasteFeature() {
         reader.onload = function(ev) {
           pendingCenterFile = { data: ev.target.result, type: 'image', name: 'لقطة شاشة.png' };
           const zone = document.getElementById('pasteZone');
-          if (zone) { zone.classList.add('captured'); zone.textContent = '📸 تم التقاط الصورة وجاهزة للإرسال!'; }
+          if (zone) { zone.classList.add('captured'); zone.textContent = '📸 تم التق��ط الصورة وجاهزة للإرسال!'; }
         };
         reader.readAsDataURL(blob);
         e.preventDefault();
@@ -2329,6 +2719,7 @@ function sendFromCenter() {
   };
   activeIssues.unshift(activeCopy);
   saveToFirebase();
+  if (!isMuted) playNotificationSound();
   const deptName = getDepartmentName(deptId);
   showToast("✅ تم الإرسال", `تم إرسال الإنشغال ${code} بنجاح! ${deptName ? 'تم توجيهه إلى ' + deptName : ''}`);
   document.getElementById('form-details').value = '';
@@ -2445,7 +2836,9 @@ function renderChatMessages(role) {
       bubbleClass = 'center-msg';
       senderLabel = 'المركز';
     }
-    return `<div class="chat-bubble ${bubbleClass}"><span class="chat-sender-label">${senderLabel}</span>${m.text ? escapeHtml(m.text) : ''}${attachHtml}<span class="chat-time">${timeStr}</span></div>`;
+    const isOwn = (m.sender === currentRole) || (m.sender === 'department' && currentRole === 'department');
+    const readMark = isOwn ? `<span class="chat-read-mark" style="margin-right:4px; font-size:12px; color:${m.read ? 'var(--gold)' : 'var(--text-dim)'};">${m.read ? '✓✓' : '✓'}</span>` : '';
+    return `<div class="chat-bubble ${bubbleClass}"><span class="chat-sender-label">${senderLabel}</span>${m.text ? escapeHtml(m.text) : ''}${attachHtml}<span class="chat-time">${readMark}${timeStr}</span></div>`;
   }).join('');
   container.innerHTML = htmlContent || '<div style="color:var(--text-dim); text-align:center; padding:40px; font-size:18px;">لا توجد رسائل بعد</div>';
   container.scrollTop = container.scrollHeight;
@@ -2653,6 +3046,50 @@ function checkForNewMessages() {
       }
     }
   });
+}
+
+// ============================================================
+// 📖 عرض المقولات الدينية
+// ============================================================
+function displayRandomQuote() {
+  const quote = religiousQuotes[Math.floor(Math.random() * religiousQuotes.length)];
+  const footer = document.getElementById('appRoot');
+  
+  let quoteContainer = document.getElementById('quoteContainer');
+  if (!quoteContainer) {
+  quoteContainer = document.createElement('div');
+  quoteContainer.id = 'quoteContainer';
+  quoteContainer.style.cssText = `
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  background: linear-gradient(135deg, rgba(0, 122, 61, 0.95), rgba(0, 166, 81, 0.85));
+  backdrop-filter: blur(10px);
+  color: #fff;
+  padding: 28px 40px;
+  border-radius: 20px;
+  max-width: 700px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 2;
+  box-shadow: 0 16px 50px rgba(0, 122, 61, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  animation: quoteSlideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  `;
+  footer.appendChild(quoteContainer);
+  }
+  
+  quoteContainer.textContent = quote;
+  quoteContainer.style.animation = 'none';
+  setTimeout(() => quoteContainer.style.animation = 'quoteSlideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)', 10);
+  
+  // إخفاء المقولة بعد 5 ثوان
+  setTimeout(() => {
+    quoteContainer.style.animation = 'quoteFadeOut 0.6s ease-in forwards';
+  }, 5000);
 }
 
 // ============================================================
@@ -2998,6 +3435,8 @@ window.onload = function() {
   selectLoginRole('directorate');
   loadRemembered();
   listenToChats();
+  isMuted = localStorage.getItem(LS_KEYS.mute) === "1";
+  updateMuteIcon();
   // إذا كانت هناك جلسة دخول محفوظة، نعيد فتح التطبيق مباشرة دون العودة لشاشة الدخول
   restoreSession();
 };
