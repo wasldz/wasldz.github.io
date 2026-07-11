@@ -1,0 +1,18 @@
+/* ============================================
+   📄 أنماط خاصة بالصفحات
+   ============================================ */
+
+/* صفحة الانشغالات - قائمة المتابعة */
+.list-fixed-table { table-layout: fixed; border-collapse: collapse; width: max-content; min-width: 100%; }
+.list-fixed-table td, .list-fixed-table th { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list-fixed-table td.wrap-cell { white-space: normal; overflow: visible; text-overflow: clip; word-break: break-word; line-height: 1.5; }
+
+/* صفحة مركز متابعة الردود - الكروت الإحصائية */
+.dept-stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
+.dept-stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; transition: var(--transition); }
+.dept-stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--algeria-green); }
+.dept-stat-card .dept-name { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.dept-stat-card .dept-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dept-stat-card .stat-item { text-align: center; padding: 8px; background: var(--bg-card-2); border-radius: 10px; }
+.dept-stat-card .stat-item .num { font-size: 24px; font-weight: 900; color: var(--algeria-green); }
+.dept-stat-card .stat-item .label { font-size: 13px; color: var(--text-dim); }

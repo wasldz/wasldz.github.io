@@ -1,0 +1,72 @@
+/* ============================================
+   📐 التخطيط والـ Layout
+   Sidebar, Brand, Header, Forms, Media Queries
+   ============================================ */
+/* ============ EXTRA ORNAMENTATION (Round 2 — 3x polish) ============ */
+.login-card { position: relative; }
+.login-card::after {
+  content: ''; position: absolute; inset: 10px; border: 1px solid rgba(212,175,55,0.35); border-radius: 22px;
+  pointer-events: none;
+}
+.login-header::after {
+  content: ''; display: block; width: 90px; height: 3px; margin: 14px auto 0; border-radius: 4px;
+  background: linear-gradient(90deg, var(--algeria-green), var(--gold), var(--algeria-red));
+  background-size: 200% 100%; animation: underlineFlow 4s linear infinite;
+}
+@keyframes underlineFlow { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+
+.page-header h2 { position: relative; padding-bottom: 4px; }
+.page-header h2::after {
+  content: ''; position: absolute; right: 0; bottom: -10px; width: 64px; height: 4px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--algeria-green), var(--gold));
+}
+
+.kpi-card { border-top: 3px solid transparent; background-image: linear-gradient(var(--bg-card), var(--bg-card)), var(--grad-brand); background-origin: border-box; background-clip: padding-box, border-box; }
+.kpi-card:hover { box-shadow: var(--shadow), 0 0 0 1px rgba(0,122,61,0.12); }
+
+.form-card, .panel, .table-wrap, .chart-card { position: relative; }
+.form-card::before, .panel::before {
+  content: ''; position: absolute; top: 0; right: 24px; width: 46px; height: 4px; border-radius: 0 0 6px 6px;
+  background: var(--grad-gold); opacity: 0.85;
+}
+
+.sidebar { border-top: 3px solid; border-image: linear-gradient(90deg, var(--algeria-green), var(--gold), var(--algeria-red)) 1; }
+
+.profile-card { box-shadow: var(--shadow-pop), inset 0 0 0 1px rgba(255,255,255,0.08); }
+
+.tab-btn.active, .btn-primary, .btn-secondary, .btn-gold, .btn-login { background-size: 160% 160%; }
+
+.login-container::before {
+  content: ''; position: absolute; inset: -3px; z-index: -1; border-radius: 30px; opacity: 0.55;
+  background: conic-gradient(from 0deg, var(--algeria-green), var(--gold), var(--algeria-red), var(--gold), var(--algeria-green));
+  filter: blur(18px); animation: haloSpin 10s linear infinite;
+}
+@keyframes haloSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+@media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .form-grid { grid-template-columns: 1fr; } .notes-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .filter-bar { flex-direction: column; } .filter-bar input, .filter-bar select { width: 100%; min-width: 0; } .page-header { flex-direction: column; align-items: flex-start; gap: 10px; } .header-actions { width: 100%; flex-wrap: wrap; } }
+@media (max-width: 768px) {
+  .app-flex { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: relative; border-left: none; border-bottom: 1px solid var(--border); }
+  .main-workspace { padding: 16px; }
+  .login-card { padding: 24px 18px; }
+  .kpi-grid { grid-template-columns: 1fr; }
+  .modal-box { max-width: 100%; margin: 10px; max-height: 92vh; }
+  .tabs-container { flex-direction: column; }
+  .role-selector { grid-template-columns: 1fr; }
+  .page-header h2 { font-size: 20px; }
+  .theme-toggle { bottom: 15px; left: 15px; width: 46px; height: 46px; font-size: 18px; }
+  #muteToggleBtn { left: 71px !important; }
+  .login-fields-row { flex-direction: column; }
+  .login-fields-row .login-field { min-width: 100%; }
+  .table-scroll table { font-size: 13px; }
+  .table-scroll td, .table-scroll th { padding: 8px 10px !important; white-space: nowrap; }
+  .chart-card { height: 240px !important; }
+  .nav-list { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 6px; }
+  .nav-list li { flex: 0 0 auto; }
+}
+@media (max-width: 480px) {
+  .kpi-value { font-size: 22px; }
+  .btn-mini, .btn-primary, .btn-gold { font-size: 14px; padding: 8px 12px; }
+}
+

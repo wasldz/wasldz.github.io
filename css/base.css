@@ -1,0 +1,69 @@
+/* ============================================
+   🧱 Reset + Typography أساسي
+   ============================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: 'Cairo', sans-serif; font-size: var(--font-base); }
+body {
+  background: var(--bg-main);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+  transition: background 0.35s ease, color 0.35s ease;
+  position: relative;
+  line-height: 1.7;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(0, 122, 61, 0.10), transparent 40%),
+    radial-gradient(circle at 92% 15%, rgba(212, 175, 55, 0.09), transparent 38%),
+    radial-gradient(circle at 50% 100%, rgba(224, 27, 63, 0.06), transparent 45%);
+}
+
+/* ============ ALGERIAN FLAG BACKDROP ============ */
+.flag-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  opacity: 0.16; transition: opacity 0.4s ease;
+}
+[data-theme="dark"] .flag-bg { opacity: 0.13; }
+.flag-bg .flag-half { position: absolute; top: 0; bottom: 0; width: 50%; }
+.flag-bg .flag-half-green { right: 0; background: linear-gradient(135deg, var(--algeria-green), var(--algeria-green-light)); }
+.flag-bg .flag-half-white { left: 0; background: linear-gradient(135deg, #ffffff, #eef1ee); }
+.flag-bg .flag-emblem { position: absolute; top: 50%; left: 50%; width: min(46vw, 620px); height: min(46vw, 620px); transform: translate(-50%, -50%); filter: drop-shadow(0 0 40px rgba(224,27,63,0.15)); }
+.flag-bg .flag-emblem .moon-star { fill: var(--algeria-red); }
+.flag-bg .flag-shine {
+  position: absolute; inset: -50%; width: 200%; height: 200%;
+  background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.16) 50%, transparent 60%);
+  animation: flagShine 9s linear infinite;
+}
+@keyframes flagShine { 0% { transform: translateX(-30%) translateY(-10%); } 100% { transform: translateX(30%) translateY(10%); } }
+.flag-dim {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: var(--bg-main); opacity: 0.62; transition: opacity 0.4s ease, background 0.4s ease;
+}
+
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: var(--grad-brand); border-radius: 12px; border: 2px solid var(--bg-main); background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--algeria-green-dark); }
+
+/* Animations الأساسية */
+@keyframes slideInRight { from { transform: translateX(130%) scale(0.9); opacity: 0; } to { transform: translateX(0) scale(1); opacity: 1; } }
+@keyframes quoteSlideUp { from { opacity: 0; transform: translateX(-50%) translateY(30px) scale(0.95); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+@keyframes pageFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes twinkle { 0%, 100% { opacity: 0.4; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
+@keyframes statusDotPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes cardRise { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes modalIn { from { transform: scale(0.95) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes bubbleIn { from { opacity: 0; transform: translateY(6px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes pulseBtn { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(224, 27, 63, 0.35); } 50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(224, 27, 63, 0.18); } }
+@keyframes syncPulse {
+  0% { box-shadow: 0 0 0 0 rgba(0,122,61,0.35); }
+  70% { box-shadow: 0 0 0 12px rgba(0,122,61,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,122,61,0); }
+}

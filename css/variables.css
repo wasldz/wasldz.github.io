@@ -1,0 +1,62 @@
+/* ============================================
+   🎨 المتغيرات الأساسية + الثيمات
+   منصة التنسيق الرقمي - الجزائر
+   ============================================ */
+
+:root {
+  --algeria-green: #007a3d;
+  --algeria-green-dark: #00522a;
+  --algeria-green-light: #00a651;
+  --algeria-red: #e01b3f;
+  --algeria-red-dark: #b0122f;
+  --algeria-white: #f5f5f5;
+  --gold: #d4af37;
+  --gold-light: #f4d777;
+
+  --bg-main: #eef1f6;
+  --bg-card: #ffffff;
+  --bg-card-2: #f7f9fc;
+  --bg-card-3: #eceff4;
+  --border: #dbe1ea;
+  --border-light: #e7ebf2;
+  --text: #10131a;
+  --text-light: #1d2230;
+  --text-dim: #62697a;
+  --shadow: 0 20px 60px rgba(15, 30, 60, 0.12);
+  --shadow-light: 0 6px 22px rgba(15, 30, 60, 0.06);
+  --shadow-pop: 0 10px 30px rgba(0, 122, 61, 0.18);
+  --input-bg: #ffffff;
+  --input-border: #dbe1ea;
+  --table-hover: rgba(0, 122, 61, 0.045);
+  --radius: 20px;
+  --radius-sm: 14px;
+  --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --grad-brand: linear-gradient(135deg, var(--algeria-green) 0%, var(--algeria-green-light) 55%, #00c46a 100%);
+  --grad-brand-dark: linear-gradient(135deg, var(--algeria-green-dark), var(--algeria-green));
+  --grad-red: linear-gradient(135deg, var(--algeria-red), var(--algeria-red-dark));
+  --grad-gold: linear-gradient(135deg, var(--gold-light), var(--gold) 60%, #b8942f);
+
+  --font-base: 18px;
+  --font-lg: 22px;
+  --font-xl: 28px;
+  --font-xxl: 34px;
+}
+
+[data-theme="dark"] {
+  --bg-main: #060a12;
+  --bg-card: #101826;
+  --bg-card-2: #16202f;
+  --bg-card-3: #1c2938;
+  --border: #263447;
+  --border-light: #324457;
+  --text: #eef3f9;
+  --text-light: #d9e2ee;
+  --text-dim: #8896ab;
+  --shadow: 0 20px 60px rgba(0,0,0,0.55);
+  --shadow-light: 0 6px 22px rgba(0,0,0,0.35);
+  --shadow-pop: 0 10px 30px rgba(0, 166, 81, 0.22);
+  --input-bg: #0c1420;
+  --input-border: #263447;
+  --table-hover: rgba(255,255,255,0.035);
+}

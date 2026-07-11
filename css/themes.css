@@ -1,0 +1,14 @@
+/* ============================================
+   🌓 تحسينات الثيم (Light/Dark)
+   ============================================ */
+
+[data-theme="dark"] .meet-stage { background: #050a16; }
+[data-theme="dark"] .meet-sidebar-card { background: var(--bg-card); }
+
+/* تخصيص الـ scrollbar في الثيم الداكن */
+[data-theme="dark"] ::-webkit-scrollbar-track { background: var(--bg-main); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: var(--grad-brand); }
+
+/* تحسينات عامة للثيم الداكن */
+[data-theme="dark"] .form-card,
+[data-theme="dark"] .panel { background: var(--bg-card); }
