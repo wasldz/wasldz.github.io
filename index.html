@@ -246,6 +246,14 @@ body::before {
   animation: slideInRight 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer;
   backdrop-filter: blur(10px);
 }
+.toast.toast-red {
+  border-right-color: var(--algeria-red) !important;
+  border-color: rgba(224,27,63,0.3) !important;
+  background: linear-gradient(135deg, var(--bg-card), rgba(224,27,63,0.04));
+  box-shadow: 0 10px 35px rgba(224,27,63,0.18) !important;
+}
+.toast.toast-red .toast-title { color: var(--algeria-red) !important; }
+.toast.toast-red .toast-action { color: var(--algeria-red) !important; }
 @keyframes slideInRight { from { transform: translateX(130%) scale(0.9); opacity: 0; } to { transform: translateX(0) scale(1); opacity: 1; } }
 @keyframes quoteSlideUp { from { opacity: 0; transform: translateX(-50%) translateY(30px) scale(0.95); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
 @keyframes quoteFadeOut { from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } to { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.95); } }
@@ -5113,12 +5121,13 @@ function _pushToFirebaseNow() {
   };
 
   const toSend = {};
+  const sentKeys = [];
   let hasChanges = false;
   for (const key in candidates) {
     const json = JSON.stringify(candidates[key]);
     if (_lastPushedJSON[key] !== json) {
       toSend[key] = candidates[key];
-      _lastPushedJSON[key] = json;
+      sentKeys.push(key);
       hasChanges = true;
     }
   }
@@ -5128,7 +5137,15 @@ function _pushToFirebaseNow() {
   toSend.timestamp = Date.now();
 
   // 🔥 استخدام update() بدل set(): لا يحذف أي مفتاح غير مذكور، وأكثر أمانًا
-  database.ref('data').update(toSend).catch(err => {
+  // ⚠️ نحدّث _lastPushedJSON فقط بعد نجاح الحفظ لتفادي مشكلة السباق الزمني:
+  // إذا وصلت بيانات قديمة من مستمع Firebase قبل اكتمال الحفظ، لن يتم تجاهل
+  // التغييرات المحلية لأن _lastPushedJSON لم يُحدَّث بعد.
+  database.ref('data').update(toSend).then(() => {
+    // ✅ تم الحفظ بنجاح — الآن نُعلّم المفاتيح المرسلة بأنها مزامنة
+    for (const key of sentKeys) {
+      _lastPushedJSON[key] = JSON.stringify(candidates[key]);
+    }
+  }).catch(err => {
     console.log('[v0] خطأ في الحفظ على Firebase:', err);
     showToast('⚠️ تحذير', 'فشل الحفظ على الخادم، حاول تحديث الصفحة أو التحقق من الاتصال');
   });
@@ -5191,6 +5208,8 @@ function listenToFirebase() {
     }
   });
 
+let _lastIssueNotifiedCode = ''; // لمنع تكرار الإشعار عند إضافة الإنشغال لمصفوفتين
+
   database.ref('data/activeIssues').on('value', (snapshot) => {
     const val = snapshot.val();
     if (!val) return;
@@ -5201,7 +5220,28 @@ function listenToFirebase() {
     pulseSyncBadge();
     if (activeIssues.length > oldCount) {
       if (!isMuted) playNotificationSound();
-      showToast('📩 إنشغال جديد', 'تم استلام إنشغال جديد من أحد المراكز!');
+      // 🔴 إشعار أحمر عند وصول انشغال من مؤسسة إلى المديرية
+      if (currentRole === 'directorate') {
+        // العثور على الإنشغال الجديد (آخر إنشغال مضاف)
+        const newIssue = val.find(i => i.code && i.code !== _lastIssueNotifiedCode && i.source === 'center');
+        if (newIssue) {
+          _lastIssueNotifiedCode = newIssue.code;
+          const issueCode = newIssue.code;
+          const issueCenter = newIssue.center || 'مؤسسة';
+          const issueTitle = newIssue.title || newIssue.type || 'إنشغال جديد';
+          showIssueRedToast(
+            '🔴 انشغال جديد وارد من ' + issueCenter,
+            issueTitle + (issueCode ? ' — ' + issueCode : ''),
+            issueCode
+          );
+          notifyBrowser('🔴 انشغال جديد وارد', issueCenter + ': ' + issueTitle, () => {
+            switchTab('list');
+            if (issueCode) setTimeout(() => openDetails(issueCode), 300);
+          });
+        }
+      } else {
+        showToast('📩 إنشغال جديد', 'تم استلام إنشغال جديد من أحد المراكز!');
+      }
     }
     updateUI();
   });
@@ -5224,7 +5264,23 @@ function listenToFirebase() {
     pulseSyncBadge();
     if (centerIssues.length > oldCount) {
       if (!isMuted) playNotificationSound();
-      showToast('📩 إنشغال جديد', 'تم استلام إنشغال جديد من أحد المراكز!');
+      // 🔴 إشعار أحمر للمديرية عند وصول انشغال من مؤسسة (فقط إذا لم يُظهر إشعاراً بالفعل)
+      if (currentRole === 'directorate') {
+        const newIssue = val.find(i => i.code && i.code !== _lastIssueNotifiedCode);
+        if (newIssue) {
+          _lastIssueNotifiedCode = newIssue.code;
+          const issueCode = newIssue.code;
+          const issueCenter = newIssue.center || 'مؤسسة';
+          const issueTitle = newIssue.title || newIssue.type || 'إنشغال جديد';
+          showIssueRedToast(
+            '🔴 انشغال جديد وارد من ' + issueCenter,
+            issueTitle + (issueCode ? ' — ' + issueCode : ''),
+            issueCode
+          );
+        }
+      } else {
+        showToast('📩 إنشغال جديد', 'تم استلام إنشغال جديد من أحد المراكز!');
+      }
     }
     updateUI();
   });
@@ -6372,17 +6428,23 @@ function editDepartmentInfo(id) {
     dept.password = newPassword.trim();
   }
   
-  saveToFirebase();
-  renderDepartmentsList();
-  renderDeptDashboard();
-  refreshAllDropdowns(); // تحديث القوائم المنسدلة
-  
-  // تحديث اسم المصلحة والمكلف في الـ sidebar إذا كانت المصلحة الحالية
-  if (currentRole === 'department' && currentDepartment === id) {
-    document.getElementById('profileName').textContent = dept.name;
-    document.getElementById('profileTitle').textContent = dept.manager;
-  }
-  showToast('✅ تم التعديل', 'تم تعديل بيانات المصلحة بنجاح');
+  // 🔥 حفظ مباشر على Firebase (مثل addDepartment) لضمان عدم فقدان التعديلات
+  database.ref('data/departments').set(departments).then(() => {
+    _markSynced('departments', departments);
+    renderDepartmentsList();
+    renderDeptDashboard();
+    refreshAllDropdowns(); // تحديث القوائم المنسدلة
+    
+    // تحديث اسم المصلحة والمكلف في الـ sidebar إذا كانت المصلحة الحالية
+    if (currentRole === 'department' && currentDepartment === id) {
+      document.getElementById('profileName').textContent = dept.name;
+      document.getElementById('profileTitle').textContent = dept.manager;
+    }
+    showToast('✅ تم التعديل', 'تم تعديل بيانات المصلحة بنجاح');
+  }).catch(err => {
+    console.error(err);
+    showToast('⚠️ خطأ', 'فشل حفظ التعديلات على الخادم');
+  });
 }
 
 // دالة جديدة لإضافة مصلحة جديدة ديناميكياً من طرف المديرية
@@ -7672,6 +7734,25 @@ function showToastWithAction(title, text, action) {
   return toast;
 }
 
+// 🔴 إشعار أحمر خاص بالانشغالات الواردة من المؤسسات إلى المديرية
+function showIssueRedToast(title, text, issueCode) {
+  const area = document.getElementById('toast-area');
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-red';
+  toast.innerHTML = `<div><div class="toast-title"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(title)}</div><div class="toast-text">${escapeHtml(text)}</div><div class="toast-action"><i class="fa-solid fa-hand-pointer"></i> اضغط للانتقال إلى الإنشغال</div></div>`;
+  toast.onclick = function() {
+    toast.remove();
+    // الانتقال مباشرة إلى صفحة الإنشغالات وفتح تفاصيل الإنشغال
+    switchTab('list');
+    if (issueCode) {
+      setTimeout(() => openDetails(issueCode), 300);
+    }
+  };
+  area.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 12000);
+  return toast;
+}
+
 function showToast(title, text) {
   const area = document.getElementById('toast-area');
   const toast = document.createElement('div');
@@ -7945,12 +8026,36 @@ function addFileType() {
 function editFileType(idx) {
   if (currentRole !== 'directorate') { showToast("⚠️ غير مسموح", "هذه الخاصية متاحة للمديرية فقط"); return; }
   const newVal = prompt("تعديل التصنيف:", fileTypes[idx]);
-  if (newVal !== null && newVal.trim() !== '') { fileTypes[idx] = newVal.trim(); saveToFirebase(); renderFileTypesManageList(); populateDropdowns(); }
+  if (newVal !== null && newVal.trim() !== '') {
+    fileTypes[idx] = newVal.trim();
+    // 🔥 حفظ مباشر على Firebase لضمان عدم فقدان التعديلات
+    database.ref('data/fileTypes').set(fileTypes).then(() => {
+      _markSynced('fileTypes', fileTypes);
+      renderFileTypesManageList();
+      populateDropdowns();
+      showToast('✅ تم التعديل', `تم تعديل التصنيف إلى "${newVal.trim()}" بنجاح`);
+    }).catch(err => {
+      console.error(err);
+      showToast('⚠️ خطأ', 'فشل حفظ التعديلات على الخادم');
+    });
+  }
 }
 
 function deleteFileType(idx) {
   if (currentRole !== 'directorate') { showToast("⚠️ غير مسموح", "هذه الخاصية متاحة للمديرية فقط"); return; }
-  if (confirm("هل أنت متأكد من حذف هذا التصنيف؟")) { fileTypes.splice(idx, 1); saveToFirebase(); renderFileTypesManageList(); populateDropdowns(); }
+  if (confirm("هل أنت متأكد من حذف هذا التصنيف؟")) {
+    fileTypes.splice(idx, 1);
+    // 🔥 حفظ مباشر على Firebase لضمان عدم فقدان التعديلات
+    database.ref('data/fileTypes').set(fileTypes).then(() => {
+      _markSynced('fileTypes', fileTypes);
+      renderFileTypesManageList();
+      populateDropdowns();
+      showToast('✅ تم الحذف', 'تم حذف التصنيف بنجاح');
+    }).catch(err => {
+      console.error(err);
+      showToast('⚠️ خطأ', 'فشل حذف التصنيف من الخادم');
+    });
+  }
 }
 
 function saveNotes() { 
@@ -9486,5 +9591,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1b3cfd3d884b6d4',t:'MTc4NDA2NjU0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1b3cfd3d884b6d4',t:'MTc4NDA2NjU0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1bb3b823e61b6c7',t:'MTc4NDE0NDM1OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
