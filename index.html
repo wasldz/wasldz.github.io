@@ -4046,13 +4046,13 @@ tbody td:last-child {
             <label><i class="fa-solid fa-building"></i> اختر المصلحة</label>
             <select id="loginDeptSelect">
               <option value="">-- اختر المصلحة --</option>
-              <option value="suivi_formation">مصلحة متابعة التكوين والتعليم المهنيين</option>
+              <option value="suivi_formation">خلية الرقمنة بالمديرية</option>
               <option value="suivi_investissement">مكتب متابعة مشاريع الإستثمار</option>
               <option value="suivi_presentiel">مصلحة متابعة التكوين الحضوري</option>
               <option value="suivi_themeen">مصلحة متابعة التمهين</option>
-              <option value="suivi_certificats">مصلحة متابعة الشهادات</option>
+              <option value="suivi_certificats"مكتب متابعة الشهادات</option>
               <option value="admin_finance">مصلحة الإدارة والمالية والوسائل</option>
-              <option value="secretariat_directeur">مكتب أمانة المدير</option>
+              <option value="secretariat_directeur">مكتب أمانة المديرية</option>
             </select>
           </div>
           <div class="login-field">
@@ -4072,8 +4072,7 @@ tbody td:last-child {
           <div class="login-field"><label><i class="fa-solid fa-building"></i> اختر المؤسسة</label><select id="loginCenterSelect"><option value="">-- اختر المؤسسة --</option></select></div>
           <div class="login-field"><label><i class="fa-solid fa-key"></i> كلمة السر</label><input type="password" id="loginCenterPass" placeholder="أدخل كلمة السر" onkeyup="if(event.key==='Enter')handleLogin()"></div>
         </div>
-        <div class="center-hint" id="centerHint"><i class="fa-solid fa-circle-info"></i> يمكنك طلب كلمة السر مباشرة من المديرية</div>
-        <button type="button" class="password-request-btn" id="requestPasswordBtn" onclick="requestCenterPassword()"><i class="fa-solid fa-key"></i> طلب كلمة السر من المديرية</button>
+        <div class="center-hint" id="centerHint"><i class="fa-solid fa-circle-info"></i> يمكنك طلب كلمة السر مباشرة من المديرية (حسان بلحاج)</div>
         <div id="passwordRequestStatus" style="display:none;margin-top:9px;text-align:center;font-size:14px;font-weight:700;color:var(--text-dim);"></div>
       </div>
 
@@ -4805,13 +4804,13 @@ database.ref = function(path) {
 // 💾 المصالح الأساسية (القائمة الثابتة - متضمنة أسماء المستخدمين والسر لكل مصلحة)
 // ============================================================
 const DEPARTMENTS_BASE = [
-  { id: "dept1", name: "مصلحة متابعة التكوين والتعليم المهنيين", type: "متابعة التكوين", manager: "مسؤول التكوين", username: "suivi_formation", password: "878789" },
+  { id: "dept1", name: "خلية الرقمنة بالمديرية ", type: "متابعة التكوين", manager: "مسؤول التكوين", username: "suivi_formation", password: "878789" },
   { id: "dept2", name: "مكتب متابعة مشاريع الإستثمار", type: "مشاريع الإستثمار", manager: "مسؤول الإستثمار", username: "suivi_investissement", password: "5678" },
   { id: "dept3", name: "مصلحة متابعة التكوين الحضوري", type: "التكوين الحضوري", manager: "مسؤول التكوين الحضوري", username: "suivi_presentiel", password: "9012" },
   { id: "dept4", name: "مصلحة متابعة التمهين", type: "التمهين", manager: "مسؤول التمهين", username: "suivi_themeen", password: "3456" },
-  { id: "dept5", name: "مصلحة متابعة الشهادات", type: "الشهادات", manager: "مسؤول الشهادات", username: "suivi_certificats", password: "7890" },
+  { id: "dept5", name: "مكتب متابعة الشهادات", type: "الشهادات", manager: "مسؤول الشهادات", username: "suivi_certificats", password: "7890" },
   { id: "dept6", name: "مصلحة الإدارة والمالية والوسائل", type: "الإدارة والمالية", manager: "مسؤول الإدارة", username: "admin_finance", password: "1111" },
-  { id: "dept7", name: "مكتب أمانة المدير", type: "الأمانة", manager: "أمين المدير", username: "secretariat_directeur", password: "20262026" }
+  { id: "dept7", name: " أمانة المديرية", type: "الأمانة", manager: "أمين المدير", username: "secretariat_directeur", password: "20262026" }
 ];
 
 // ============================================================
@@ -9617,5 +9616,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1b3cfd3d884b6d4',t:'MTc4NDA2NjU0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1bb90be5ac9b6ce',t:'MTc4NDE0Nzg0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1b3cfd3d884b6d4',t:'MTc4NDA2NjU0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1bb90be5ac9b6ce',t:'MTc4NDE0Nzg0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c393f468de336f',t:'MTc4NDIzMTg2Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
 </html>
