@@ -117,23 +117,6 @@ table td { font-size: 17px !important; padding: 14px 16px !important; }
 .idn-kpi strong { font-size: 32px !important; }
 .idn-kpi span { font-size: 15px !important; }
 .idn-tab { font-size: 16px !important; padding: 14px !important; }
-.gm-ctrl-label { font-size: 13px !important; }
-.gm-ctrl-btn { width: 60px !important; height: 60px !important; font-size: 22px !important; }
-.gm-ctrl-danger { width: 78px !important; height: 78px !important; font-size: 30px !important; }
-.gm-idle h3 { font-size: 28px !important; }
-.gm-idle p { font-size: 18px !important; }
-.gm-action-btn { font-size: 19px !important; padding: 18px 34px !important; }
-.gm-tile-name { font-size: 16px !important; padding: 7px 16px !important; }
-.incoming-call-popup { min-width: 480px !important; }
-.incoming-call-popup .popup-title { font-size: 22px !important; }
-.incoming-call-popup .popup-subtitle { font-size: 17px !important; }
-.incoming-call-popup .popup-actions button { font-size: 16px !important; padding: 13px 22px !important; }
-.gm-chat-panel { width: 480px !important; height: 640px !important; }
-.gm-chat-panel-head { font-size: 18px !important; padding: 16px 22px !important; }
-.gm-chat-panel-input input { font-size: 16px !important; padding: 12px 18px !important; }
-.gm-cp-msg { font-size: 16px !important; padding: 12px 16px !important; }
-.gm-cp-msg .gm-cp-sender { font-size: 14px !important; }
-.gm-cp-msg .gm-cp-time { font-size: 12px !important; }
 .teachers-hero h3 { font-size: 22px !important; }
 .teachers-hero p { font-size: 16px !important; }
 .teachers-form-card h3 { font-size: 20px !important; }
@@ -739,1090 +722,6 @@ tbody tr:hover { background: var(--table-hover) !important; }
   .btn-mini, .btn-primary, .btn-gold { font-size: 14px; padding: 8px 12px; }
 }
 
-/* ============ 🎥 VIDEO MEETING (Google Meet-like) ============ */
-.meet-layout {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 20px;
-  min-height: 70vh;
-}
-@media (max-width: 1100px) { .meet-layout { grid-template-columns: 1fr; } }
-
-.meet-sidebar-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow-light);
-}
-.meet-sidebar-card h3 {
-  font-size: 20px;
-  font-weight: 800;
-  margin-bottom: 14px;
-  color: var(--text);
-  display: flex; align-items: center; gap: 10px;
-}
-.meet-sidebar-card h3 i { color: var(--algeria-green); }
-
-.meet-create-row {
-  display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
-}
-.meet-create-row input {
-  flex: 1; min-width: 160px;
-  padding: 14px 18px; background: var(--input-bg);
-  border: 2px solid var(--input-border); border-radius: 12px;
-  color: var(--text); font-size: 17px; font-family: inherit;
-}
-.meet-create-row input:focus { border-color: var(--algeria-green); outline: none; }
-.meet-create-row button {
-  padding: 14px 22px; border-radius: 12px;
-  background: var(--grad-brand); color: #fff;
-  font-weight: 800; font-size: 17px; border: none; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 8px; font-family: inherit;
-  transition: var(--transition);
-}
-.meet-create-row button:hover { filter: brightness(1.08); transform: translateY(-1px); }
-
-.meet-status-list { display: flex; flex-direction: column; gap: 10px; max-height: 460px; overflow-y: auto; }
-.meet-status-item {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 10px; padding: 14px 16px;
-  background: var(--bg-card-2); border: 1px solid var(--border);
-  border-radius: 12px; transition: var(--transition);
-}
-.meet-status-item:hover { border-color: var(--algeria-green); transform: translateX(-2px); }
-.meet-status-item .msi-info { flex: 1; min-width: 0; }
-.meet-status-item .msi-name {
-  font-size: 16px; font-weight: 800; color: var(--text);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.meet-status-item .msi-meta { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
-.meet-status-item .msi-pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 800; padding: 4px 12px;
-  border-radius: 14px;
-}
-.msi-pill.live { background: rgba(224, 27, 63, 0.12); color: var(--algeria-red); }
-.msi-pill.live::before {
-  content: ''; width: 8px; height: 8px; border-radius: 50%;
-  background: var(--algeria-red);
-  animation: statusDotPulse 1.4s ease-in-out infinite;
-}
-.msi-pill.waiting { background: rgba(212, 175, 55, 0.18); color: #8a6c0a; }
-.msi-pill.ended { background: rgba(0, 122, 61, 0.10); color: var(--algeria-green); }
-
-.meet-stage {
-  background: #0b1322;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  min-height: 60vh;
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  display: flex; flex-direction: column;
-  color: #fff;
-}
-.meet-stage::before {
-  content: ''; position: absolute; inset: 0;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(0, 122, 61, 0.16), transparent 45%),
-    radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.12), transparent 45%);
-  pointer-events: none;
-}
-
-.meet-empty-state {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; padding: 40px;
-  text-align: center; gap: 16px; position: relative; z-index: 1;
-}
-.meet-empty-state .meet-icon-big {
-  font-size: 86px; opacity: 0.85;
-  background: linear-gradient(135deg, var(--algeria-green), var(--gold));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 8px 24px rgba(0, 122, 61, 0.35));
-}
-.meet-empty-state h3 { font-size: 26px; font-weight: 800; color: #fff; }
-.meet-empty-state p { color: rgba(255,255,255,0.7); font-size: 17px; max-width: 480px; line-height: 1.9; }
-
-.meet-active {
-  flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1;
-}
-.meet-room-head {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.35);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  flex-wrap: wrap;
-}
-.meet-room-head .room-title {
-  display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800;
-}
-.meet-room-head .room-title i { color: var(--algeria-green); }
-.meet-room-head .room-meta { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 600; }
-
-.meet-videos {
-  flex: 1; display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 14px; padding: 20px;
-  align-content: center; min-height: 360px;
-}
-.meet-video-tile {
-  position: relative;
-  background: #050a16; border-radius: 14px;
-  border: 2px solid rgba(255,255,255,0.08);
-  overflow: hidden;
-  aspect-ratio: 16/9;
-  min-height: 200px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  transition: border-color 0.25s ease;
-}
-.meet-video-tile.screen-share { border-color: var(--gold); }
-.meet-video-tile video {
-  width: 100%; height: 100%; object-fit: cover;
-  background: #000; display: block;
-}
-.meet-video-tile video.mirror { transform: scaleX(-1); }
-.meet-video-tile .tile-name {
-  position: absolute; bottom: 10px; left: 10px;
-  background: rgba(0,0,0,0.55); color: #fff;
-  padding: 6px 14px; border-radius: 999px;
-  font-size: 13px; font-weight: 700;
-  display: flex; align-items: center; gap: 6px;
-  backdrop-filter: blur(6px);
-}
-.meet-video-tile .tile-name .dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--algeria-green);
-  box-shadow: 0 0 0 3px rgba(0,122,61,0.18);
-}
-.meet-video-tile .tile-name.muted .dot { background: var(--algeria-red); box-shadow: 0 0 0 3px rgba(224,27,63,0.18); }
-.meet-video-tile .tile-actions {
-  position: absolute; top: 10px; right: 10px;
-  display: flex; gap: 6px;
-}
-.meet-video-tile .tile-actions span {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: rgba(0,0,0,0.55); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; backdrop-filter: blur(6px);
-}
-.meet-video-tile .tile-off {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #1c2938, #0b1322);
-  color: rgba(255,255,255,0.6);
-  gap: 10px;
-}
-.meet-video-tile .tile-off i { font-size: 44px; opacity: 0.5; }
-
-.meet-controls {
-  display: flex; align-items: center; justify-content: center;
-  gap: 12px; padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.45);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  flex-wrap: wrap;
-}
-.meet-ctrl-btn {
-  width: 54px; height: 54px; border-radius: 50%;
-  background: rgba(255,255,255,0.10); color: #fff;
-  border: 1px solid rgba(255,255,255,0.15);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 19px; cursor: pointer; transition: var(--transition);
-  position: relative;
-}
-.meet-ctrl-btn:hover { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
-.meet-ctrl-btn.danger { background: var(--grad-red); border-color: transparent; }
-.meet-ctrl-btn.danger:hover { filter: brightness(1.1); }
-.meet-ctrl-btn.active { background: var(--grad-gold); border-color: transparent; color: #fff; }
-.meet-ctrl-btn.active::after {
-  content: ''; position: absolute; bottom: -8px; left: 50%;
-  transform: translateX(-50%);
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--gold);
-}
-.meet-ctrl-label {
-  font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 700;
-  margin-top: 4px; text-align: center;
-}
-
-/* 🙋 شارة رفع اليد أعلى البلاط */
-.meet-video-tile .hand-badge {
-  position: absolute; top: 10px; left: 10px;
-  background: var(--grad-gold); color: #fff;
-  width: 36px; height: 36px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; box-shadow: 0 4px 16px rgba(212,175,55,0.55);
-  animation: handWave 0.9s ease-in-out infinite;
-  z-index: 4;
-}
-@keyframes handWave {
-  0%, 100% { transform: translateY(0) rotate(-12deg); }
-  50% { transform: translateY(-8px) rotate(18deg); }
-}
-
-/* 🚫 شارة "المايك مقفل من الإدارة" على البلاط */
-.meet-video-tile .lock-badge {
-  position: absolute; top: 10px; left: 52px;
-  background: var(--grad-red); color: #fff;
-  padding: 4px 10px; border-radius: 999px;
-  font-size: 11px; font-weight: 800;
-  display: flex; align-items: center; gap: 4px;
-  z-index: 4;
-}
-
-/* 🔒 زر قفل المايك (يظهر للمديرية على بلاط كل مشارك) */
-.meet-tile-lock-btn {
-  position: absolute; top: 10px; right: 10px;
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(0,0,0,0.55); color: #fff;
-  border: 1px solid rgba(255,255,255,0.18);
-  display: none; align-items: center; justify-content: center;
-  font-size: 14px; cursor: pointer;
-  z-index: 5; transition: all 0.2s ease;
-}
-.meet-tile-lock-btn:hover { background: var(--algeria-red); transform: scale(1.08); }
-.meet-tile-lock-btn.locked { background: var(--algeria-red); display: flex; }
-
-/* 🖥️ وضع ملء الشاشة — يخفي الـ sidebar ويكبّر المرحلة */
-.meet-stage.fullscreen-mode {
-  position: fixed; inset: 0; z-index: 9000;
-  border-radius: 0; min-height: 100vh;
-}
-.meet-stage.fullscreen-mode .meet-side-panel { right: 16px; }
-.meet-stage.fullscreen-mode .meet-videos { padding: 30px; }
-.meet-ctrl-btn.fullscreen-active { background: var(--grad-brand); border-color: transparent; }
-
-/* 🙋 لوحة قائمة المتدخلين (تظهر للمديرية فقط) */
-.meet-hand-queue-panel {
-  position: absolute; top: 70px; left: 20px; bottom: 100px;
-  width: 320px; max-width: calc(100% - 40px);
-  background: var(--bg-card); color: var(--text);
-  border-radius: var(--radius); border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  display: none; flex-direction: column;
-  z-index: 5; overflow: hidden;
-}
-.meet-hand-queue-panel.open { display: flex; }
-.meet-hand-queue-panel .panel-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px; border-bottom: 1px solid var(--border);
-  font-size: 16px; font-weight: 800;
-}
-.meet-hand-queue-panel .panel-head button {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--bg-card-2); border: 1px solid var(--border);
-  color: var(--text); display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 14px;
-}
-.meet-hand-queue-panel .hand-queue-list {
-  flex: 1; overflow-y: auto; padding: 14px 16px;
-  display: flex; flex-direction: column; gap: 10px;
-  background: var(--bg-card-2);
-}
-.meet-hand-queue-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 14px; background: var(--bg-card);
-  border: 1px solid var(--border); border-radius: 12px;
-}
-.meet-hand-queue-item .hqi-info { flex: 1; min-width: 0; }
-.meet-hand-queue-item .hqi-name {
-  font-size: 15px; font-weight: 800; color: var(--text);
-  display: flex; align-items: center; gap: 6px;
-}
-.meet-hand-queue-item .hqi-time { font-size: 11px; color: var(--text-dim); }
-.meet-hand-queue-item .hqi-order {
-  background: var(--grad-gold); color: #fff;
-  font-size: 11px; font-weight: 800;
-  padding: 2px 8px; border-radius: 8px;
-  margin-right: 6px;
-}
-.meet-hand-queue-item .hqi-actions { display: flex; gap: 6px; }
-
-/* 🙋 حالة القبول التلقائي لليد المرفوعة */
-.meet-hand-queue-item.accepted {
-  background: linear-gradient(135deg, rgba(0,122,61,0.10), rgba(0,166,81,0.05));
-  border-color: var(--algeria-green);
-  animation: acceptedFlash 1.2s ease-out;
-}
-@keyframes acceptedFlash {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0,122,61,0.5); }
-  50% { transform: scale(1.02); box-shadow: 0 0 0 14px rgba(0,122,61,0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,122,61,0); }
-}
-
-/* شارة القبول (✓) على بلاط المتحدّث الذي قُبلت يده */
-.meet-video-tile .accepted-badge {
-  position: absolute; top: 10px; left: 10px;
-  background: var(--grad-brand); color: #fff;
-  padding: 4px 10px; border-radius: 999px;
-  font-size: 11px; font-weight: 800;
-  display: none; align-items: center; gap: 4px;
-  z-index: 4;
-  box-shadow: 0 4px 12px rgba(0,122,61,0.4);
-}
-.meet-video-tile .accepted-badge.show { display: flex; }
-
-.meet-hand-queue-empty {
-  text-align: center; color: var(--text-dim);
-  font-size: 14px; padding: 30px 10px; font-weight: 700;
-}
-
-.meet-ctrl-group { display: flex; flex-direction: column; align-items: center; }
-
-/* 💬 نافذة الشات المدمجة (مصغّرة في الزاوية) */
-.meet-side-panel {
-  position: absolute; top: 70px; right: 20px; bottom: 100px;
-  width: 340px; max-width: calc(100% - 40px);
-  background: var(--bg-card); color: var(--text);
-  border-radius: var(--radius); border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  display: none; flex-direction: column;
-  z-index: 5; overflow: hidden;
-  animation: chatSlideIn 0.3s ease;
-}
-@keyframes chatSlideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-.meet-side-panel.open { display: flex; }
-.meet-side-panel .panel-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; border-bottom: 1px solid var(--border);
-  font-size: 15px; font-weight: 800; flex-shrink: 0;
-}
-.meet-side-panel .panel-head .head-actions { display: flex; gap: 6px; align-items: center; }
-.meet-side-panel .panel-head button {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--bg-card-2); border: 1px solid var(--border);
-  color: var(--text); display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 12px;
-}
-.meet-side-panel .panel-head button:hover { background: var(--bg-card); border-color: var(--algeria-green); }
-
-/* منطقة الرسائل (مصغّرة — رسائل صغيرة) */
-.meet-side-panel .chat-msgs {
-  flex: 1; overflow-y: auto; padding: 8px 10px;
-  display: flex; flex-direction: column; gap: 4px;
-  background: var(--bg-card-2);
-  font-size: 13px;
-}
-.meet-chat-msg {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 6px 10px;
-  font-size: 13px; line-height: 1.5;
-  word-break: break-word; max-width: 100%;
-  animation: chatMsgIn 0.25s ease-out;
-}
-@keyframes chatMsgIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.meet-chat-msg .sender { font-size: 11px; font-weight: 800; color: var(--algeria-green); margin-bottom: 1px; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-.meet-chat-msg .sender .time { font-weight: 600; opacity: 0.55; font-size: 10px; }
-.meet-chat-msg .me { background: linear-gradient(135deg, rgba(0,122,61,0.10), rgba(0,166,81,0.05)); border-color: rgba(0,122,61,0.18); }
-.meet-chat-msg .me .sender { color: var(--gold); }
-
-/* صف الإدخال (مصغّر) */
-.meet-side-panel .chat-input {
-  display: flex; gap: 6px; padding: 8px 10px;
-  background: var(--bg-card); border-top: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.meet-side-panel .chat-input input {
-  flex: 1; padding: 7px 12px; border-radius: 999px;
-  border: 1.5px solid var(--border); background: var(--input-bg);
-  color: var(--text); font-size: 13px; font-family: inherit;
-  min-width: 0;
-}
-.meet-side-panel .chat-input input:focus { border-color: var(--algeria-green); outline: none; }
-.meet-side-panel .chat-input button {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--grad-brand); color: #fff; border: none;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 12px; flex-shrink: 0;
-}
-
-/* شارة الإشعارات على زر الشات */
-.meet-ctrl-btn .chat-badge {
-  position: absolute; top: -4px; right: -4px;
-  background: var(--algeria-red); color: #fff;
-  font-size: 10px; font-weight: 800;
-  min-width: 18px; height: 18px; border-radius: 9px;
-  padding: 0 5px; display: none; align-items: center; justify-content: center;
-  border: 2px solid #0b1322;
-  animation: badgePulse 1.5s ease-in-out infinite;
-}
-.meet-ctrl-btn .chat-badge.show { display: flex; }
-@keyframes badgePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-}
-
-/* 👥 نافذة قائمة المنتسبين للاجتماع (للمديرية) */
-.meet-participants-panel {
-  position: absolute; top: 70px; left: 20px; bottom: 100px;
-  width: 360px; max-width: calc(100% - 40px);
-  background: var(--bg-card); color: var(--text);
-  border-radius: var(--radius); border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  display: none; flex-direction: column;
-  z-index: 5; overflow: hidden;
-  animation: chatSlideIn 0.3s ease;
-}
-.meet-participants-panel.open { display: flex; }
-.meet-participants-panel .panel-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; border-bottom: 1px solid var(--border);
-  font-size: 15px; font-weight: 800; flex-shrink: 0;
-  background: var(--bg-card);
-}
-.meet-participants-panel .panel-head button {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--bg-card-2); border: 1px solid var(--border);
-  color: var(--text); display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 12px;
-}
-.meet-participants-panel .panel-head button:hover { background: var(--grad-red); color: #fff; border-color: transparent; }
-.meet-participants-panel .participants-list {
-  flex: 1; overflow-y: auto; padding: 10px 12px;
-  display: flex; flex-direction: column; gap: 8px;
-  background: var(--bg-card-2);
-}
-.participant-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; background: var(--bg-card);
-  border: 1px solid var(--border); border-radius: 12px;
-  transition: var(--transition);
-}
-.participant-row:hover { border-color: var(--algeria-green); }
-.participant-row .p-avatar {
-  width: 38px; height: 38px; border-radius: 50%;
-  background: var(--grad-brand); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 800; flex-shrink: 0;
-  position: relative;
-}
-.participant-row .p-avatar .p-status-dot {
-  position: absolute; bottom: 0; right: 0;
-  width: 12px; height: 12px; border-radius: 50%;
-  background: var(--algeria-green); border: 2px solid var(--bg-card);
-}
-.participant-row .p-avatar .p-status-dot.muted { background: var(--algeria-red); }
-.participant-row .p-avatar .p-status-dot.locked { background: var(--algeria-red); }
-.participant-row .p-info { flex: 1; min-width: 0; }
-.participant-row .p-name {
-  font-size: 14px; font-weight: 800; color: var(--text);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  display: flex; align-items: center; gap: 4px;
-}
-.participant-row .p-meta {
-  font-size: 11px; color: var(--text-dim); display: flex; gap: 6px; flex-wrap: wrap;
-}
-.participant-row .p-meta .p-tag {
-  background: var(--bg-card-2); padding: 1px 6px; border-radius: 6px;
-  font-weight: 700;
-}
-.participant-row .p-actions { display: flex; gap: 4px; flex-shrink: 0; }
-.participant-row .p-action-btn {
-  width: 32px; height: 32px; border-radius: 8px;
-  background: var(--bg-card-2); border: 1px solid var(--border);
-  color: var(--text); display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 12px;
-  transition: var(--transition);
-  position: relative;
-}
-.participant-row .p-action-btn:hover { border-color: var(--algeria-green); color: var(--algeria-green); }
-.participant-row .p-action-btn.locked { background: var(--algeria-red); color: #fff; border-color: transparent; }
-.participant-row .p-action-btn.has-msg::after {
-  content: ''; position: absolute; top: -2px; right: -2px;
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--algeria-red);
-  border: 2px solid var(--bg-card);
-}
-.participants-empty {
-  text-align: center; color: var(--text-dim);
-  font-size: 14px; padding: 30px 10px; font-weight: 700;
-}
-
-/* 💌 نافذة الدردشة الخاصة */
-.meet-dm-panel {
-  position: absolute; top: 70px; right: 20px; bottom: 100px;
-  width: 340px; max-width: calc(100% - 40px);
-  background: var(--bg-card); color: var(--text);
-  border-radius: var(--radius); border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  display: none; flex-direction: column;
-  z-index: 6; overflow: hidden;
-  animation: chatSlideIn 0.3s ease;
-}
-.meet-dm-panel.open { display: flex; }
-.meet-dm-panel .panel-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; border-bottom: 1px solid var(--border);
-  font-size: 15px; font-weight: 800; flex-shrink: 0;
-  background: var(--bg-card);
-}
-.meet-dm-panel .panel-head .dm-avatar {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--grad-brand); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 800;
-}
-.meet-dm-panel .panel-head .dm-title {
-  display: flex; flex-direction: column; gap: 2px;
-  flex: 1; margin: 0 10px;
-}
-.meet-dm-panel .panel-head .dm-title strong { font-size: 14px; }
-.meet-dm-panel .panel-head .dm-title small { font-size: 11px; color: var(--algeria-green); font-weight: 700; }
-.meet-dm-panel .panel-head button {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--bg-card-2); border: 1px solid var(--border);
-  color: var(--text); display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 12px;
-}
-.meet-dm-panel .dm-msgs {
-  flex: 1; overflow-y: auto; padding: 10px 12px;
-  display: flex; flex-direction: column; gap: 6px;
-  background: var(--bg-card-2);
-}
-.dm-msg {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 7px 12px;
-  font-size: 13px; line-height: 1.5;
-  max-width: 85%; word-break: break-word;
-  animation: chatMsgIn 0.25s ease-out;
-}
-.dm-msg.me {
-  align-self: flex-end;
-  background: linear-gradient(135deg, rgba(0,122,61,0.10), rgba(0,166,81,0.05));
-  border-color: rgba(0,122,61,0.18);
-}
-.dm-msg .dm-time { font-size: 10px; color: var(--text-dim); margin-top: 2px; opacity: 0.7; }
-.meet-dm-panel .dm-input {
-  display: flex; gap: 6px; padding: 8px 10px;
-  background: var(--bg-card); border-top: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.meet-dm-panel .dm-input input {
-  flex: 1; padding: 7px 12px; border-radius: 999px;
-  border: 1.5px solid var(--border); background: var(--input-bg);
-  color: var(--text); font-size: 13px; font-family: inherit;
-  min-width: 0;
-}
-.meet-dm-panel .dm-input input:focus { border-color: var(--algeria-green); outline: none; }
-.meet-dm-panel .dm-input button {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--grad-brand); color: #fff; border: none;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 12px;
-}
-
-/* تبويب الرسائل الخاصة في نافذة المتدخلين (يظهر شارة الرسائل الجديدة) */
-.dm-inbox-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 12px; background: var(--bg-card);
-  border: 1px solid var(--border); border-radius: 10px;
-  margin-bottom: 6px; cursor: pointer; transition: var(--transition);
-}
-.dm-inbox-item:hover { border-color: var(--algeria-green); }
-.dm-inbox-item.unread { border-right: 3px solid var(--algeria-red); background: linear-gradient(90deg, rgba(224,27,63,0.05), transparent); }
-.dm-inbox-item .dm-inbox-info { flex: 1; min-width: 0; }
-.dm-inbox-item .dm-inbox-name { font-size: 14px; font-weight: 800; }
-.dm-inbox-item .dm-inbox-preview { font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dm-inbox-item .dm-inbox-badge {
-  background: var(--algeria-red); color: #fff;
-  font-size: 10px; font-weight: 800;
-  min-width: 18px; height: 18px; border-radius: 9px;
-  padding: 0 5px; display: flex; align-items: center; justify-content: center;
-}
-
-.meet-side-panel {
-  position: absolute; top: 70px; right: 20px; bottom: 100px;
-  width: 320px; max-width: calc(100% - 40px);
-  background: var(--bg-card); color: var(--text);
-  border-radius: var(--radius); border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  display: none; flex-direction: column;
-  z-index: 5; overflow: hidden;
-}
-.meet-side-panel.open { display: flex; }
-.meet-side-panel .panel-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px; border-bottom: 1px solid var(--border);
-  font-size: 16px; font-weight: 800;
-}
-.meet-side-panel .panel-head button {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--bg-card-2); border: 1px solid var(--border);
-  color: var(--text); display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 14px;
-}
-.meet-side-panel .chat-msgs {
-  flex: 1; overflow-y: auto; padding: 14px 16px;
-  display: flex; flex-direction: column; gap: 10px;
-  background: var(--bg-card-2);
-}
-.meet-chat-msg {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 10px 14px;
-  font-size: 14px; line-height: 1.7;
-  word-break: break-word;
-}
-.meet-chat-msg .sender { font-size: 12px; font-weight: 800; color: var(--algeria-green); margin-bottom: 2px; }
-.meet-chat-msg .me { background: linear-gradient(135deg, rgba(0,122,61,0.10), rgba(0,166,81,0.05)); border-color: rgba(0,122,61,0.18); }
-.meet-chat-msg .me .sender { color: var(--gold); }
-.meet-side-panel .chat-input {
-  display: flex; gap: 8px; padding: 12px;
-  background: var(--bg-card); border-top: 1px solid var(--border);
-}
-.meet-side-panel .chat-input input {
-  flex: 1; padding: 10px 14px; border-radius: 999px;
-  border: 2px solid var(--border); background: var(--input-bg);
-  color: var(--text); font-size: 14px; font-family: inherit;
-}
-.meet-side-panel .chat-input input:focus { border-color: var(--algeria-green); outline: none; }
-.meet-side-panel .chat-input button {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: var(--grad-brand); color: #fff; border: none;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 14px;
-}
-
-.meet-toggle-panel-btn {
-  position: absolute; top: 76px; right: 20px; z-index: 6;
-  width: 44px; height: 44px; border-radius: 50%;
-  background: rgba(255,255,255,0.12); color: #fff;
-  border: 1px solid rgba(255,255,255,0.18);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 15px;
-  transition: var(--transition);
-}
-.meet-toggle-panel-btn:hover { background: rgba(255,255,255,0.22); }
-
-.meet-waiting-banner {
-  background: rgba(212, 175, 55, 0.18);
-  color: #f4d777; border: 1px solid rgba(212,175,55,0.4);
-  padding: 10px 18px; border-radius: 999px;
-  display: inline-flex; align-items: center; gap: 10px;
-  font-size: 14px; font-weight: 700;
-  margin: 0 auto 14px;
-}
-.meet-waiting-banner::before {
-  content: ''; width: 8px; height: 8px; border-radius: 50%;
-  background: var(--gold);
-  animation: statusDotPulse 1.2s ease-in-out infinite;
-}
-
-/* 📨 إشعار دعوة اجتماع عائم (يظهر في الواجهة الرئيسية للمدعو) */
-.meet-incoming-banner {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-  z-index: 9500; max-width: 560px; width: calc(100% - 48px);
-  background: linear-gradient(135deg, var(--algeria-green) 0%, #00a651 100%);
-  color: #fff; padding: 18px 22px; border-radius: 18px;
-  box-shadow: 0 16px 50px rgba(0,122,61,0.45);
-  display: flex; align-items: center; gap: 16px;
-  border: 2px solid rgba(255,255,255,0.25);
-  animation: meetBannerSlide 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
-  cursor: pointer;
-}
-@keyframes meetBannerSlide {
-  from { opacity: 0; transform: translate(-50%, 80px) scale(0.9); }
-  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
-}
-.meet-incoming-banner .mib-icon {
-  width: 56px; height: 56px; border-radius: 50%;
-  background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;
-  font-size: 26px; flex-shrink: 0;
-  animation: meetRingPulse 1.4s ease-in-out infinite;
-}
-@keyframes meetRingPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.45); }
-  50% { box-shadow: 0 0 0 14px rgba(255,255,255,0); }
-}
-.meet-incoming-banner .mib-body { flex: 1; min-width: 0; }
-.meet-incoming-banner .mib-title {
-  font-size: 17px; font-weight: 800; margin-bottom: 4px;
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
-.meet-incoming-banner .mib-title .live-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: #fff; display: inline-block;
-  animation: meetLiveDot 1.2s ease-in-out infinite;
-}
-@keyframes meetLiveDot { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
-.meet-incoming-banner .mib-sub {
-  font-size: 14px; opacity: 0.95; line-height: 1.5;
-}
-.meet-incoming-banner .mib-actions { display: flex; gap: 8px; flex-shrink: 0; }
-.meet-incoming-banner .mib-btn {
-  background: #fff; color: var(--algeria-green-dark);
-  border: none; padding: 10px 18px; border-radius: 10px;
-  font-weight: 800; font-size: 14px; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: inherit; transition: all 0.2s ease;
-}
-.meet-incoming-banner .mib-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.18); }
-.meet-incoming-banner .mib-btn.dismiss { background: rgba(255,255,255,0.2); color: #fff; }
-.meet-incoming-banner .mib-btn.dismiss:hover { background: rgba(255,255,255,0.3); }
-
-/* بطاقة دعوة داخل صندوق الوارد */
-.meet-invite-card {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px; background: linear-gradient(135deg, rgba(0,122,61,0.06), rgba(0,166,81,0.03));
-  border: 2px solid var(--algeria-green); border-radius: 12px;
-  position: relative; overflow: hidden;
-}
-.meet-invite-card::before {
-  content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%;
-  background: var(--algeria-green);
-}
-.meet-invite-card .mic-info { flex: 1; min-width: 0; }
-.meet-invite-card .mic-title { font-size: 16px; font-weight: 800; color: var(--text); }
-.meet-invite-card .mic-meta { font-size: 12px; color: var(--text-dim); margin-top: 3px; }
-.meet-invite-card .mic-note {
-  font-size: 13px; color: var(--text); padding: 8px 12px; background: var(--bg-card);
-  border-radius: 8px; margin-top: 8px; border-right: 3px solid var(--gold);
-}
-.meet-invite-card .mic-actions { display: flex; flex-direction: column; gap: 6px; }
-.meet-invite-card .mic-actions button { white-space: nowrap; }
-
-[data-theme="dark"] .meet-stage { background: #050a16; }
-[data-theme="dark"] .meet-sidebar-card { background: var(--bg-card); }
-
-/* ============ 🆕 إشعار طلب التدخل العائم (يظهر على نافذة المؤسسة) ============ */
-.meet-hand-notification {
-  position: fixed;
-  top: 90px;
-  right: 24px;
-  z-index: 9600;
-  max-width: 380px;
-  width: calc(100% - 48px);
-  background: linear-gradient(135deg, var(--algeria-red) 0%, var(--algeria-red-dark) 100%);
-  color: #fff;
-  padding: 18px 20px;
-  border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(224, 27, 63, 0.45);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  animation: handNotifSlide 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
-  cursor: default;
-}
-@keyframes handNotifSlide {
-  from { opacity: 0; transform: translateX(120%) scale(0.92); }
-  to { opacity: 1; transform: translateX(0) scale(1); }
-}
-.meet-hand-notification .mhn-icon {
-  width: 52px; height: 52px; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; flex-shrink: 0;
-  animation: handNotifPulse 1.2s ease-in-out infinite;
-}
-@keyframes handNotifPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6); }
-  50% { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); }
-}
-.meet-hand-notification .mhn-body { flex: 1; min-width: 0; }
-.meet-hand-notification .mhn-title {
-  font-size: 16px; font-weight: 800; margin-bottom: 4px;
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
-.meet-hand-notification .mhn-order {
-  background: #fff; color: var(--algeria-red);
-  font-size: 13px; font-weight: 900;
-  padding: 3px 10px; border-radius: 999px;
-  min-width: 28px; text-align: center;
-}
-.meet-hand-notification .mhn-sub {
-  font-size: 13px; opacity: 0.95; line-height: 1.5;
-}
-.meet-hand-notification .mhn-actions {
-  display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;
-}
-.meet-hand-notification .mhn-btn {
-  background: #fff; color: var(--algeria-red-dark);
-  border: none; padding: 7px 14px; border-radius: 8px;
-  font-weight: 800; font-size: 12px; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 5px;
-  font-family: inherit; transition: all 0.2s ease;
-  white-space: nowrap;
-}
-.meet-hand-notification .mhn-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
-.meet-hand-notification .mhn-btn.stop-sound {
-  background: rgba(0, 0, 0, 0.35); color: #fff;
-}
-
-/* ============ 🆕 تنبيه دعوة الاجتماع (أحمر متكرر) ============ */
-.meet-incoming-banner-red {
-  background: linear-gradient(135deg, var(--algeria-red) 0%, #8B0000 100%) !important;
-  animation: meetBannerSlide 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
-             meetRedFlash 0.9s ease-in-out infinite;
-}
-@keyframes meetRedFlash {
-  0%, 100% { box-shadow: 0 16px 50px rgba(224, 27, 63, 0.45), 0 0 0 0 rgba(224, 27, 63, 0.5); }
-  50% { box-shadow: 0 16px 50px rgba(224, 27, 63, 0.65), 0 0 0 16px rgba(224, 27, 63, 0); }
-}
-.meet-incoming-banner-red .mib-icon { background: rgba(255, 255, 255, 0.25) !important; }
-.meet-incoming-banner-red .mib-actions .stop-ringtone-btn {
-  background: rgba(0, 0, 0, 0.4) !important;
-  color: #fff !important;
-}
-
-/* ============ 🆕 نافذة الشات الجانبية (خانة مثبتة) ============ */
-.meet-chat-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 360px;
-  max-width: 90vw;
-  background: var(--bg-card);
-  color: var(--text);
-  border-left: 1px solid var(--border);
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.18);
-  display: flex; flex-direction: column;
-  z-index: 8500;
-  transform: translateX(100%);
-  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.meet-chat-panel.open { transform: translateX(0); }
-.meet-chat-panel .mcp-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px;
-  background: var(--grad-brand-dark);
-  color: #fff;
-  flex-shrink: 0;
-  gap: 10px;
-}
-.meet-chat-panel .mcp-head h4 {
-  font-size: 17px; font-weight: 800;
-  display: flex; align-items: center; gap: 8px;
-  flex: 1; min-width: 0;
-}
-.meet-chat-panel .mcp-head h4 .chat-mode-tag {
-  font-size: 11px; font-weight: 700;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 2px 8px; border-radius: 999px;
-}
-.meet-chat-panel .mcp-head button {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15); color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 14px;
-  transition: var(--transition);
-}
-.meet-chat-panel .mcp-head button:hover { background: rgba(255, 255, 255, 0.28); }
-
-/* تابات التبديل بين الشات الجماعي و الخاص */
-.meet-chat-tabs {
-  display: flex;
-  background: var(--bg-card-2);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  padding: 6px 8px;
-  gap: 4px;
-}
-.meet-chat-tab {
-  flex: 1;
-  padding: 9px 12px;
-  border-radius: 10px;
-  font-weight: 800;
-  font-size: 13px;
-  background: transparent;
-  color: var(--text-dim);
-  border: none;
-  cursor: pointer;
-  transition: var(--transition);
-  font-family: inherit;
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  position: relative;
-}
-.meet-chat-tab:hover { background: var(--table-hover); color: var(--text); }
-.meet-chat-tab.active {
-  background: var(--grad-brand);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 122, 61, 0.25);
-}
-.meet-chat-tab .tab-badge {
-  background: var(--algeria-red);
-  color: #fff;
-  font-size: 9px; font-weight: 800;
-  min-width: 16px; height: 16px; border-radius: 8px;
-  padding: 0 4px;
-  display: none; align-items: center; justify-content: center;
-}
-.meet-chat-tab .tab-badge.show { display: inline-flex; }
-
-/* قائمة المحادثات (يظهر في وضع الخاص) */
-.meet-chat-dm-list {
-  flex: 1; overflow-y: auto;
-  padding: 10px 12px;
-  background: var(--bg-card-2);
-  display: none;
-}
-.meet-chat-dm-list.active { display: block; }
-.meet-chat-dm-list .dm-list-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.meet-chat-dm-list .dm-list-item:hover { border-color: var(--algeria-green); }
-.meet-chat-dm-list .dm-list-item.unread {
-  border-right: 3px solid var(--algeria-red);
-  background: linear-gradient(90deg, rgba(224, 27, 63, 0.05), var(--bg-card));
-}
-.dm-list-item .dm-list-avatar {
-  width: 42px; height: 42px; border-radius: 50%;
-  background: var(--grad-brand); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; font-weight: 800; flex-shrink: 0;
-}
-.dm-list-item .dm-list-info { flex: 1; min-width: 0; }
-.dm-list-item .dm-list-name {
-  font-size: 14px; font-weight: 800; color: var(--text);
-  display: flex; align-items: center; gap: 6px;
-}
-.dm-list-item .dm-list-preview {
-  font-size: 12px; color: var(--text-dim);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  margin-top: 2px;
-}
-.dm-list-item .dm-list-meta {
-  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
-  flex-shrink: 0;
-}
-.dm-list-item .dm-list-time {
-  font-size: 11px; color: var(--text-dim);
-}
-.dm-list-item .dm-list-badge {
-  background: var(--algeria-red); color: #fff;
-  font-size: 10px; font-weight: 800;
-  min-width: 18px; height: 18px; border-radius: 9px;
-  padding: 0 5px;
-  display: none; align-items: center; justify-content: center;
-}
-.dm-list-item.unread .dm-list-badge { display: inline-flex; }
-.dm-list-item .dm-list-empty {
-  text-align: center; color: var(--text-dim);
-  padding: 30px 16px; font-size: 13px; font-weight: 700;
-}
-
-/* منطقة الرسائل (مشتركة بين الجماعي و الخاص) */
-.meet-chat-panel .mcp-msgs {
-  flex: 1; overflow-y: auto;
-  padding: 14px 16px;
-  background: var(--bg-card-2);
-  display: flex; flex-direction: column; gap: 8px;
-  font-size: 14px;
-}
-.meet-chat-panel .mcp-msgs.active { display: flex; }
-.meet-chat-panel .mcp-msgs:not(.active) { display: none; }
-.meet-chat-panel .mcp-msg {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 8px 12px;
-  line-height: 1.6;
-  word-break: break-word;
-  max-width: 88%;
-  animation: chatMsgIn 0.25s ease-out;
-  font-size: 14px;
-}
-.meet-chat-panel .mcp-msg.me {
-  align-self: flex-end;
-  background: linear-gradient(135deg, rgba(0, 122, 61, 0.10), rgba(0, 166, 81, 0.05));
-  border-color: rgba(0, 122, 61, 0.22);
-}
-.meet-chat-panel .mcp-msg .mcp-sender {
-  font-size: 12px; font-weight: 800; color: var(--algeria-green);
-  margin-bottom: 2px; display: flex; justify-content: space-between; gap: 8px;
-}
-.meet-chat-panel .mcp-msg.me .mcp-sender { color: var(--gold); }
-.meet-chat-panel .mcp-msg .mcp-time {
-  font-size: 10px; opacity: 0.55; font-weight: 600;
-}
-.meet-chat-panel .mcp-msg .mcp-text {
-  white-space: pre-wrap; word-break: break-word;
-}
-.meet-chat-panel .mcp-empty {
-  text-align: center; color: var(--text-dim);
-  padding: 40px 16px; font-size: 14px; font-weight: 700;
-  margin: auto;
-}
-
-/* صف الإدخال */
-.meet-chat-panel .mcp-input {
-  display: flex; gap: 8px;
-  padding: 12px 14px;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.meet-chat-panel .mcp-input input {
-  flex: 1; padding: 11px 16px; border-radius: 999px;
-  border: 2px solid var(--border); background: var(--input-bg);
-  color: var(--text); font-size: 14px; font-family: inherit;
-  min-width: 0;
-}
-.meet-chat-panel .mcp-input input:focus { border-color: var(--algeria-green); outline: none; }
-.meet-chat-panel .mcp-input button {
-  width: 42px; height: 42px; border-radius: 50%;
-  background: var(--grad-brand); color: #fff; border: none;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 14px; flex-shrink: 0;
-  transition: var(--transition);
-}
-.meet-chat-panel .mcp-input button:hover { filter: brightness(1.1); transform: scale(1.05); }
-.meet-chat-panel .mcp-input button:disabled {
-  background: var(--bg-card-2); color: var(--text-dim);
-  cursor: not-allowed; transform: none;
-}
-
-/* رأس المحادثة الخاصة (يظهر في وضع الخاص) */
-.meet-chat-dm-header {
-  display: none;
-  align-items: center; gap: 10px;
-  padding: 12px 16px;
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.meet-chat-dm-header.active { display: flex; }
-.meet-chat-dm-header .back-btn {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--bg-card-2); border: 1px solid var(--border);
-  color: var(--text); display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 13px; transition: var(--transition);
-}
-.meet-chat-dm-header .back-btn:hover { background: var(--grad-brand); color: #fff; border-color: transparent; }
-.meet-chat-dm-header .dm-target-avatar {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: var(--grad-brand); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 800;
-}
-.meet-chat-dm-header .dm-target-info { flex: 1; min-width: 0; }
-.meet-chat-dm-header .dm-target-name {
-  font-size: 14px; font-weight: 800; color: var(--text);
-}
-.meet-chat-dm-header .dm-target-status {
-  font-size: 11px; color: var(--algeria-green); font-weight: 700;
-  display: flex; align-items: center; gap: 4px;
-}
-
-/* إخفاء اللوحات القديمة (الشات الجانبي القديم) */
-.meet-side-panel { display: none !important; }
-
-
 /* ============ طلب كلمة السر + الرد الصوتي ============ */
 .password-request-btn {
   width: 100%; margin-top: 10px; padding: 13px 18px; border-radius: 13px;
@@ -2029,262 +928,6 @@ tbody tr:hover { background: var(--table-hover) !important; }
   .db-emblem { font-size: 32px; }
 }
 
-/* ============ 🔴 إشعار منبثق أحمر للمكالمات الواردة ============ */
-.incoming-call-popup {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-120px);
-  z-index: 99999;
-  background: linear-gradient(135deg, #d21034 0%, #b71c1c 50%, #ff1744 100%);
-  color: #fff;
-  border-radius: 18px;
-  padding: 0;
-  box-shadow: 0 8px 40px rgba(224,27,63,0.45), 0 0 0 4px rgba(255,255,255,0.15);
-  display: flex;
-  align-items: stretch;
-  overflow: hidden;
-  min-width: 420px;
-  max-width: 600px;
-  opacity: 0;
-  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
-  pointer-events: none;
-  direction: rtl;
-  font-family: inherit;
-}
-.incoming-call-popup.popup-show {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-}
-.incoming-call-popup .popup-ring-side {
-  width: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.15);
-  flex-shrink: 0;
-  position: relative;
-}
-.incoming-call-popup .popup-ring-icon {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  position: relative;
-}
-.incoming-call-popup .popup-ring-pulse {
-  position: absolute;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  border: 3px solid rgba(255,255,255,0.5);
-  animation: popupRingPulse 1.5s ease-out infinite;
-}
-@keyframes popupRingPulse {
-  0% { transform: scale(1); opacity: 0.7; }
-  100% { transform: scale(2.2); opacity: 0; }
-}
-.incoming-call-popup .popup-body {
-  flex: 1;
-  padding: 16px 20px 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-}
-.incoming-call-popup .popup-title {
-  font-size: 18px;
-  font-weight: 800;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.incoming-call-popup .popup-title .popup-badge {
-  background: rgba(255,255,255,0.25);
-  padding: 2px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-}
-.incoming-call-popup .popup-subtitle {
-  font-size: 14px;
-  opacity: 0.9;
-  margin: 0;
-}
-.incoming-call-popup .popup-actions {
-  display: flex;
-  gap: 8px;
-  padding: 0 20px 16px 20px;
-  align-items: flex-end;
-}
-.incoming-call-popup .popup-actions button {
-  border: none;
-  border-radius: 12px;
-  padding: 10px 18px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: transform 0.15s, box-shadow 0.15s;
-  font-family: inherit;
-}
-.incoming-call-popup .popup-actions button:hover {
-  transform: scale(1.05);
-}
-.incoming-call-popup .popup-accept-video {
-  background: #00c853;
-  color: #fff;
-  box-shadow: 0 3px 12px rgba(0,200,83,0.4);
-}
-.incoming-call-popup .popup-accept-audio {
-  background: #2979ff;
-  color: #fff;
-  box-shadow: 0 3px 12px rgba(41,121,255,0.4);
-}
-.incoming-call-popup .popup-accept-text {
-  background: rgba(255,255,255,0.2);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.3) !important;
-}
-.incoming-call-popup .popup-end-call {
-  background: #d21034;
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(224,27,63,0.6);
-  font-weight: 800;
-  padding: 12px 22px !important;
-  font-size: 15px !important;
-}
-.incoming-call-popup .popup-timer {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-top: 2px;
-}
-.incoming-call-popup.popup-show .popup-ring-icon {
-  animation: popupIconShake 0.6s ease-in-out infinite;
-}
-@keyframes popupIconShake {
-  0%, 100% { transform: rotate(0deg); }
-  15% { transform: rotate(12deg); }
-  30% { transform: rotate(-10deg); }
-  45% { transform: rotate(8deg); }
-  60% { transform: rotate(-6deg); }
-  75% { transform: rotate(3deg); }
-}
-@media (max-width: 600px) {
-  .incoming-call-popup {
-    min-width: auto;
-    max-width: calc(100vw - 24px);
-    border-radius: 14px;
-    flex-direction: column;
-  }
-  .incoming-call-popup .popup-ring-side {
-    width: 100%;
-    height: 70px;
-  }
-  .incoming-call-popup .popup-actions {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
-
-/* ============ 💬 دردشة المديريات (Google Meet-style — صوت وصورة) ============ */
-.gm-chat-page { display: flex; flex-direction: column; gap: 0; height: calc(100vh - 260px); min-height: 500px; }
-
-.gm-header {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; padding: 14px 22px;
-  background: linear-gradient(135deg, var(--algeria-green) 0%, #00a651 100%);
-  color: #fff; border-radius: var(--radius) var(--radius) 0 0;
-  flex-shrink: 0;
-}
-.gm-header h3 { font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 10px; }
-.gm-header h3 i { font-size: 22px; }
-.gm-header .gm-live-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 99px;
-  font-size: 13px; font-weight: 800;
-}
-
-.gm-body { flex: 1; display: flex; min-height: 0; background: var(--bg-card); border: 1px solid var(--border); border-top: none; }
-
-.gm-sidebar { width: 260px; flex-shrink: 0; border-left: 1px solid var(--border); display: flex; flex-direction: column; background: var(--bg-card-2); overflow: hidden; }
-.gm-sidebar-head { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-.gm-sidebar-head input { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--input-bg); color: var(--text); font-size: 14px; font-family: inherit; }
-.gm-sidebar-head input:focus { border-color: var(--algeria-green); outline: none; }
-.gm-sidebar-head .gm-room-btn { width: 100%; padding: 10px; border-radius: 10px; border: none; background: linear-gradient(135deg, rgba(0,122,61,0.10), rgba(0,166,81,0.05)); color: var(--algeria-green); font-weight: 800; font-size: 14px; cursor: pointer; transition: var(--transition); font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.gm-room-btn:hover { background: var(--grad-brand); color: #fff; }
-.gm-room-btn.active { background: var(--grad-brand); color: #fff; }
-
-.gm-conv-list { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
-.gm-conv-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: var(--transition); border: 1px solid transparent; font-size: 14px; font-weight: 700; color: var(--text); }
-.gm-conv-item:hover { background: rgba(0,122,61,0.06); border-color: rgba(0,122,61,0.12); }
-.gm-conv-item.active { background: rgba(0,122,61,0.10); border-color: var(--algeria-green); color: var(--algeria-green); }
-.gm-conv-item .gm-conv-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--grad-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; flex-shrink: 0; }
-.gm-conv-item .gm-conv-info { flex: 1; min-width: 0; }
-.gm-conv-item .gm-conv-name { font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gm-conv-item .gm-conv-status { font-size: 11px; color: var(--text-dim); }
-.gm-conv-item .gm-conv-badge { background: var(--algeria-red); color: #fff; font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 9px; display: none; align-items: center; justify-content: center; padding: 0 5px; }
-.gm-conv-item.unread .gm-conv-badge { display: inline-flex; }
-.gm-conv-item.online .gm-conv-avatar { box-shadow: 0 0 0 3px rgba(0,122,61,0.25); }
-.gm-conv-item.alert-new { border-color: var(--algeria-red) !important; background: rgba(224,27,63,0.08) !important; animation: convRedPulse 1.2s ease-in-out infinite; }
-@keyframes convRedPulse { 0%,100%{ box-shadow: 0 0 0 0 rgba(224,27,63,0.3); } 50%{ box-shadow: 0 0 0 6px rgba(224,27,63,0); } }
-
-.gm-main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
-
-/* واجهة عدم وجود مكالمة */
-.gm-idle { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; padding: 40px; }
-.gm-idle-icon { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--algeria-green), #00a651); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 42px; box-shadow: 0 12px 36px rgba(0,122,61,0.25); }
-.gm-idle h3 { font-size: 24px; font-weight: 900; color: var(--text); }
-.gm-idle p { color: var(--text-dim); font-size: 16px; max-width: 400px; line-height: 1.8; }
-
-/* أزرار الاتصال */
-.gm-call-actions { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 14px; z-index: 3; }
-.gm-action-btn { padding: 16px 30px; border-radius: 16px; border: none; font-weight: 800; font-size: 17px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; font-family: inherit; transition: var(--transition); }
-.gm-action-btn:hover { transform: translateY(-2px); }
-.gm-video-call { background: linear-gradient(135deg, var(--algeria-green), #00a651); color: #fff; box-shadow: 0 10px 28px rgba(0,122,61,0.3); }
-.gm-video-call:hover { box-shadow: 0 14px 36px rgba(0,122,61,0.4); }
-.gm-audio-call { background: var(--bg-card); color: var(--text); border: 2px solid var(--border); box-shadow: var(--shadow-light); }
-.gm-audio-call:hover { border-color: var(--algeria-green); color: var(--algeria-green); }
-.gm-group-call { background: linear-gradient(135deg, var(--gold), #b8942f); color: #fff; box-shadow: 0 10px 28px rgba(212,175,55,0.3); }
-.gm-group-call:hover { box-shadow: 0 14px 36px rgba(212,175,55,0.4); }
-.gm-idle-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
-.gm-ctrl-btn.disabled { opacity: 0.35; cursor: not-allowed; }
-.gm-accept-text { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.3) !important; }
-.gm-remote-tile { border: 2px solid rgba(0,122,61,0.2); }
-
-/* واجهة المكالمة النشطة */
-.gm-call-active { flex: 1; display: flex; flex-direction: column; position: relative; background: #0a0f1a; }
-.gm-video-grid { flex: 1; display: grid; grid-template-columns: 1fr; gap: 8px; padding: 16px; align-content: center; min-height: 300px; }
-.gm-video-tile { position: relative; background: #111827; border-radius: 16px; overflow: hidden; aspect-ratio: 16/9; min-height: 250px; border: 2px solid rgba(255,255,255,0.06); }
-.gm-video-tile video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.gm-video-tile video.mirror { transform: scaleX(-1); }
-.gm-tile-off { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); gap: 10px; background: linear-gradient(135deg, #1a2236, #0a0f1a); }
-.gm-tile-off i { font-size: 44px; opacity: 0.4; }
-.gm-tile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--grad-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; box-shadow: 0 8px 24px rgba(0,122,61,0.3); }
-.gm-tile-name { position: absolute; bottom: 10px; right: 12px; background: rgba(0,0,0,0.55); color: #fff; padding: 5px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; backdrop-filter: blur(6px); }
-.gm-local-tile { position: absolute; bottom: 90px; left: 20px; width: 220px; height: auto; aspect-ratio: 16/9; min-height: unset; border-radius: 12px; border: 2px solid rgba(255,255,255,0.15); z-index: 4; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-
-/* أزرار التحكم */
-.gm-controls { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 22px 20px 26px; background: rgba(0,0,0,0.65); backdrop-filter: blur(12px); position: relative; z-index: 50; flex-wrap: wrap; }
-.gm-ctrl-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-.gm-ctrl-btn { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: var(--transition); position: relative; }
-.gm-ctrl-btn:hover { background: rgba(255,255,255,0.26); transform: translateY(-2px); }
-.gm-ctrl-btn.muted { background: var(--algeria-red); border-color: transparent; }
-.gm-ctrl-btn.cam-off { background: var(--algeria-red); border-color: transparent; }
-.gm-ctrl-btn.screen-on { background: var(--grad-gold); border-color: transparent; }
-.gm-ctrl-danger { background: var(--grad-red) !important; border-color: transparent !important; width: 72px !important; height: 72px !important; font-size: 28px !important; box-shadow: 0 6px 24px rgba(224,27,63,0.5); }
-.gm-ctrl-danger:hover { filter: brightness(1.15); box-shadow: 0 8px 32px rgba(224,27,63,0.6); }
-.gm-ctrl-label { font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 700; }
-.gm-ctrl-chat-badge { position: absolute; top: -4px; right: -4px; background: var(--algeria-red); color: #fff; font-size: 9px; font-weight: 800; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
-
 /* ============ 🎓 الأساتذة المتدخلين ============ */
 .teachers-page { padding: 0; }
 .teachers-hero { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 28px; background: linear-gradient(135deg, rgba(0,122,61,0.08), var(--bg-card), rgba(255,193,7,0.05)); border: 1px solid var(--border); border-radius: 18px; margin-bottom: 20px; }
@@ -2326,369 +969,6 @@ tbody tr:hover { background: var(--table-hover) !important; }
 .teachers-empty { text-align: center; padding: 40px; color: var(--text-dim); font-size: 14px; }
 .teachers-empty i { font-size: 42px; display: block; margin-bottom: 10px; opacity: 0.2; }
 @media (max-width: 900px) { .teachers-layout { grid-template-columns: 1fr; } }
-
-/* ============ 💬 نافذة الدردشة العائمة أثناء المكالمة ============ */
-.gm-chat-panel {
-  position: fixed;
-  top: 80px;
-  right: 30px;
-  width: 440px;
-  height: 580px;
-  max-width: calc(100vw - 20px);
-  max-height: calc(100vh - 100px);
-  background: var(--bg-card);
-  color: var(--text);
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
-  display: flex;
-  flex-direction: column;
-  z-index: 99998;
-  overflow: hidden;
-  animation: gmChatFloatIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  resize: both;
-}
-@keyframes gmChatFloatIn {
-  0% { transform: scale(0.5) translateY(40px); opacity: 0; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
-}
-.gm-chat-panel.minimized {
-  height: 52px !important;
-  width: 280px !important;
-  resize: none;
-  border-radius: 14px;
-  overflow: hidden;
-}
-.gm-chat-panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-  font-size: 16px;
-  font-weight: 800;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, rgba(0,122,61,0.08), var(--bg-card), rgba(224,27,63,0.05));
-  cursor: move;
-  user-select: none;
-  gap: 10px;
-}
-.gm-chat-panel-head .gm-cp-head-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-  min-width: 0;
-}
-.gm-chat-panel-head .gm-cp-head-title i {
-  font-size: 20px;
-  color: var(--algeria-green);
-}
-.gm-chat-panel-head .gm-cp-head-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
-.gm-chat-panel-head button {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: var(--bg-card-2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 13px;
-  transition: background 0.15s, transform 0.15s;
-}
-.gm-chat-panel-head button:hover {
-  background: var(--bg-card);
-  transform: scale(1.08);
-}
-.gm-chat-panel-msgs {
-  flex: 1;
-  overflow-y: auto;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: var(--bg-card-2);
-  min-height: 0;
-}
-.gm-cp-msg {
-  max-width: 88%;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-size: 14px;
-  line-height: 1.6;
-  word-break: break-word;
-  position: relative;
-}
-.gm-cp-msg.me {
-  align-self: flex-end;
-  background: linear-gradient(135deg, rgba(0,122,61,0.15), rgba(0,166,81,0.08));
-  border: 1px solid rgba(0,122,61,0.2);
-  border-bottom-left: 4px;
-}
-.gm-cp-msg.other {
-  align-self: flex-start;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-bottom-right: 4px;
-}
-.gm-cp-msg .gm-cp-sender {
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--algeria-green);
-  margin-bottom: 3px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.gm-cp-msg.me .gm-cp-sender { color: var(--gold); }
-.gm-cp-msg .gm-cp-time {
-  font-size: 10px;
-  opacity: 0.5;
-  margin-top: 4px;
-}
-.gm-cp-msg .gm-cp-attachment {
-  margin-top: 8px;
-  border-radius: 12px;
-  overflow: hidden;
-  max-width: 100%;
-}
-.gm-cp-msg .gm-cp-attachment img,
-.gm-cp-msg .gm-cp-attachment video {
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: 10px;
-  display: block;
-}
-.gm-cp-msg .gm-cp-attachment audio {
-  width: 100%;
-  max-width: 260px;
-  height: 40px;
-  border-radius: 8px;
-}
-.gm-cp-msg .gm-cp-attachment .gm-cp-file-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: rgba(0,122,61,0.08);
-  border: 1px solid rgba(0,122,61,0.15);
-  border-radius: 10px;
-  text-decoration: none;
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 700;
-  transition: background 0.15s;
-}
-.gm-cp-msg .gm-cp-attachment .gm-cp-file-link:hover {
-  background: rgba(0,122,61,0.15);
-}
-.gm-cp-msg .gm-cp-attachment .gm-cp-file-link i {
-  font-size: 22px;
-  color: var(--algeria-green);
-}
-
-/* منطقة رفع المرفقات */
-.gm-chat-panel-attach-area {
-  display: none;
-  padding: 10px 14px;
-  background: var(--bg-card-2);
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.gm-chat-panel-attach-area.active { display: block; }
-.gm-attach-preview {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  margin-bottom: 6px;
-}
-.gm-attach-preview .gm-attach-thumb {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-.gm-attach-preview .gm-attach-info {
-  flex: 1;
-  min-width: 0;
-  font-size: 12px;
-  font-weight: 700;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.gm-attach-preview .gm-attach-info small {
-  display: block;
-  font-weight: 400;
-  color: var(--text-dim);
-  font-size: 10px;
-}
-.gm-attach-preview .gm-attach-remove {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(224,27,63,0.12);
-  color: var(--algeria-red);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  flex-shrink: 0;
-}
-.gm-attach-preview .gm-attach-remove:hover {
-  background: rgba(224,27,63,0.25);
-}
-.gm-attach-btns {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-}
-.gm-attach-btns label,
-.gm-attach-btns button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.12s;
-  font-family: inherit;
-}
-.gm-attach-btns label:hover,
-.gm-attach-btns button:hover {
-  background: var(--bg-card-2);
-  transform: scale(1.03);
-}
-.gm-attach-btns label i,
-.gm-attach-btns button i {
-  font-size: 15px;
-}
-
-/* حقل الإدخال */
-.gm-chat-panel-input {
-  display: flex;
-  gap: 8px;
-  padding: 12px 14px;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
-  align-items: flex-end;
-}
-.gm-chat-panel-input .gm-cp-attach-toggle {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: var(--bg-card-2);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 16px;
-  flex-shrink: 0;
-  transition: color 0.15s, background 0.15s;
-}
-.gm-chat-panel-input .gm-cp-attach-toggle:hover {
-  color: var(--algeria-green);
-  background: rgba(0,122,61,0.08);
-}
-.gm-chat-panel-input .gm-cp-attach-toggle.has-attachment {
-  color: var(--algeria-green);
-  background: rgba(0,122,61,0.12);
-  border-color: var(--algeria-green);
-}
-.gm-chat-panel-input input {
-  flex: 1;
-  padding: 10px 16px;
-  border-radius: 14px;
-  border: 1.5px solid var(--border);
-  background: var(--input-bg);
-  color: var(--text);
-  font-size: 14px;
-  font-family: inherit;
-  min-width: 0;
-}
-.gm-chat-panel-input input:focus {
-  border-color: var(--algeria-green);
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0,122,61,0.1);
-}
-.gm-chat-panel-input .gm-cp-send-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: var(--grad-brand);
-  color: #fff;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 15px;
-  flex-shrink: 0;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 4px 14px rgba(0,122,61,0.3);
-}
-.gm-chat-panel-input .gm-cp-send-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(0,122,61,0.4);
-}
-
-@media (max-width: 600px) {
-  .gm-chat-panel {
-    width: calc(100vw - 16px);
-    height: calc(100vh - 80px);
-    right: 8px;
-    top: 70px;
-    border-radius: 16px;
-  }
-}
-
-/* استقبال مكالمة واردة */
-.gm-incoming { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 40px; text-align: center; background: linear-gradient(135deg, #0a0f1a, #111827); color: #fff; position: relative; }
-.gm-incoming-ring { position: absolute; width: 200px; height: 200px; border-radius: 50%; border: 3px solid rgba(0,122,61,0.3); animation: gmRing 1.5s ease-in-out infinite; }
-@keyframes gmRing { 0%{ transform: scale(0.8); opacity: 1; } 100%{ transform: scale(2); opacity: 0; } }
-.gm-incoming-avatar { width: 90px; height: 90px; border-radius: 50%; background: var(--grad-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 900; z-index: 2; box-shadow: 0 12px 36px rgba(0,122,61,0.35); animation: gmAvatarPulse 1.5s ease-in-out infinite; }
-@keyframes gmAvatarPulse { 0%,100%{ box-shadow: 0 12px 36px rgba(0,122,61,0.35), 0 0 0 0 rgba(0,122,61,0.4); } 50%{ box-shadow: 0 12px 36px rgba(0,122,61,0.35), 0 0 0 18px rgba(0,122,61,0); } }
-.gm-incoming h3 { font-size: 22px; z-index: 2; }
-.gm-incoming p { color: rgba(255,255,255,0.6); font-size: 15px; z-index: 2; }
-.gm-incoming-actions { display: flex; gap: 12px; z-index: 2; flex-wrap: wrap; justify-content: center; }
-.gm-incoming-btn { padding: 14px 22px; border-radius: 14px; border: none; font-weight: 800; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-family: inherit; transition: var(--transition); }
-.gm-incoming-btn:hover { transform: translateY(-2px); }
-.gm-accept-video { background: linear-gradient(135deg, var(--algeria-green), #00a651); color: #fff; box-shadow: 0 8px 24px rgba(0,122,61,0.3); }
-.gm-accept-audio { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25) !important; }
-.gm-reject { background: var(--grad-red); color: #fff; box-shadow: 0 8px 24px rgba(224,27,63,0.3); }
-
-/* رسائل الدردشة — أنماط مدمجة في القسم الرئيسي أعلاه */
-
-@media (max-width: 900px) {
-  .gm-body { flex-direction: column; }
-  .gm-sidebar { width: 100%; max-height: 180px; border-left: none; border-bottom: 1px solid var(--border); }
-  .gm-chat-page { height: auto; min-height: 400px; }
-  .gm-local-tile { width: 140px; bottom: 80px; left: 12px; }
-  .gm-call-actions { bottom: 16px; }
-  .gm-action-btn { padding: 12px 18px; font-size: 14px; }
-}
 
 /* ============ 🎬 الفيديوهات التعليمية ============ */
 .edu-videos-hero { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; background: linear-gradient(135deg, rgba(0,122,61,0.08), var(--bg-card), rgba(255,193,7,0.05)); border: 1px solid var(--border); border-radius: 18px; margin-bottom: 20px; }
@@ -3409,8 +1689,7 @@ tbody tr:hover { background: var(--table-hover) !important; }
    ========================================================================== */
 
 /* 1. GLASSMORPHIC INTERFACE */
-.login-card, .modal-box, .incoming-issue-chat, .meet-side-panel, 
-.meet-hand-queue-panel, .meet-participants-panel, .meet-dm-panel, .meet-chat-panel, .panel, .form-card {
+.login-card, .modal-box, .incoming-issue-chat, .panel, .form-card {
   background: rgba(255, 255, 255, 0.72) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
@@ -3420,11 +1699,6 @@ tbody tr:hover { background: var(--table-hover) !important; }
 [data-theme="dark"] .login-card, 
 [data-theme="dark"] .modal-box, 
 [data-theme="dark"] .incoming-issue-chat, 
-[data-theme="dark"] .meet-side-panel, 
-[data-theme="dark"] .meet-hand-queue-panel, 
-[data-theme="dark"] .meet-participants-panel, 
-[data-theme="dark"] .meet-dm-panel, 
-[data-theme="dark"] .meet-chat-panel,
 [data-theme="dark"] .panel,
 [data-theme="dark"] .form-card {
   background: rgba(16, 24, 38, 0.75) !important;
@@ -3569,41 +1843,6 @@ tbody tr:hover { background: var(--table-hover) !important; }
 .kpi-pending::after { background: linear-gradient(90deg, #ff9f07, #e8830f); }
 .kpi-done::after { background: linear-gradient(90deg, #2eef85, #1fa855); }
 .kpi-efficiency::after { background: var(--grad-gold); }
-
-/* 6. SLEEK MEET VIDEO GRID LAYOUT */
-.meet-stage, .gm-call-active {
-  border-radius: 20px !important;
-  overflow: hidden !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-.meet-video-tile, .gm-video-tile {
-  border-radius: 16px !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4) !important;
-  overflow: hidden;
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
-}
-.meet-video-tile:hover, .gm-video-tile:hover {
-  transform: translateY(-3px) scale(1.01);
-  border-color: var(--algeria-green) !important;
-  box-shadow: 0 18px 40px rgba(0, 122, 61, 0.2) !important;
-}
-.meet-video-tile .tile-name, .gm-video-tile .gm-tile-name {
-  background: rgba(10, 15, 26, 0.6) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 30px !important;
-  padding: 6px 14px !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-}
-.meet-controls, .gm-controls {
-  background: rgba(10, 15, 26, 0.72) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
 
 /* 7. ELEGANT CHAT BUBBLES */
 .chat-bubble {
@@ -4125,25 +2364,6 @@ tbody td:last-child {
       <div class="db-red-bar"></div>
     </div>
 
-    <!-- 🔴 إشعار منبثق أحمر للمكالمات الواردة -->
-    <div class="incoming-call-popup" id="incomingCallPopup">
-      <div class="popup-ring-side">
-        <div class="popup-ring-icon" id="popupRingIcon">📹</div>
-        <div class="popup-ring-pulse"></div>
-      </div>
-      <div class="popup-body">
-        <h4 class="popup-title" id="popupTitle">مكالمة واردة <span class="popup-badge" id="popupBadge">فيديو</span></h4>
-        <p class="popup-subtitle" id="popupSubtitle">مديرية —</p>
-        <p class="popup-timer" id="popupTimer"></p>
-      </div>
-      <div class="popup-actions">
-        <button class="popup-accept-video" onclick="popupAcceptVideo()"><i class="fa-solid fa-video"></i> فيديو</button>
-        <button class="popup-accept-audio" onclick="popupAcceptAudio()"><i class="fa-solid fa-phone"></i> صوت</button>
-        <button class="popup-accept-text" onclick="popupAcceptText()"><i class="fa-solid fa-comment"></i> دردشة</button>
-        <button class="popup-end-call" onclick="popupReject()"><i class="fa-solid fa-phone-slash"></i> إنهاء</button>
-      </div>
-    </div>
-
     <!-- DASHBOARD -->
     <section class="page" id="page-dashboard">
       <div class="page-header">
@@ -4219,33 +2439,14 @@ tbody td:last-child {
       </div>
     </section>
 
-    <!-- BROADCAST -->
+    <!-- BROADCAST / المراسلات والمهام -->
     <section class="page hidden" id="page-broadcast">
-      <div class="page-header"><h2><i class="fa-solid fa-bullhorn"></i> إرسال تعميم / إنشغال للجميع</h2></div>
-      <div class="form-card">
-        <div class="broadcast-section">
-          <h4>🎯 اختر الجهة المستهدفة</h4>
-          <div class="broadcast-options">
-            <button class="active" data-target="all" onclick="selectBroadcastTarget('all')">الجميع</button>
-            <button data-target="centers" onclick="selectBroadcastTarget('centers')">المراكز والمعاهد</button>
-            <button data-target="private" onclick="selectBroadcastTarget('private')">المدارس الخاصة</button>
-            <button data-target="single" onclick="selectBroadcastTarget('single')">مؤسسة واحدة</button>
-          </div>
-          <div id="broadcast-single-container" style="display:none; margin-top:10px;">
-            <label style="font-weight:700; display:block; margin-bottom:6px;">اختر المؤسسة:</label>
-            <select id="broadcast-single-select" style="width:100%; padding:14px 18px; background:var(--input-bg); border:2px solid var(--input-border); border-radius:12px; font-size:17px;" onchange="updateBroadcastCount()">
-              <option value="">-- اختر مؤسسة --</option>
-            </select>
-          </div>
-          <p style="font-size:16px; color:var(--text-dim); margin-top:6px;" id="broadcastCount">سيتم الإرسال إلى: جميع المؤسسات (0 مؤسسة)</p>
-        </div>
-        <div class="form-grid">
-          <div class="form-field full"><label>عنوان التعميم</label><input type="text" id="broadcast-title" placeholder="أدخل عنوان التعميم..."></div>
-          <div class="form-field full"><label>نص التعميم / الإنشغال</label><textarea id="broadcast-content" class="broadcast-textarea" placeholder="اكتب نص التعميم أو الإنشغال..."></textarea></div>
-          <div class="form-field full"><label>درجة الأهمية</label><select id="broadcast-priority"><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select></div>
-        </div>
-        <button id="broadcast-send-btn" class="btn-gold" style="width:100%; justify-content:center;" onclick="sendBroadcast()"><i class="fa-solid fa-broadcast"></i> إرسال التعميم للجميع</button>
-      </div>
+      <div id="broadcastPageContent"></div>
+    </section>
+
+    <!-- USER GUIDES / دليل الاستعمال -->
+    <section class="page hidden" id="page-user-guides">
+      <div id="userGuidesPageContent"></div>
     </section>
 
     <!-- LIST -->
@@ -4373,100 +2574,6 @@ tbody td:last-child {
         </div>
       </div>
     </section>
-    <section class="page hidden" id="page-gm-chat">
-      <div class="gm-chat-page">
-        <!-- شريط علوي -->
-        <div class="gm-header">
-          <h3><i class="fa-solid fa-video"></i> مكالمة المديريات</h3>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div class="gm-live-badge" id="gmLiveBadge" style="display:none;">🔴 مباشر</div>
-            <span id="gmCallTimer" style="font-size:14px;font-weight:800;background:rgba(255,255,255,0.15);padding:4px 12px;border-radius:8px;display:none;">00:00</span>
-            <span id="gmParticipantCount" style="font-size:13px;font-weight:800;background:rgba(255,255,255,0.12);padding:4px 12px;border-radius:8px;display:none;"><i class="fa-solid fa-users"></i> 0</span>
-          </div>
-        </div>
-
-        <div class="gm-body">
-          <!-- شريط جانبي -->
-          <div class="gm-sidebar" id="gmSidebar">
-            <div class="gm-sidebar-head">
-              <input type="text" id="gmSearchInput" placeholder="ابحث عن مديرية..." oninput="renderGmConvList()">
-              <button class="gm-room-btn active" id="gmRoomBtn" onclick="selectGmRoom('all')"><i class="fa-solid fa-globe"></i> الغرفة الوطنية</button>
-            </div>
-            <div class="gm-conv-list" id="gmConvList"></div>
-          </div>
-
-          <!-- المنطقة الرئيسية -->
-          <div class="gm-main">
-            <!-- واجهة عدم وجود مكالمة -->
-            <div class="gm-idle" id="gmIdle">
-              <div class="gm-idle-icon"><i class="fa-solid fa-video"></i></div>
-              <h3>مكالمة مديريات</h3>
-              <p>اختر مديرية من القائمة أو أنشئ غرفة جماعية</p>
-              <div class="gm-idle-actions">
-                <button class="gm-action-btn gm-video-call" onclick="gmStartCall(true,'private')"><i class="fa-solid fa-video"></i> اتصال مرئي</button>
-                <button class="gm-action-btn gm-audio-call" onclick="gmStartCall(false,'private')"><i class="fa-solid fa-phone"></i> اتصال صوتي</button>
-                <button class="gm-action-btn gm-group-call" onclick="gmStartCall(true,'group')" id="gmGroupCallBtn"><i class="fa-solid fa-users"></i> غرفة جماعية</button>
-              </div>
-            </div>
-
-            <!-- واجهة المكالمة النشطة -->
-            <div class="gm-call-active" id="gmCallActive" style="display:none;">
-              <!-- منطقة الفيديو -->
-              <div class="gm-video-grid" id="gmVideoGrid">
-                <!-- فيديو محلي (صغير) -->
-                <div class="gm-video-tile gm-local-tile" id="gmLocalTile">
-                  <video id="gmLocalVideo" autoplay playsinline muted></video>
-                  <div class="gm-tile-off" id="gmLocalOff">
-                    <div class="gm-tile-avatar">أنت</div>
-                  </div>
-                  <div class="gm-tile-name">أنت</div>
-                </div>
-              </div>
-
-              <!-- أزرار التحكم -->
-              <div class="gm-controls" id="gmControls">
-                <div class="gm-ctrl-group">
-                  <button class="gm-ctrl-btn" id="gmMicBtn" onclick="gmToggleMic()" title="كتم المايك"><i class="fa-solid fa-microphone"></i></button>
-                  <span class="gm-ctrl-label">المايك</span>
-                </div>
-                <div class="gm-ctrl-group">
-                  <button class="gm-ctrl-btn" id="gmCamBtn" onclick="gmToggleCam()" title="إيقاف الكاميرا"><i class="fa-solid fa-video"></i></button>
-                  <span class="gm-ctrl-label">الكاميرا</span>
-                </div>
-                <div class="gm-ctrl-group">
-                  <button class="gm-ctrl-btn gm-ctrl-danger" onclick="gmEndCall()" title="إنهاء المكالمة"><i class="fa-solid fa-phone-slash"></i></button>
-                  <span class="gm-ctrl-label">إنهاء</span>
-                </div>
-                <div class="gm-ctrl-group">
-                  <button class="gm-ctrl-btn" id="gmScreenBtn" onclick="gmToggleScreen()" title="مشاركة الشاشة"><i class="fa-solid fa-display"></i></button>
-                  <span class="gm-ctrl-label">الشاشة</span>
-                </div>
-                <div class="gm-ctrl-group">
-                  <button class="gm-ctrl-btn" id="gmChatPanelBtn" onclick="gmToggleChatPanel()" title="الدردشة"><i class="fa-solid fa-comment-dots"></i><span class="gm-ctrl-chat-badge" id="gmChatBadge" style="display:none;">0</span></button>
-                  <span class="gm-ctrl-label">الدردشة</span>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- واجهة استقبال مكالمة واردة -->
-            <div class="gm-incoming" id="gmIncoming" style="display:none;">
-              <div class="gm-incoming-ring"></div>
-              <div class="gm-incoming-avatar" id="gmIncomingAvatar">?</div>
-              <h3 id="gmIncomingName">مديرية —</h3>
-              <p id="gmIncomingType">مكالمة واردة...</p>
-              <div class="gm-incoming-actions">
-                <button class="gm-incoming-btn gm-accept-video" onclick="gmAcceptCall(true)"><i class="fa-solid fa-video"></i> قبول بالفيديو</button>
-                <button class="gm-incoming-btn gm-accept-audio" onclick="gmAcceptCall(false)"><i class="fa-solid fa-phone"></i> قبول صوتي</button>
-                <button class="gm-incoming-btn gm-accept-text" onclick="gmAcceptCallText()"><i class="fa-solid fa-comment"></i> انضم بالدردشة فقط</button>
-                <button class="gm-incoming-btn gm-reject" onclick="gmRejectCall()"><i class="fa-solid fa-phone-slash"></i> رفض</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- 🎬 الفيديوهات التعليمية — من المديرية للمراكز والمعاهد -->
     <section class="page hidden" id="page-edu-videos">
       <div class="page-header">
@@ -4526,36 +2633,6 @@ tbody td:last-child {
         <div class="empty-msg">جاري تحميل الفيديوهات...</div>
       </div>
     </section>
-
-    <!-- 💬 نافذة الدردشة العائمة أثناء المكالمة (خارج القسم لكي تطفو فوق كل الصفحات) -->
-    <div class="gm-chat-panel" id="gmChatPanel" style="display:none;">
-      <div class="gm-chat-panel-head" id="gmChatPanelHead">
-        <div class="gm-cp-head-title">
-          <i class="fa-solid fa-comments"></i>
-          <strong>دردشة المكالمة</strong>
-          <span class="gm-ctrl-chat-badge" id="gmChatBadgeFloat" style="display:none;">0</span>
-        </div>
-        <div class="gm-cp-head-actions">
-          <button onclick="gmMinimizeChatPanel()" title="تصغير"><i class="fa-solid fa-minus"></i></button>
-          <button onclick="gmToggleChatPanel()" title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-      </div>
-      <div class="gm-chat-panel-msgs" id="gmChatPanelMsgs"></div>
-      <div class="gm-chat-panel-attach-area" id="gmAttachArea">
-        <div id="gmAttachPreview"></div>
-        <div class="gm-attach-btns">
-          <label title="صورة"><i class="fa-solid fa-image"></i> صورة<input type="file" accept="image/*" hidden onchange="gmHandleAttach(event,'image')"></label>
-          <label title="فيديو"><i class="fa-solid fa-film"></i> فيديو<input type="file" accept="video/*" hidden onchange="gmHandleAttach(event,'video')"></label>
-          <label title="صوت"><i class="fa-solid fa-music"></i> صوت<input type="file" accept="audio/*" hidden onchange="gmHandleAttach(event,'audio')"></label>
-          <label title="ملف"><i class="fa-solid fa-file-lines"></i> ملف<input type="file" accept="*/*" hidden onchange="gmHandleAttach(event,'file')"></label>
-        </div>
-      </div>
-      <div class="gm-chat-panel-input">
-        <button class="gm-cp-attach-toggle" id="gmAttachToggle" onclick="gmToggleAttachArea()" title="إرفاق ملف"><i class="fa-solid fa-paperclip"></i></button>
-        <input type="text" id="gmChatPanelInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendGmCallMessage()">
-        <button class="gm-cp-send-btn" onclick="sendGmCallMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-      </div>
-    </div>
 
     <!-- 🎓 الأساتذة المتدخلين -->
     <section class="page hidden teachers-page" id="page-teachers">
@@ -4735,6 +2812,20 @@ tbody td:last-child {
   </div>
 </div>
 
+<div class="modal-overlay" id="readStatusModal" onclick="if(event.target===this)closeReadStatusModal()">
+  <div class="modal-box" style="max-width:850px; max-height:88vh;">
+    <div class="modal-head">
+      <div>
+        <h3 id="readModalTitle">👁️ تفاصيل الاطلاع والقراءة للمؤسسات</h3>
+        <div class="sub" id="readModalSubtitle"></div>
+      </div>
+      <button class="btn-close-modal" onclick="closeReadStatusModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="readModalBody">
+    </div>
+  </div>
+</div>
+
 <div id="lightboxOverlay" onclick="closeLightbox()"><div class="lightbox-close"><i class="fa-solid fa-xmark"></i></div><img id="lightboxImg" src="" alt="صورة مكبرة"></div>
 
 <script>
@@ -4820,6 +2911,10 @@ let MASTER_PASSWORD = "1996";
 let currentRole = null;
 let currentDepartment = null;
 let activeIssues = [];
+let userGuides = [];
+let broadcastPendingAttachment = null;
+let guidePendingAttachment = null;
+let guideTargetScope = 'all';
 let archivedIssues = [];
 let fileTypes = [];
 let centerIssues = [];
@@ -5259,6 +3354,14 @@ let _lastIssueNotifiedCode = ''; // لمنع تكرار الإشعار عند إ
     updateUI();
   });
 
+  database.ref('data/userGuides').on('value', (snapshot) => {
+    const val = snapshot.val();
+    userGuides = val || [];
+    _markSynced('userGuides', userGuides);
+    pulseSyncBadge();
+    updateUI();
+  });
+
   database.ref('data/archivedIssues').on('value', (snapshot) => {
     const val = snapshot.val();
     if (!val) return;
@@ -5416,7 +3519,7 @@ function updateUI() {
 // الحاجة لفتح القسم — تُحدَّث تلقائياً مع كل updateUI()
 function updateNavBadges() {
   if (currentRole === 'directorate') {
-    const pendingCount = activeIssues.filter(i => !(i.status && i.status.indexOf('تم الحل') !== -1)).length;
+    const pendingCount = activeIssues.filter(i => !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم' && !(i.status && i.status.indexOf('تم الحل') !== -1)).length;
     const badge = document.getElementById('navBadgeList');
     if (badge) {
       if (pendingCount > 0) { badge.textContent = pendingCount; badge.style.display = 'inline-flex'; }
@@ -5428,6 +3531,28 @@ function updateNavBadges() {
     if (badge) {
       if (pendingCount > 0) { badge.textContent = pendingCount; badge.style.display = 'inline-flex'; }
       else { badge.style.display = 'none'; }
+    }
+  } else if (currentRole === 'center') {
+    const centerName = getCenterName();
+    const unreadCorr = activeIssues.filter(i => 
+      (i.source === 'directorate' || i.isBroadcast) && 
+      isTargetedToCenter(i, centerName) && 
+      (!i.readBy || !i.readBy[centerName])
+    ).length;
+    const corrBadge = document.getElementById('navBadgeBroadcastCenter');
+    if (corrBadge) {
+      if (unreadCorr > 0) { corrBadge.textContent = unreadCorr; corrBadge.style.display = 'inline-flex'; }
+      else { corrBadge.style.display = 'none'; }
+    }
+
+    const unreadGuides = userGuides.filter(g => 
+      isTargetedToCenter(g, centerName) && 
+      (!g.readBy || !g.readBy[centerName])
+    ).length;
+    const guideBadge = document.getElementById('navBadgeUserGuidesCenter');
+    if (guideBadge) {
+      if (unreadGuides > 0) { guideBadge.textContent = unreadGuides; guideBadge.style.display = 'inline-flex'; }
+      else { guideBadge.style.display = 'none'; }
     }
   }
 }
@@ -5903,11 +4028,6 @@ function initApp() {
   requestBrowserNotificationPermission();
   
   listenToFirebase();
-  // 📣 بدء الاستماع الفوري لدعوات الاجتماع (حتى قبل فتح صفحة قاعة الاجتماعات)
-  // هذا يضمن ظهور الإشعار الصوتي والمرئي العائم فور وصول دعوة من المديرية
-  if (typeof listenToMeetInvitations === 'function' && currentRole !== 'directorate') {
-    listenToMeetInvitations();
-  }
   if (currentRole === 'directorate') listenToPasswordRequestsForDirectorate();
   // 💬 محادثة المؤسسات: نظام مستقل بالكامل الآن (push لكل رسالة) — راجع appendInterChatMessage
   listenToInterChat();
@@ -6054,13 +4174,13 @@ function setupSidebar() {
       <li><button class="nav-btn" data-tab="dept-dashboard" onclick="switchTab('dept-dashboard')"><i class="fa-solid fa-chart-simple"></i> أداء المصالح</button></li>
       <li><button class="nav-btn" data-tab="departments" onclick="switchTab('departments')"><i class="fa-solid fa-users-gear"></i> إدارة المصالح</button></li>
       <li><button class="nav-btn" data-tab="add" onclick="switchTab('add')"><i class="fa-solid fa-pen-to-square"></i> تدوين إنشغال</button></li>
-      <li><button class="nav-btn" data-tab="broadcast" onclick="switchTab('broadcast')"><i class="fa-solid fa-bullhorn"></i> إرسال إنشغال</button></li>
+      <li><button class="nav-btn" data-tab="broadcast" onclick="switchTab('broadcast')"><i class="fa-solid fa-envelope-open-text"></i> المراسلات والمهام <span class="nav-badge" id="navBadgeBroadcast" style="display:none;"></span></button></li>
+      <li><button class="nav-btn" data-tab="user-guides" onclick="switchTab('user-guides')"><i class="fa-solid fa-book-bookmark"></i> دليل الاستعمال <span class="nav-badge" id="navBadgeUserGuides" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="list" onclick="switchTab('list')"><i class="fa-solid fa-list-check"></i> متابعة الإنشغالات <span class="nav-badge" id="navBadgeList" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="archive" onclick="switchTab('archive')"><i class="fa-solid fa-box-archive"></i> الأرشيف</button></li>
       <li><button class="nav-btn" data-tab="tokens" onclick="switchTab('tokens')"><i class="fa-solid fa-key"></i> كلمات السر</button></li>
       <li><button class="nav-btn" data-tab="audit-log" onclick="switchTab('audit-log')"><i class="fa-solid fa-shield-halved"></i> سجل التدقيق</button></li>
       <li><button class="nav-btn" data-tab="inter-directorates" onclick="switchTab('inter-directorates')"><i class="fa-solid fa-network-wired"></i> شبكة المديريات <span class="nav-badge" id="navBadgeIdn" style="display:none"></span></button></li>
-      <li><button class="nav-btn" data-tab="gm-chat" onclick="switchTab('gm-chat')"><i class="fa-solid fa-video"></i> دردشة المديريات <span class="nav-badge" id="navBadgeGm" style="display:none"></span></button></li>
       <li><button class="nav-btn" data-tab="teachers" onclick="switchTab('teachers')"><i class="fa-solid fa-chalkboard-user"></i> الأساتذة المتدخلين <span class="nav-badge" id="navBadgeTeachers" style="display:none"></span></button></li>
             <li><button class="nav-btn" data-tab="edu-videos" onclick="switchTab('edu-videos')"><i class="fa-solid fa-graduation-cap"></i> فيديوهات تعليمية</button></li>
             <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
@@ -6097,9 +4217,11 @@ function setupSidebar() {
     navList.innerHTML = `
       <li><button class="nav-btn active" data-tab="send-panel" onclick="switchTab('send-panel')"><i class="fa-solid fa-paper-plane"></i> إرسال إنشغال</button></li>
       <li><button class="nav-btn" data-tab="chat-hub" onclick="switchTab('chat-hub')"><i class="fa-solid fa-comments"></i> متابعة الردود</button></li>
+      <li><button class="nav-btn" data-tab="broadcast" onclick="switchTab('broadcast')"><i class="fa-solid fa-envelope-open-text"></i> المراسلات والمهام <span class="nav-badge" id="navBadgeBroadcastCenter" style="display:none;"></span></button></li>
+      <li><button class="nav-btn" data-tab="user-guides" onclick="switchTab('user-guides')"><i class="fa-solid fa-book-bookmark"></i> دليل الاستعمال <span class="nav-badge" id="navBadgeUserGuidesCenter" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="teachers" onclick="switchTab('teachers')"><i class="fa-solid fa-chalkboard-user"></i> الأساتذة المتدخلين</button></li>
       <li><button class="nav-btn" data-tab="edu-videos" onclick="switchTab('edu-videos')"><i class="fa-solid fa-graduation-cap"></i> فيديوهات تعليمية</button></li>
-            <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
+      <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
     `;
   }
 }
@@ -6113,18 +4235,15 @@ function switchTab(tab) {
   if (navBtn) navBtn.classList.add('active');
   if (tab === 'chat-hub' && currentRole === 'center') renderChatHub();
   if (tab === 'tokens' && currentRole === 'directorate') renderTokensGrid();
-  if (tab === 'broadcast') updateBroadcastCount();
+  if (tab === 'broadcast') renderBroadcastPage();
+  if (tab === 'user-guides') renderUserGuidesPage();
   if (tab === 'departments' && currentRole === 'directorate') renderDepartmentsList();
   if (tab === 'dept-dashboard' && currentRole === 'directorate') renderDeptDashboard();
   if (tab === 'dept-issues' && currentRole === 'department') renderDeptIssuesForDepartment();
   if (tab === 'audit-log' && currentRole === 'directorate') renderAuditLog();
   if (tab === 'inter-directorates' && currentRole === 'directorate') initInterDirectorates();
-  if (tab === 'gm-chat' && currentRole === 'directorate') initGmChat();
   if (tab === 'edu-videos') initEduVideos();
   if (tab === 'teachers') initTeachersPage();
-  if (tab === 'meet') {
-    if (typeof initMeetPage === 'function') initMeetPage();
-  }
 }
 
 // ============================================================
@@ -6239,9 +4358,11 @@ function updateTeacherRequest(key, status) {
 // 📊 DASHBOARD FUNCTIONS
 // ============================================================
 function renderKPIs() {
-  const total = activeIssues.length + archivedIssues.length;
-  const pending = activeIssues.length;
-  const done = archivedIssues.length;
+  const actualActive = activeIssues.filter(i => !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم');
+  const actualArchived = archivedIssues.filter(i => !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم');
+  const total = actualActive.length + actualArchived.length;
+  const pending = actualActive.filter(i => !(i.status && i.status.indexOf('تم الحل') !== -1)).length;
+  const done = total - pending;
   const efficiency = total > 0 ? Math.round((done / total) * 100) : 0;
   document.getElementById('kpi-total').textContent = total;
   document.getElementById('kpi-pending').textContent = pending;
@@ -6723,6 +4844,8 @@ function renderList() {
     });
   } else {
     filtered = activeIssues.filter(issue => {
+      // 🛑 عدم إظهار المراسلات، المهام، والتعاميم الصادرة في خانة متابعة الإنشغالات
+      if (issue.isBroadcast || issue.type === 'مراسلة / مهمة' || issue.type === 'تعميم') return false;
       if (currentListTab === 'directorate' && issue.source !== 'directorate') return false;
       if (currentListTab === 'centers' && issue.source !== 'center') return false;
       const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
@@ -7309,7 +5432,6 @@ function resetPasteZone() {
 //      المحادثة تحتوي مئات الرسائل — استهلاك متزايد للبيانات مع الوقت.
 //
 // الآن: كل رسالة تُخزَّن كعنصر مستقل عبر push() تحت chats/{code}/{msgId}،
-// بنفس الأسلوب المستخدم أصلاً في شات الاجتماعات المرئية (meet/.../chat).
 // هذا يضمن عدم فقدان أي رسالة عند التزامن، ويجعل حجم البيانات المرسلة مع
 // كل رسالة صغيراً وثابتاً بغض النظر عن طول المحادثة. تحديث حالة "مقروء"
 // يتم أيضاً بشكل مستهدف (تحديث الحقل الخاص بكل رسالة فقط) بدل إعادة بث
@@ -7633,7 +5755,7 @@ function renderChatHub() {
   if (!container) return;
   const centerName = getCenterName();
   const sentByCenter = centerIssues.filter(issue => issue.center === centerName);
-  const receivedFromDirectorate = activeIssues.filter(issue => issue.center === centerName && issue.source === 'directorate');
+  const receivedFromDirectorate = activeIssues.filter(issue => issue.center === centerName && issue.source === 'directorate' && !issue.isBroadcast && issue.type !== 'مراسلة / مهمة' && issue.type !== 'تعميم');
   const myIssues = [...receivedFromDirectorate, ...sentByCenter].sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
   
   if (myIssues.length === 0) { 
@@ -8139,7 +6261,7 @@ function detectIncomingDirectorateIssues(issues) {
   const seen = _getIncomingSeen();
   const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const incoming = issues
-    .filter(i => i && i.source === 'directorate' && i.center === centerName && !seen[i.code] && (i.createdAt || 0) >= cutoff)
+    .filter(i => i && i.source === 'directorate' && !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم' && i.center === centerName && !seen[i.code] && (i.createdAt || 0) >= cutoff)
     .sort((a,b) => (a.createdAt || 0) - (b.createdAt || 0));
   incoming.forEach(issue => {
     if (_incomingIssueOpenCode !== issue.code && !_incomingIssueQueue.some(q => q.code === issue.code)) _incomingIssueQueue.push(issue);
@@ -8253,37 +6375,205 @@ function closeIncomingIssueChat(showNext=true) {
 }
 
 // ============================================================
-// 📢 BROADCAST
 // ============================================================
+// 📢 المراسلات والمهام ودليل الاستعمال وحالة الاطلاع
+// ============================================================
+
+function guessAttachmentCategory(mimeType) {
+  if (!mimeType) return 'file';
+  if (mimeType.startsWith('image/')) return 'image';
+  if (mimeType.startsWith('video/')) return 'video';
+  if (mimeType.startsWith('audio/')) return 'audio';
+  return 'file';
+}
+
+function handleBroadcastFileAttach(e, category) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) {
+    showToast("⚠️ ملف كبير", "حجم الملف يتجاوز الحد الأقصى المسموح به (10 ميغابايت).");
+    e.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    broadcastPendingAttachment = {
+      name: file.name,
+      type: file.type,
+      data: ev.target.result,
+      category: category || guessAttachmentCategory(file.type),
+      size: file.size
+    };
+    renderBroadcastAttachPreview();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function removeBroadcastAttachment() {
+  broadcastPendingAttachment = null;
+  const p = document.getElementById('broadcastAttachPreview');
+  if (p) p.innerHTML = '';
+}
+
+function renderBroadcastAttachPreview() {
+  const p = document.getElementById('broadcastAttachPreview');
+  if (!p) return;
+  p.innerHTML = renderAttachmentPreviewHtml(broadcastPendingAttachment, 'removeBroadcastAttachment');
+}
+
+function handleGuideFileAttach(e, category) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) {
+    showToast("⚠️ ملف كبير", "حجم الملف يتجاوز الحد الأقصى المسموح به (10 ميغابايت).");
+    e.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    guidePendingAttachment = {
+      name: file.name,
+      type: file.type,
+      data: ev.target.result,
+      category: category || guessAttachmentCategory(file.type),
+      size: file.size
+    };
+    renderGuideAttachPreview();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function removeGuideAttachment() {
+  guidePendingAttachment = null;
+  const p = document.getElementById('guideAttachPreview');
+  if (p) p.innerHTML = '';
+}
+
+function renderGuideAttachPreview() {
+  const p = document.getElementById('guideAttachPreview');
+  if (!p) return;
+  p.innerHTML = renderAttachmentPreviewHtml(guidePendingAttachment, 'removeGuideAttachment');
+}
+
+function renderAttachmentPreviewHtml(attachment, removeFnName) {
+  if (!attachment) return '';
+  const sizeKb = attachment.size ? (attachment.size / 1024).toFixed(0) + ' KB' : '';
+  let thumb = '';
+  if (attachment.category === 'image' || (attachment.type && attachment.type.startsWith('image/'))) {
+    thumb = `<img src="${attachment.data}" style="width:60px; height:60px; object-fit:cover; border-radius:10px; border:1px solid var(--border);" alt="">`;
+  } else if (attachment.category === 'video' || (attachment.type && attachment.type.startsWith('video/'))) {
+    thumb = `<video src="${attachment.data}" style="width:80px; height:60px; object-fit:cover; border-radius:10px; border:1px solid var(--border);" muted></video>`;
+  } else {
+    thumb = `<div style="width:60px; height:60px; border-radius:10px; background:rgba(0,122,61,0.1); border:1px solid rgba(0,122,61,0.2); display:flex; align-items:center; justify-content:center; font-size:24px; color:var(--algeria-green);"><i class="fa-solid fa-file-lines"></i></div>`;
+  }
+  return `
+    <div style="display:flex; align-items:center; gap:14px; background:var(--bg-card-2); border:1.5px dashed var(--algeria-green); border-radius:14px; padding:12px 18px; margin-top:12px;">
+      ${thumb}
+      <div style="flex:1; min-width:0;">
+        <div style="font-weight:800; font-size:15px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(attachment.name)}</div>
+        <div style="font-size:13px; color:var(--algeria-green); font-weight:700;">📎 مرفق جاهز للإرسال ${sizeKb ? '• ' + sizeKb : ''}</div>
+      </div>
+      <button type="button" onclick="${removeFnName}()" style="width:36px; height:36px; border-radius:50%; border:none; background:rgba(224,27,63,0.12); color:var(--algeria-red); cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;" title="إزالة المرفق"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  `;
+}
+
+function renderMediaDisplayHtml(attachment) {
+  if (!attachment || !attachment.data) return '';
+  const cat = attachment.category || guessAttachmentCategory(attachment.type);
+  if (cat === 'image') {
+    return `<div style="margin-top:12px;">
+      <p style="font-weight:700; font-size:14px; color:var(--text-dim); margin-bottom:6px;"><i class="fa-solid fa-image"></i> الصورة المرفقة (اضغط للتكبير):</p>
+      <img src="${attachment.data}" onclick="openLightbox('${attachment.data}')" style="max-width:100%; max-height:340px; border-radius:14px; cursor:pointer; border:1px solid var(--border); box-shadow:var(--shadow-light);" alt="${escapeHtml(attachment.name || '')}">
+    </div>`;
+  }
+  if (cat === 'video') {
+    return `<div style="margin-top:12px;">
+      <p style="font-weight:700; font-size:14px; color:var(--text-dim); margin-bottom:6px;"><i class="fa-solid fa-film"></i> الفيديو المرفق:</p>
+      <video src="${attachment.data}" controls style="width:100%; max-height:380px; border-radius:14px; background:#000; box-shadow:var(--shadow-light);"></video>
+    </div>`;
+  }
+  return `<div style="margin-top:12px;">
+    <a href="${attachment.data}" download="${escapeHtml(attachment.name || 'ملف_مرفق')}" style="display:inline-flex; align-items:center; gap:10px; padding:12px 22px; background:var(--grad-brand); color:#fff; border-radius:12px; font-weight:800; font-size:15px; text-decoration:none; box-shadow:0 4px 14px rgba(0,122,61,0.2); transition:0.2s;">
+      <i class="fa-solid fa-file-arrow-down" style="font-size:20px;"></i> تحميل المرفق: ${escapeHtml(attachment.name || 'تحميل')}
+    </a>
+  </div>`;
+}
+
+function getTargetInstitutions(scope, singleName) {
+  if (scope === 'single' && singleName) {
+    const matched = INSTITUTIONS_DATA.filter(inst => inst.name === singleName);
+    if (matched.length > 0) return matched;
+    return [{ name: singleName, type: 'center', code: 'TARGET' }];
+  }
+  if (scope === 'centers') {
+    return INSTITUTIONS_DATA.filter(inst => inst.type === 'center');
+  }
+  if (scope === 'private') {
+    return INSTITUTIONS_DATA.filter(inst => inst.type === 'private');
+  }
+  return INSTITUTIONS_DATA;
+}
+
+function isTargetedToCenter(item, centerName) {
+  if (!item || !centerName) return false;
+
+  // إذا كان السجل موجهاً لمؤسسة محددة صراحةً، لا نطبّق قاعدة "الجميع" عليه.
+  // هذا يعالج السجلات القديمة التي كانت تُنشأ مرة لكل مؤسسة مع targetScope='all'،
+  // مما كان يجعل كل مؤسسة ترى نفس المراسلة بعدد المؤسسات كاملة.
+  const explicitCenter = item.center || item.targetInstitution;
+  if (explicitCenter) {
+    return item.center === centerName || item.targetInstitution === centerName;
+  }
+
+  const scope = item.targetScope || 'all';
+  if (scope === 'all') return true;
+
+  const inst = INSTITUTIONS_DATA.find(i => i.name === centerName);
+  if (scope === 'centers' && inst && inst.type === 'center') return true;
+  if (scope === 'private' && inst && inst.type === 'private') return true;
+  return false;
+}
+
+function filterBroadcastInstitutions() {
+  const q = (document.getElementById('broadcast-search-inst')?.value || '').trim().toLowerCase();
+  const sel = document.getElementById('broadcast-single-select');
+  if (!sel) return;
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="">-- اختر مؤسسة --</option>';
+  const matched = INSTITUTIONS_DATA.filter(inst => 
+    !q || inst.name.toLowerCase().includes(q) || (inst.code && inst.code.toLowerCase().includes(q))
+  );
+  matched.forEach(inst => {
+    const opt = document.createElement('option');
+    opt.value = inst.name;
+    opt.textContent = `${inst.name} (${inst.type === 'center' ? 'عمومية' : 'خاصة'} - ${inst.code})`;
+    sel.appendChild(opt);
+  });
+  if (currentVal && matched.some(m => m.name === currentVal)) {
+    sel.value = currentVal;
+  } else if (matched.length === 1 && q) {
+    sel.value = matched[0].name;
+  }
+  updateBroadcastCount();
+}
+
 function selectBroadcastTarget(target) {
   broadcastTarget = target;
-  document.querySelectorAll('.broadcast-options button').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.broadcast-options button[data-target="${target}"]`)?.classList.add('active');
+  document.querySelectorAll('#broadcast-target-opts button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`#broadcast-target-opts button[data-target="${target}"]`)?.classList.add('active');
   
   const singleContainer = document.getElementById('broadcast-single-container');
   if (singleContainer) {
     singleContainer.style.display = (target === 'single') ? 'block' : 'none';
   }
   
-  // populate single select once
   if (target === 'single') {
-    populateSingleBroadcastSelect();
+    filterBroadcastInstitutions();
   }
-  
   updateBroadcastCount();
-}
-
-function populateSingleBroadcastSelect() {
-  const sel = document.getElementById('broadcast-single-select');
-  if (!sel) return;
-  if (sel.options.length > 1) return; // already populated
-  sel.innerHTML = '<option value="">-- اختر مؤسسة --</option>';
-  INSTITUTIONS_DATA.forEach(inst => {
-    const opt = document.createElement('option');
-    opt.value = inst.name;
-    opt.textContent = inst.name + ' (' + (inst.type === 'center' ? 'مركز' : 'خاص') + ')';
-    sel.appendChild(opt);
-  });
 }
 
 function updateBroadcastCount() {
@@ -8292,19 +6582,19 @@ function updateBroadcastCount() {
   if (!count) return;
   let targets = [];
   let label = '';
-  let btnLabel = 'إرسال التعميم';
+  let btnLabel = 'إرسال المراسلة / المهمة';
   if (broadcastTarget === 'all') {
     targets = INSTITUTIONS_DATA;
     label = 'جميع المؤسسات';
-    btnLabel = 'إرسال التعميم للجميع';
+    btnLabel = 'إرسال المراسلة / المهمة للجميع';
   } else if (broadcastTarget === 'centers') {
     targets = INSTITUTIONS_DATA.filter(i => i.type === 'center');
     label = 'المراكز والمعاهد';
-    btnLabel = 'إرسال التعميم للمراكز';
+    btnLabel = 'إرسال المراسلة للمراكز والمعاهد';
   } else if (broadcastTarget === 'private') {
     targets = INSTITUTIONS_DATA.filter(i => i.type === 'private');
     label = 'المدارس الخاصة';
-    btnLabel = 'إرسال التعميم للمدارس الخاصة';
+    btnLabel = 'إرسال المراسلة للمدارس الخاصة';
   } else if (broadcastTarget === 'single') {
     const sel = document.getElementById('broadcast-single-select');
     const chosen = sel ? sel.value : '';
@@ -8312,69 +6602,877 @@ function updateBroadcastCount() {
       targets = INSTITUTIONS_DATA.filter(i => i.name === chosen);
     }
     label = chosen ? chosen : 'مؤسسة واحدة';
-    btnLabel = chosen ? `إرسال إلى ${chosen}` : 'إرسال التعميم لمؤسسة واحدة';
+    btnLabel = chosen ? `إرسال المراسلة إلى ${chosen}` : 'إرسال لمؤسسة واحدة';
   }
   count.textContent = `سيتم الإرسال إلى: ${label} (${targets.length} مؤسسة)`;
-  if (sendBtn) sendBtn.innerHTML = `<i class="fa-solid fa-broadcast"></i> ${btnLabel}`;
+  if (sendBtn) sendBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> ${btnLabel}`;
 }
 
-function sendBroadcast() {
-  const title = document.getElementById('broadcast-title').value.trim();
-  const content = document.getElementById('broadcast-content').value.trim();
-  const priority = document.getElementById('broadcast-priority').value;
-  if (!title || !content) { alert("يرجى كتابة عنوان ونص التعميم قبل الإرسال."); return; }
-  let targets = [];
-  if (broadcastTarget === 'all') targets = INSTITUTIONS_DATA;
-  else if (broadcastTarget === 'centers') targets = INSTITUTIONS_DATA.filter(i => i.type === 'center');
-  else if (broadcastTarget === 'private') targets = INSTITUTIONS_DATA.filter(i => i.type === 'private');
-  else if (broadcastTarget === 'single') {
-    const sel = document.getElementById('broadcast-single-select');
-    const chosen = sel ? sel.value : '';
-    if (chosen) targets = INSTITUTIONS_DATA.filter(i => i.name === chosen);
+function sendCorrespondence() {
+  const title = (document.getElementById('broadcast-title')?.value || '').trim();
+  const content = (document.getElementById('broadcast-content')?.value || '').trim();
+  const priority = document.getElementById('broadcast-priority')?.value || 'عادي';
+  if (!title || !content) {
+    showToast("⚠️ بيانات ناقصة", "يرجى كتابة عنوان ونص المراسلة أو المهمة قبل الإرسال.");
+    return;
   }
-  if (targets.length === 0) { alert("لا توجد مؤسسات في الفئة المحددة. يرجى اختيار مؤسسة واحدة."); return; }
+
+  let targets = [];
+  let singleSelectedInstName = null;
+  if (broadcastTarget === 'all') {
+    targets = INSTITUTIONS_DATA;
+  } else if (broadcastTarget === 'centers') {
+    targets = INSTITUTIONS_DATA.filter(i => i.type === 'center');
+  } else if (broadcastTarget === 'private') {
+    targets = INSTITUTIONS_DATA.filter(i => i.type === 'private');
+  } else if (broadcastTarget === 'single') {
+    const sel = document.getElementById('broadcast-single-select');
+    singleSelectedInstName = sel ? sel.value : '';
+    if (singleSelectedInstName) {
+      targets = INSTITUTIONS_DATA.filter(i => i.name === singleSelectedInstName);
+    }
+  }
+
+  if (targets.length === 0) {
+    showToast("⚠️ تنبيه", "يرجى اختيار المؤسسة المستقبلة.");
+    return;
+  }
+
   const code = generateRefCode();
-  targets.forEach(inst => {
-    const issue = { 
-      code: code + '-' + inst.code, 
-      center: inst.name, 
-      type: "تعميم", 
-      title: title,
-      content: content,
-      priority: priority, 
-      author: "المديرية (تعميم)", 
-      details: `📢 **${title}**\n\n${content}\n\n📌 هذا التعميم مرسل إلى: ${inst.name}`, 
-      status: "قيد المعالجة 🔄", 
-      createdAt: Date.now(), 
-      source: 'directorate', 
-      attachments: [], 
-      isBroadcast: true,
-      department: '',
-      transferHistory: []
-    };
-    activeIssues.unshift(issue);
-  });
+  const batchCode = 'CORR-' + Date.now();
+  const timestamp = Date.now();
+  const isSingleTarget = broadcastTarget === 'single';
+  const primaryTarget = isSingleTarget ? targets[0] : null;
+
+  // مهم: عند اختيار الجميع/المراكز/المدارس الخاصة نسجل مراسلة واحدة فقط
+  // مع targetScope مناسب، بدل إنشاء نسخة لكل مؤسسة. هذا يمنع ظهورها مكررة
+  // داخل كل مؤسسة ويحافظ على حجم قاعدة البيانات والملف.
+  const issue = {
+    code: code + '-' + (isSingleTarget ? (primaryTarget.code || 'TARGET') : String(broadcastTarget).toUpperCase()),
+    batchCode: batchCode,
+    center: isSingleTarget ? primaryTarget.name : '',
+    targetScope: broadcastTarget,
+    targetInstitution: isSingleTarget ? primaryTarget.name : null,
+    targetCount: targets.length,
+    type: "مراسلة / مهمة",
+    title: title,
+    content: content,
+    priority: priority,
+    author: "المديرية",
+    details: content,
+    status: "قيد المعالجة 🔄",
+    createdAt: timestamp,
+    source: 'directorate',
+    attachments: broadcastPendingAttachment ? [broadcastPendingAttachment] : [],
+    isBroadcast: true,
+    readBy: {},
+    department: '',
+    transferHistory: []
+  };
+
+  activeIssues.unshift(issue);
+
   saveToFirebase();
   renderKPIs();
   updateChart();
   renderList();
-  let toastMsg = `تم إرسال التعميم إلى ${targets.length} مؤسسة`;
-  if (broadcastTarget === 'single' && targets.length === 1) {
-    toastMsg = `تم إرسال التعميم إلى ${targets[0].name}`;
-  }
-  showToast("📢 تم الإرسال", toastMsg);
 
-  // reset single select if used
-  if (broadcastTarget === 'single') {
-    const sel = document.getElementById('broadcast-single-select');
-    if (sel) sel.value = '';
-  }
+  showToast("✅ تم الإرسال", `تم إرسال المراسلة/المهمة بنجاح إلى ${targets.length} مؤسسة`);
 
   document.getElementById('broadcast-title').value = '';
   document.getElementById('broadcast-content').value = '';
+  removeBroadcastAttachment();
 
-  // refresh count / button label
+  if (broadcastTarget === 'single') {
+    const sel = document.getElementById('broadcast-single-select');
+    if (sel) sel.value = '';
+    const searchInput = document.getElementById('broadcast-search-inst');
+    if (searchInput) searchInput.value = '';
+  }
+
   updateBroadcastCount();
+  renderBroadcastPage();
+}
+
+function sendBroadcast() { sendCorrespondence(); }
+
+function selectGuideTarget(target) {
+  guideTargetScope = target;
+  document.querySelectorAll('#guide-target-opts button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`#guide-target-opts button[data-target="${target}"]`)?.classList.add('active');
+
+  const singleContainer = document.getElementById('guide-single-container');
+  if (singleContainer) {
+    singleContainer.style.display = (target === 'single') ? 'block' : 'none';
+  }
+
+  if (target === 'single') {
+    filterGuideInstitutions();
+  }
+  updateGuideCount();
+}
+
+function filterGuideInstitutions() {
+  const q = (document.getElementById('guide-search-inst')?.value || '').trim().toLowerCase();
+  const sel = document.getElementById('guide-single-select');
+  if (!sel) return;
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="">-- اختر مؤسسة --</option>';
+  const matched = INSTITUTIONS_DATA.filter(inst => 
+    !q || inst.name.toLowerCase().includes(q) || (inst.code && inst.code.toLowerCase().includes(q))
+  );
+  matched.forEach(inst => {
+    const opt = document.createElement('option');
+    opt.value = inst.name;
+    opt.textContent = `${inst.name} (${inst.type === 'center' ? 'عمومية' : 'خاصة'} - ${inst.code})`;
+    sel.appendChild(opt);
+  });
+  if (currentVal && matched.some(m => m.name === currentVal)) {
+    sel.value = currentVal;
+  } else if (matched.length === 1 && q) {
+    sel.value = matched[0].name;
+  }
+  updateGuideCount();
+}
+
+function updateGuideCount() {
+  const count = document.getElementById('guideCount');
+  const sendBtn = document.getElementById('guide-publish-btn');
+  if (!count) return;
+  let targets = [];
+  let label = '';
+  if (guideTargetScope === 'all') {
+    targets = INSTITUTIONS_DATA;
+    label = 'جميع المؤسسات';
+  } else if (guideTargetScope === 'centers') {
+    targets = INSTITUTIONS_DATA.filter(i => i.type === 'center');
+    label = 'المراكز والمعاهد';
+  } else if (guideTargetScope === 'private') {
+    targets = INSTITUTIONS_DATA.filter(i => i.type === 'private');
+    label = 'المدارس الخاصة';
+  } else if (guideTargetScope === 'single') {
+    const sel = document.getElementById('guide-single-select');
+    const chosen = sel ? sel.value : '';
+    if (chosen) {
+      targets = INSTITUTIONS_DATA.filter(i => i.name === chosen);
+    }
+    label = chosen ? chosen : 'مؤسسة واحدة';
+  }
+  count.textContent = `موجه إلى: ${label} (${targets.length} مؤسسة)`;
+  if (sendBtn) sendBtn.innerHTML = `<i class="fa-solid fa-book-medical"></i> نشر دليل الاستعمال (${targets.length} مؤسسة)`;
+}
+
+function publishUserGuide() {
+  const title = (document.getElementById('guide-title')?.value || '').trim();
+  const category = document.getElementById('guide-category')?.value || 'دليل مستخدم 📘';
+  const details = (document.getElementById('guide-details')?.value || '').trim();
+  if (!title || !details) {
+    showToast("⚠️ بيانات ناقصة", "يرجى إدخال عنوان وشرح دليل الاستعمال.");
+    return;
+  }
+
+  let singleSelectedInstName = null;
+  if (guideTargetScope === 'single') {
+    const sel = document.getElementById('guide-single-select');
+    singleSelectedInstName = sel ? sel.value : '';
+    if (!singleSelectedInstName) {
+      showToast("⚠️ تنبيه", "يرجى اختيار المؤسسة المستهدفة.");
+      return;
+    }
+  }
+
+  const guide = {
+    id: 'GUIDE-' + Date.now(),
+    title: title,
+    category: category,
+    targetScope: guideTargetScope,
+    targetInstitution: singleSelectedInstName,
+    details: details,
+    attachment: guidePendingAttachment || null,
+    createdAt: Date.now(),
+    author: 'المديرية',
+    readBy: {}
+  };
+
+  userGuides.unshift(guide);
+  database.ref('data/userGuides').set(userGuides).then(() => {
+    showToast("✅ تم النشر", `تم نشر دليل الاستعمال "${title}" بنجاح.`);
+    document.getElementById('guide-title').value = '';
+    document.getElementById('guide-details').value = '';
+    removeGuideAttachment();
+    if (guideTargetScope === 'single') {
+      const sel = document.getElementById('guide-single-select');
+      if (sel) sel.value = '';
+      const searchInput = document.getElementById('guide-search-inst');
+      if (searchInput) searchInput.value = '';
+    }
+    updateGuideCount();
+    renderUserGuidesPage();
+  }).catch(err => {
+    console.error(err);
+    showToast("⚠️ خطأ", "تعذر نشر دليل الاستعمال في الخادم.");
+  });
+}
+
+function deleteUserGuide(guideId) {
+  if (!confirm("هل أنت متأكد من حذف دليل الاستعمال هذا؟")) return;
+  userGuides = userGuides.filter(g => g.id !== guideId);
+  database.ref('data/userGuides').set(userGuides).then(() => {
+    showToast("🗑️ تم الحذف", "تم حذف دليل الاستعمال بنجاح.");
+    renderUserGuidesPage();
+  });
+}
+
+function renderBroadcastPage() {
+  const container = document.getElementById('broadcastPageContent');
+  if (!container) return;
+
+  if (currentRole === 'directorate') {
+    renderDirectorateBroadcastPage(container);
+  } else if (currentRole === 'center') {
+    const centerName = getCenterName();
+    let updated = false;
+    activeIssues.forEach(issue => {
+      if ((issue.source === 'directorate' || issue.isBroadcast) && isTargetedToCenter(issue, centerName)) {
+        if (!issue.readBy || !issue.readBy[centerName]) {
+          issue.readBy = issue.readBy || {};
+          issue.readBy[centerName] = Date.now();
+          updated = true;
+        }
+      }
+    });
+    if (updated) saveToFirebase();
+
+    renderCenterBroadcastPage(container);
+  } else {
+    container.innerHTML = `<div class="empty-msg">هذه الصفحة مخصصة للمديرية والمؤسسات فقط.</div>`;
+  }
+}
+
+function renderDirectorateBroadcastPage(container) {
+  if (!container) return;
+
+  const sentCorr = activeIssues.filter(i => (i.source === 'directorate' || i.isBroadcast));
+  const uniqueBatches = [];
+  const seenBatches = new Set();
+
+  sentCorr.forEach(item => {
+    const key = item.batchCode || item.code.split('-')[0] + '-' + (item.code.split('-')[1] || '0');
+    if (!seenBatches.has(key)) {
+      seenBatches.add(key);
+      const batchItems = sentCorr.filter(b => (b.batchCode && b.batchCode === key) || (b.code && b.code.startsWith(key)));
+      const primary = batchItems[0] || item;
+      const scope = primary.targetScope || (batchItems.length === 1 ? 'single' : 'all');
+      const singleTarget = primary.targetInstitution || primary.center;
+      const targetInsts = getTargetInstitutions(scope, singleTarget);
+      
+      const readByMap = {};
+      batchItems.forEach(bi => {
+        if (bi.readBy) {
+          Object.keys(bi.readBy).forEach(cn => readByMap[cn] = bi.readBy[cn]);
+        }
+        if (bi.readByCenter) {
+          readByMap[bi.center] = bi.readByCenter;
+        }
+      });
+
+      const readCount = targetInsts.filter(inst => readByMap[inst.name]).length;
+
+      uniqueBatches.push({
+        batchKey: key,
+        primary: primary,
+        title: primary.title || primary.content || primary.code,
+        details: primary.details || primary.content,
+        createdAt: primary.createdAt,
+        priority: primary.priority || 'عادي',
+        attachments: primary.attachments || [],
+        targetScope: scope,
+        targetInstitution: singleTarget,
+        targetInsts: targetInsts,
+        readByMap: readByMap,
+        readCount: readCount,
+        totalTargets: targetInsts.length
+      });
+    }
+  });
+
+  uniqueBatches.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  let sentRowsHtml = uniqueBatches.map(batch => {
+    const dateStr = batch.createdAt ? new Date(batch.createdAt).toLocaleString('ar-DZ', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+    
+    let targetBadge = 'الجميع 🌐';
+    if (batch.targetScope === 'centers') targetBadge = 'المراكز والمعاهد 🏛️';
+    else if (batch.targetScope === 'private') targetBadge = 'المدارس الخاصة 🏫';
+    else if (batch.targetScope === 'single') targetBadge = escapeHtml(batch.targetInstitution || 'مؤسسة واحدة');
+
+    let attachBadge = 'لا يوجد';
+    if (batch.attachments && batch.attachments.length > 0) {
+      const att = batch.attachments[0];
+      if (att.category === 'image' || (att.type && att.type.startsWith('image/'))) attachBadge = '🖼️ صورة';
+      else if (att.category === 'video' || (att.type && att.type.startsWith('video/'))) attachBadge = '🎥 فيديو';
+      else attachBadge = '📄 ملف مرفق';
+    }
+
+    const pct = batch.totalTargets > 0 ? Math.round((batch.readCount / batch.totalTargets) * 100) : 0;
+    const readBadgeClass = pct === 100 ? 'status-badge resolved' : (pct > 0 ? 'pill pill-medium' : 'status-badge pending');
+
+    return `
+      <tr>
+        <td><strong style="font-size:15px;">${escapeHtml(batch.batchKey)}</strong></td>
+        <td><strong style="font-size:16px; color:var(--text);">${escapeHtml(batch.title)}</strong></td>
+        <td><span class="pill pill-normal">${targetBadge}</span></td>
+        <td style="font-size:14px; color:var(--text-dim);">${dateStr}</td>
+        <td style="font-size:14px; font-weight:700;">${attachBadge}</td>
+        <td><span class="${readBadgeClass}"><i class="fa-solid fa-eye"></i> ${batch.readCount}/${batch.totalTargets} (${pct}%)</span></td>
+        <td>
+          <button class="btn-mini view-btn" onclick="openReadStatusModal('${batch.batchKey}', 'correspondence')">
+            <i class="fa-solid fa-users-viewfinder"></i> تفاصيل القراءة
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  if (uniqueBatches.length === 0) {
+    sentRowsHtml = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-dim); font-size:16px;">لا توجد مراسلات أو مهام صادرة حتى الآن.</td></tr>`;
+  }
+
+  container.innerHTML = `
+    <div class="page-header">
+      <h2><i class="fa-solid fa-envelope-open-text"></i> المراسلات والمهام</h2>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="form-card" style="margin-bottom:28px;">
+      <h3 style="font-size:20px; font-weight:900; color:var(--algeria-green); margin-bottom:18px; display:flex; align-items:center; gap:10px;">
+        <i class="fa-solid fa-paper-plane"></i> إرسال مراسلة أو تكليف بمهمة جديدة
+      </h3>
+
+      <div class="broadcast-section" style="margin-bottom:20px;">
+        <h4>🎯 اختر الجهة المستقبلة والبحث بالاسم</h4>
+        <div class="broadcast-options" id="broadcast-target-opts">
+          <button class="active" data-target="all" onclick="selectBroadcastTarget('all')">الجميع 🌐</button>
+          <button data-target="centers" onclick="selectBroadcastTarget('centers')">المراكز والمعاهد 🏛️</button>
+          <button data-target="private" onclick="selectBroadcastTarget('private')">المدارس الخاصة 🏫</button>
+          <button data-target="single" onclick="selectBroadcastTarget('single')">مؤسسة واحدة 🏢</button>
+        </div>
+
+        <div id="broadcast-single-container" style="display:none; margin-top:14px; background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:16px;">
+          <label style="font-weight:800; display:block; margin-bottom:8px; color:var(--text);">🔍 البحث عن مؤسسة بالاسم وإرسال المراسلة إليها مباشرة:</label>
+          <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <input type="text" id="broadcast-search-inst" placeholder="اكتب اسم أو رمز المؤسسة للبحث..." oninput="filterBroadcastInstitutions()" style="flex:1; padding:13px 18px; background:var(--input-bg); border:2px solid var(--border); border-radius:12px; font-size:17px;">
+          </div>
+          <select id="broadcast-single-select" style="width:100%; padding:14px 18px; background:var(--input-bg); border:2px solid var(--input-border); border-radius:12px; font-size:17px; font-weight:700;" onchange="updateBroadcastCount()">
+            <option value="">-- اختر مؤسسة --</option>
+          </select>
+        </div>
+
+        <p style="font-size:16px; color:var(--algeria-green); font-weight:800; margin-top:10px;" id="broadcastCount">
+          سيتم الإرسال إلى: جميع المؤسسات (${INSTITUTIONS_DATA.length} مؤسسة)
+        </p>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field full">
+          <label><i class="fa-solid fa-heading"></i> عنوان المراسلة / المهمة</label>
+          <input type="text" id="broadcast-title" placeholder="أدخل عنوان المراسلة أو التكليف بالمهام...">
+        </div>
+
+        <div class="form-field full">
+          <label><i class="fa-solid fa-align-right"></i> نص المراسلة / التكليف / التفاصيل</label>
+          <textarea id="broadcast-content" class="broadcast-textarea" placeholder="اكتب تفاصيل المراسلة أو المهام المطلوبة..."></textarea>
+        </div>
+
+        <div class="form-field full">
+          <label><i class="fa-solid fa-flag"></i> درجة الأهمية</label>
+          <select id="broadcast-priority">
+            <option value="عادي">عادي 🟢</option>
+            <option value="متوسط">متوسط 🟡</option>
+            <option value="مستعجل جداً">مستعجل جداً 🔴</option>
+          </select>
+        </div>
+
+        <div class="form-field full">
+          <label><i class="fa-solid fa-paperclip"></i> إرفاق وسائط (صورة / فيديو / ملف)</label>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
+            <label class="btn-mini" style="background:rgba(0,122,61,0.08); color:var(--algeria-green); border-color:var(--algeria-green); cursor:pointer;">
+              <i class="fa-solid fa-image"></i> إرفاق صورة
+              <input type="file" id="broadcastImgInput" accept="image/*" hidden onchange="handleBroadcastFileAttach(event, 'image')">
+            </label>
+            <label class="btn-mini" style="background:rgba(212,175,55,0.12); color:#9a7418; border-color:var(--gold); cursor:pointer;">
+              <i class="fa-solid fa-film"></i> إرفاق فيديو
+              <input type="file" id="broadcastVidInput" accept="video/*" hidden onchange="handleBroadcastFileAttach(event, 'video')">
+            </label>
+            <label class="btn-mini" style="background:rgba(224,27,63,0.08); color:var(--algeria-red); border-color:var(--algeria-red); cursor:pointer;">
+              <i class="fa-solid fa-file-arrow-up"></i> إرفاق ملف (PDF / Word / Excel)
+              <input type="file" id="broadcastFileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,*/*" hidden onchange="handleBroadcastFileAttach(event, 'file')">
+            </label>
+          </div>
+          <div id="broadcastAttachPreview"></div>
+        </div>
+      </div>
+
+      <button id="broadcast-send-btn" class="btn-gold" style="width:100%; justify-content:center; margin-top:18px;" onclick="sendCorrespondence()">
+        <i class="fa-solid fa-paper-plane"></i> إرسال المراسلة / المهمة
+      </button>
+    </div>
+
+    <!-- SENT ITEMS & READ STATUS TABLE -->
+    <div class="form-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+        <h3 style="font-size:20px; font-weight:900; color:var(--text);"><i class="fa-solid fa-list-check"></i> المراسلات والمهام الصادرة وحالة القراءة والاطلاع</h3>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="min-width:140px;">الرمز المرجعي</th>
+                <th style="min-width:200px;">العنوان</th>
+                <th style="min-width:160px;">الجهة المستهدفة</th>
+                <th style="min-width:140px;">تاريخ الإرسال</th>
+                <th style="min-width:110px;">المرفق</th>
+                <th style="min-width:180px;">حالة القراءة والاطلاع</th>
+                <th style="min-width:140px;">تفاصيل الاطلاع</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sentRowsHtml}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (broadcastPendingAttachment) renderBroadcastAttachPreview();
+  updateBroadcastCount();
+}
+
+function renderCenterBroadcastPage(container) {
+  if (!container) return;
+
+  const centerName = getCenterName();
+  const myCorr = activeIssues.filter(i => (i.source === 'directorate' || i.isBroadcast) && isTargetedToCenter(i, centerName));
+  myCorr.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  let cardsHtml = myCorr.map(issue => {
+    const timeStr = new Date(issue.createdAt || Date.now()).toLocaleString('ar-DZ', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    const priorityPill = issue.priority === 'مستعجل جداً' 
+      ? `<span class="pill pill-urgent">مستعجل جداً 🔴</span>`
+      : (issue.priority === 'متوسط' ? `<span class="pill pill-medium">متوسط 🟡</span>` : `<span class="pill pill-normal">عادي 🟢</span>`);
+    
+    let mediaHtml = '';
+    if (issue.attachments && issue.attachments.length > 0) {
+      mediaHtml = renderMediaDisplayHtml(issue.attachments[0]);
+    }
+
+    const readTime = issue.readBy ? issue.readBy[centerName] : null;
+    const readBadge = readTime 
+      ? `<span class="status-badge resolved" style="font-size:13px;"><i class="fa-solid fa-circle-check"></i> تم الاطلاع (${new Date(readTime).toLocaleTimeString('ar-DZ', {hour:'2-digit', minute:'2-digit'})})</span>`
+      : `<span class="status-badge pending" style="font-size:13px;"><i class="fa-solid fa-bell"></i> جديد</span>`;
+
+    return `
+      <div class="form-card" style="margin-bottom:20px; border-right:6px solid var(--algeria-green);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-weight:900; font-size:18px; color:var(--algeria-green);"><i class="fa-solid fa-envelope-open-text"></i> ${escapeHtml(issue.title || issue.type)}</span>
+            ${priorityPill}
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            ${readBadge}
+            <span style="font-size:14px; color:var(--text-dim); font-weight:700;"><i class="fa-regular fa-clock"></i> ${timeStr}</span>
+          </div>
+        </div>
+
+        <div style="font-size:17px; line-height:1.9; color:var(--text); white-space:pre-wrap; background:var(--bg-card-2); padding:18px; border-radius:14px; border:1px solid var(--border-light); margin-bottom:12px;">${linkifyText(issue.details || issue.content || '')}</div>
+
+        ${mediaHtml}
+      </div>
+    `;
+  }).join('');
+
+  if (myCorr.length === 0) {
+    cardsHtml = `<div class="empty-msg"><i class="fa-solid fa-envelope-open" style="font-size:48px; opacity:0.3; display:block; margin-bottom:12px;"></i>لا توجد مراسلات أو مهام واردة من المديرية.</div>`;
+  }
+
+  container.innerHTML = `
+    <div class="page-header">
+      <h2><i class="fa-solid fa-envelope-open-text"></i> المراسلات والمهام الواردة من المديرية</h2>
+    </div>
+    ${cardsHtml}
+  `;
+}
+
+function renderUserGuidesPage() {
+  const container = document.getElementById('userGuidesPageContent');
+  if (!container) return;
+
+  if (currentRole === 'directorate') {
+    renderDirectorateUserGuidesPage(container);
+  } else if (currentRole === 'center') {
+    const centerName = getCenterName();
+    let updated = false;
+    userGuides.forEach(guide => {
+      if (isTargetedToCenter(guide, centerName)) {
+        if (!guide.readBy || !guide.readBy[centerName]) {
+          guide.readBy = guide.readBy || {};
+          guide.readBy[centerName] = Date.now();
+          updated = true;
+        }
+      }
+    });
+    if (updated) database.ref('data/userGuides').set(userGuides);
+
+    renderCenterUserGuidesPage(container);
+  } else {
+    container.innerHTML = `<div class="empty-msg">هذه الصفحة مخصصة للمديرية والمؤسسات فقط.</div>`;
+  }
+}
+
+function renderDirectorateUserGuidesPage(container) {
+  if (!container) return;
+
+  const sortedGuides = [...userGuides].sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  let guideCardsHtml = sortedGuides.map(guide => {
+    const timeStr = guide.createdAt ? new Date(guide.createdAt).toLocaleString('ar-DZ', { year:'numeric', month:'short', day:'numeric' }) : '—';
+    const targetInsts = getTargetInstitutions(guide.targetScope || 'all', guide.targetInstitution);
+    const totalTargets = targetInsts.length;
+    const readBy = guide.readBy || {};
+    const readCount = targetInsts.filter(i => readBy[i.name]).length;
+    const pct = totalTargets > 0 ? Math.round((readCount / totalTargets) * 100) : 0;
+
+    let mediaHtml = '';
+    if (guide.attachment) {
+      mediaHtml = renderMediaDisplayHtml(guide.attachment);
+    }
+
+    let targetLabel = 'جميع المؤسسات 🌐';
+    if (guide.targetScope === 'centers') targetLabel = 'المراكز والمعاهد 🏛️';
+    else if (guide.targetScope === 'private') targetLabel = 'المدارس الخاصة 🏫';
+    else if (guide.targetScope === 'single') targetLabel = escapeHtml(guide.targetInstitution || 'مؤسسة واحدة');
+
+    return `
+      <div class="form-card" style="margin-bottom:20px; border-top:4px solid var(--gold);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="pill pill-normal" style="background:rgba(212,175,55,0.15); color:#8a6c0a; font-weight:800;">
+              ${escapeHtml(guide.category || 'دليل مستخدم')}
+            </span>
+            <strong style="font-size:20px; color:var(--text);">${escapeHtml(guide.title)}</strong>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="pill pill-normal">${targetLabel}</span>
+            <span style="font-size:14px; color:var(--text-dim); font-weight:700;"><i class="fa-regular fa-calendar"></i> ${timeStr}</span>
+          </div>
+        </div>
+
+        <div style="font-size:16px; line-height:1.8; color:var(--text); white-space:pre-wrap; background:var(--bg-card-2); padding:16px; border-radius:14px; margin-bottom:12px;">${linkifyText(guide.details || '')}</div>
+
+        ${mediaHtml}
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-light);">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span class="status-badge resolved" style="font-size:14px;"><i class="fa-solid fa-eye"></i> نسبة الاطلاع: ${readCount}/${totalTargets} مؤسسة (${pct}%)</span>
+            <button class="btn-mini view-btn" onclick="openReadStatusModal('${guide.id}', 'guide')">
+              <i class="fa-solid fa-users-viewfinder"></i> تفاصيل القراءة
+            </button>
+          </div>
+          <button class="btn-mini danger" onclick="deleteUserGuide('${guide.id}')">
+            <i class="fa-solid fa-trash"></i> حذف الدليل
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (sortedGuides.length === 0) {
+    guideCardsHtml = `<div class="empty-msg"><i class="fa-solid fa-book" style="font-size:48px; opacity:0.3; display:block; margin-bottom:12px;"></i>لا توجد أدلة استعمال منشورة حتى الآن.</div>`;
+  }
+
+  container.innerHTML = `
+    <div class="page-header">
+      <h2><i class="fa-solid fa-book-bookmark"></i> دليل الاستعمال والأدلة التنظيمية</h2>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="form-card" style="margin-bottom:28px;">
+      <h3 style="font-size:20px; font-weight:900; color:var(--algeria-green); margin-bottom:18px; display:flex; align-items:center; gap:10px;">
+        <i class="fa-solid fa-book-medical"></i> نشر دليل استعمال أو لائحة تنظيمية جديدة
+      </h3>
+
+      <div class="broadcast-section" style="margin-bottom:20px;">
+        <h4>🎯 اختر الفئة أو المؤسسة المستهدفة</h4>
+        <div class="broadcast-options" id="guide-target-opts">
+          <button class="active" data-target="all" onclick="selectGuideTarget('all')">الجميع 🌐</button>
+          <button data-target="centers" onclick="selectGuideTarget('centers')">المراكز والمعاهد 🏛️</button>
+          <button data-target="private" onclick="selectGuideTarget('private')">المدارس الخاصة 🏫</button>
+          <button data-target="single" onclick="selectGuideTarget('single')">مؤسسة واحدة 🏢</button>
+        </div>
+
+        <div id="guide-single-container" style="display:none; margin-top:14px; background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:16px;">
+          <label style="font-weight:800; display:block; margin-bottom:8px; color:var(--text);">🔍 البحث عن مؤسسة بالاسم للتعيين:</label>
+          <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <input type="text" id="guide-search-inst" placeholder="اكتب اسم أو رمز المؤسسة للبحث..." oninput="filterGuideInstitutions()" style="flex:1; padding:13px 18px; background:var(--input-bg); border:2px solid var(--border); border-radius:12px; font-size:17px;">
+          </div>
+          <select id="guide-single-select" style="width:100%; padding:14px 18px; background:var(--input-bg); border:2px solid var(--input-border); border-radius:12px; font-size:17px; font-weight:700;" onchange="updateGuideCount()">
+            <option value="">-- اختر مؤسسة --</option>
+          </select>
+        </div>
+
+        <p style="font-size:16px; color:var(--algeria-green); font-weight:800; margin-top:10px;" id="guideCount">
+          موجه إلى: جميع المؤسسات (${INSTITUTIONS_DATA.length} مؤسسة)
+        </p>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field full">
+          <label><i class="fa-solid fa-heading"></i> عنوان دليل الاستعمال / الشرح</label>
+          <input type="text" id="guide-title" placeholder="أدخل عنوان الدليل أو الشرح التنظيمي...">
+        </div>
+
+        <div class="form-field full">
+          <label><i class="fa-solid fa-layer-group"></i> تصنيف الدليل</label>
+          <select id="guide-category">
+            <option value="دليل مستخدم 📘">دليل مستخدم 📘</option>
+            <option value="فيديو توضيحي 🎥">فيديو توضيحي 🎥</option>
+            <option value="منشور مؤطر 📜">منشور مؤطر 📜</option>
+            <option value="تعليمات تنفيذية 🏛️">تعليمات تنفيذية 🏛️</option>
+            <option value="إجراءات تنظيمية ⚙️">إجراءات تنظيمية ⚙️</option>
+          </select>
+        </div>
+
+        <div class="form-field full">
+          <label><i class="fa-solid fa-align-right"></i> مضمون وشرح الدليل</label>
+          <textarea id="guide-details" class="broadcast-textarea" placeholder="اكتب الشرح، الخطوات، أو المضمون بالتفصيل..."></textarea>
+        </div>
+
+        <div class="form-field full">
+          <label><i class="fa-solid fa-paperclip"></i> إرفاق وسائط الدليل (صورة / فيديو / ملف PDF أو Word)</label>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
+            <label class="btn-mini" style="background:rgba(0,122,61,0.08); color:var(--algeria-green); border-color:var(--algeria-green); cursor:pointer;">
+              <i class="fa-solid fa-image"></i> إرفاق صورة
+              <input type="file" id="guideImgInput" accept="image/*" hidden onchange="handleGuideFileAttach(event, 'image')">
+            </label>
+            <label class="btn-mini" style="background:rgba(212,175,55,0.12); color:#9a7418; border-color:var(--gold); cursor:pointer;">
+              <i class="fa-solid fa-film"></i> إرفاق فيديو
+              <input type="file" id="guideVidInput" accept="video/*" hidden onchange="handleGuideFileAttach(event, 'video')">
+            </label>
+            <label class="btn-mini" style="background:rgba(224,27,63,0.08); color:var(--algeria-red); border-color:var(--algeria-red); cursor:pointer;">
+              <i class="fa-solid fa-file-arrow-up"></i> إرفاق ملف (PDF / Word)
+              <input type="file" id="guideFileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,*/*" hidden onchange="handleGuideFileAttach(event, 'file')">
+            </label>
+          </div>
+          <div id="guideAttachPreview"></div>
+        </div>
+      </div>
+
+      <button id="guide-publish-btn" class="btn-primary" style="width:100%; justify-content:center; margin-top:18px;" onclick="publishUserGuide()">
+        <i class="fa-solid fa-book-medical"></i> نشر دليل الاستعمال
+      </button>
+    </div>
+
+    <!-- PUBLISHED GUIDES LIST -->
+    <div class="form-card">
+      <h3 style="font-size:20px; font-weight:900; color:var(--text); margin-bottom:18px;">
+        <i class="fa-solid fa-book"></i> أدلة الاستعمال والمنشورات التنظيمية المنشورة
+      </h3>
+
+      ${guideCardsHtml}
+    </div>
+  `;
+
+  if (guidePendingAttachment) renderGuideAttachPreview();
+  updateGuideCount();
+}
+
+function renderCenterUserGuidesPage(container) {
+  if (!container) return;
+
+  const centerName = getCenterName();
+  const myGuides = userGuides.filter(g => isTargetedToCenter(g, centerName));
+  myGuides.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  let guideCardsHtml = myGuides.map(guide => {
+    const timeStr = guide.createdAt ? new Date(guide.createdAt).toLocaleString('ar-DZ', { year:'numeric', month:'short', day:'numeric' }) : '—';
+    
+    let mediaHtml = '';
+    if (guide.attachment) {
+      mediaHtml = renderMediaDisplayHtml(guide.attachment);
+    }
+
+    const readTime = guide.readBy ? guide.readBy[centerName] : null;
+    const readBadge = readTime 
+      ? `<span class="status-badge resolved" style="font-size:13px;"><i class="fa-solid fa-circle-check"></i> تم الاطلاع (${new Date(readTime).toLocaleTimeString('ar-DZ', {hour:'2-digit', minute:'2-digit'})})</span>`
+      : `<span class="status-badge pending" style="font-size:13px;"><i class="fa-solid fa-bell"></i> جديد</span>`;
+
+    return `
+      <div class="form-card" style="margin-bottom:20px; border-top:4px solid var(--gold);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="pill pill-normal" style="background:rgba(212,175,55,0.15); color:#8a6c0a; font-weight:800;">
+              ${escapeHtml(guide.category || 'دليل مستخدم')}
+            </span>
+            <strong style="font-size:20px; color:var(--text);">${escapeHtml(guide.title)}</strong>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            ${readBadge}
+            <span style="font-size:14px; color:var(--text-dim); font-weight:700;"><i class="fa-regular fa-calendar"></i> ${timeStr}</span>
+          </div>
+        </div>
+
+        <div style="font-size:16px; line-height:1.8; color:var(--text); white-space:pre-wrap; background:var(--bg-card-2); padding:16px; border-radius:14px; margin-bottom:12px;">${linkifyText(guide.details || '')}</div>
+
+        ${mediaHtml}
+      </div>
+    `;
+  }).join('');
+
+  if (myGuides.length === 0) {
+    guideCardsHtml = `<div class="empty-msg"><i class="fa-solid fa-book" style="font-size:48px; opacity:0.3; display:block; margin-bottom:12px;"></i>لا توجد أدلة استعمال منشورة حالياً.</div>`;
+  }
+
+  container.innerHTML = `
+    <div class="page-header">
+      <h2><i class="fa-solid fa-book-bookmark"></i> دليل الاستعمال والأدلة التنظيمية</h2>
+    </div>
+    ${guideCardsHtml}
+  `;
+}
+
+let currentModalTargets = [];
+let currentModalReadBy = {};
+
+function openReadStatusModal(itemId, type) {
+  let itemTitle = '', targetScope = 'all', targetInstitution = null, readBy = {};
+
+  if (type === 'correspondence' || type === 'broadcast') {
+    const matches = activeIssues.filter(i => i.code === itemId || i.batchCode === itemId || (i.code && i.code.startsWith(itemId)));
+    if (matches.length === 0) return;
+    const primary = matches[0];
+    itemTitle = primary.title || primary.content || primary.code;
+    targetScope = primary.targetScope || (matches.length === 1 ? 'single' : 'all');
+    targetInstitution = primary.targetInstitution || primary.center;
+    
+    readBy = {};
+    matches.forEach(m => {
+      if (m.readBy) {
+        Object.keys(m.readBy).forEach(cName => {
+          readBy[cName] = m.readBy[cName];
+        });
+      }
+      if (m.readByCenter) {
+        readBy[m.center] = m.readByCenter;
+      }
+    });
+  } else if (type === 'guide') {
+    const guide = userGuides.find(g => g.id === itemId);
+    if (!guide) return;
+    itemTitle = guide.title;
+    targetScope = guide.targetScope || 'all';
+    targetInstitution = guide.targetInstitution;
+    readBy = guide.readBy || {};
+  }
+
+  currentModalReadBy = readBy;
+  currentModalTargets = getTargetInstitutions(targetScope, targetInstitution);
+
+  const totalCount = currentModalTargets.length;
+  const readCount = currentModalTargets.filter(inst => readBy[inst.name]).length;
+  const pct = totalCount > 0 ? Math.round((readCount / totalCount) * 100) : 0;
+
+  document.getElementById('readModalTitle').textContent = `👁️ تفاصيل الاطلاع والقراءة: ${itemTitle}`;
+  document.getElementById('readModalSubtitle').textContent = `النسبة الكلية: ${readCount} من أصل ${totalCount} مؤسسة (${pct}%)`;
+
+  const modalBody = document.getElementById('readModalBody');
+  modalBody.innerHTML = `
+    <div style="background:var(--bg-card-2); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:18px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-weight:800; font-size:16px; color:var(--text);">📊 نسبة القراءة والاستلام</span>
+        <span style="font-weight:900; font-size:18px; color:var(--algeria-green);">${pct}% (${readCount}/${totalCount})</span>
+      </div>
+      <div style="width:100%; height:12px; background:var(--border-light); border-radius:10px; overflow:hidden;">
+        <div style="width:${pct}%; height:100%; background:var(--grad-brand); border-radius:10px; transition:width 0.4s ease;"></div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+      <input type="text" id="read-receipt-search" placeholder="🔍 ابحث عن مؤسسة بالاسم..." oninput="filterReadStatusModalTable()" style="flex:1; min-width:200px; padding:12px 18px; background:var(--input-bg); border:2px solid var(--border); border-radius:12px; font-size:16px;">
+      <select id="read-receipt-status-filter" onchange="filterReadStatusModalTable()" style="padding:12px 16px; background:var(--bg-card-2); border:2px solid var(--border); border-radius:12px; font-size:16px; font-weight:700;">
+        <option value="all">عرض الجميع (${totalCount})</option>
+        <option value="read">تم الاطلاع فقط (${readCount})</option>
+        <option value="unread">لم يتم الاطلاع (${totalCount - readCount})</option>
+      </select>
+    </div>
+
+    <div class="table-wrap" style="max-height:400px; overflow-y:auto;">
+      <table style="width:100%;">
+        <thead>
+          <tr>
+            <th style="width:60px; text-align:center;">#</th>
+            <th>اسم المؤسسة</th>
+            <th>النوع</th>
+            <th>حالة الاطلاع</th>
+            <th>تاريخ وساعة الاطلاع</th>
+          </tr>
+        </thead>
+        <tbody id="readReceiptsTableBody">
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  filterReadStatusModalTable();
+  document.getElementById('readStatusModal').classList.add('open');
+}
+
+function filterReadStatusModalTable() {
+  const q = (document.getElementById('read-receipt-search')?.value || '').trim().toLowerCase();
+  const filter = document.getElementById('read-receipt-status-filter')?.value || 'all';
+  const tbody = document.getElementById('readReceiptsTableBody');
+  if (!tbody) return;
+
+  let filtered = currentModalTargets.filter(inst => {
+    const isRead = !!currentModalReadBy[inst.name];
+    if (filter === 'read' && !isRead) return false;
+    if (filter === 'unread' && isRead) return false;
+    if (q && !inst.name.toLowerCase().includes(q) && !(inst.code && inst.code.toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-dim); font-size:16px;">لا توجد نتائج مطابقة.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((inst, idx) => {
+    const readTime = currentModalReadBy[inst.name];
+    const isRead = !!readTime;
+    const statusHtml = isRead 
+      ? `<span class="status-badge resolved"><i class="fa-solid fa-circle-check"></i> تم الاطلاع</span>`
+      : `<span class="status-badge pending"><i class="fa-solid fa-clock"></i> لم يطلع بعد</span>`;
+    const timeStr = isRead 
+      ? new Date(readTime).toLocaleString('ar-DZ', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })
+      : '—';
+    const typeLabel = inst.type === 'center' ? 'عمومية 🏛️' : 'خاصة 🏫';
+
+    return `
+      <tr>
+        <td style="text-align:center; font-weight:800; opacity:0.6;">${idx + 1}</td>
+        <td><strong style="font-size:16px; color:var(--text);">${escapeHtml(inst.name)}</strong><br><small style="color:var(--text-dim);">${escapeHtml(inst.code || '')}</small></td>
+        <td style="font-weight:700;">${typeLabel}</td>
+        <td>${statusHtml}</td>
+        <td style="font-size:14px; font-weight:700; color:var(--text-dim);">${timeStr}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function closeReadStatusModal() {
+  document.getElementById('readStatusModal').classList.remove('open');
 }
 
 // ============================================================
@@ -8507,7 +7605,7 @@ function logout() {
     document.getElementById('appRoot').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('loginError').style.display = 'none';
-    if (currentRole === 'directorate') { stopInterDirectorates(); gmListening = false; }
+    if (currentRole === 'directorate') { stopInterDirectorates(); }
     currentRole = null;
     currentDepartment = null;
     localStorage.removeItem(LS_KEYS.remember);
@@ -8623,718 +7721,6 @@ function sendIdnIssueReply(){const input=document.getElementById('idnIssueReply'
 function closeIdnIssue(){if(idnOpenIssueKey)nationalRef('issueThreads/'+idnOpenIssueKey).off();idnOpenIssueKey=null;document.getElementById('idnIssueModal').classList.remove('open');}
 
 // ============================================================
-// 💬 مكالمة المديريات (Google Meet — صوت+صورة+دردشة جماعي)
-// ============================================================
-let gmListening = false, gmSelectedRecipient = 'all';
-let gmInitialLoaded = false, gmCallActive = false, gmLocalStream = null;
-let gmPeerConnections = {}; // { wilayaCode: RTCPeerConnection } — دعم جماعي
-let gmRemoteStreams = {};   // { wilayaCode: MediaStream }
-let gmMicOn = true, gmCamOn = true, gmScreenOn = false, gmHasMedia = false;
-let gmCallTimerInterval = null, gmCallSeconds = 0;
-let gmUnreadChatInCall = 0, gmIncomingCallData = null;
-let gmRoomId = null, gmCallMode = 'private'; // 'private' | 'group'
-
-const GM_ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }];
-
-function initGmChat() {
-  if (currentRole !== 'directorate') return;
-  nationalRef('presence/' + selectedWilaya).set({ online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP, name: getWilayaName(selectedWilaya) });
-  if (!gmListening) {
-    gmListening = true;
-    nationalRef('messages').on('value', s => {
-      const raw = s.val() || {};
-      const oldVisible = idnMessages.filter(idnMessageVisible).length;
-      idnMessages = Object.keys(raw).map(k => ({ ...raw[k], _key: k })).sort((a, b) => (a.time || 0) - (b.time || 0));
-      renderGmConvList(); updateGmBadge();
-      const visible = idnMessages.filter(idnMessageVisible);
-      const last = visible[visible.length - 1];
-      if (gmInitialLoaded && visible.length > oldVisible && last && last.from !== selectedWilaya) {
-        activateBannerAlert();
-        const activeTab = document.querySelector('.nav-btn[data-tab="gm-chat"]')?.classList.contains('active');
-        if (!activeTab) { showToastWithAction('💬 رسالة من مديرية ' + getWilayaName(last.from), last.text || '(مرفق)', () => { switchTab('gm-chat'); }); if (!isMuted) playNotificationSound(); }
-      }
-      if (gmCallActive) renderGmCallChat();
-      gmInitialLoaded = true;
-    });
-    nationalRef('presence').on('value', s => { idnPresence = s.val() || {}; renderGmConvList(); if (gmCallActive) gmUpdateParticipantCount(); });
-    // إشارات المكالمات
-    // تنظيف الإشارات القديمة أولاً ثم الاستماع للجديدة فقط
-    nationalRef('calls/' + selectedWilaya).once('value', s => {
-      const old = s.val();
-      if (old) {
-        const now = Date.now();
-        Object.keys(old).forEach(k => {
-          const d = old[k];
-          // حذف أي إشارة أقدم من 15 ثانية
-          if (!d.timestamp || (now - d.timestamp > 15000)) {
-            nationalRef('calls/' + selectedWilaya + '/' + k).remove();
-          }
-        });
-      }
-    }).then(() => {
-      nationalRef('calls/' + selectedWilaya).on('child_added', s => {
-        const data = s.val(); if (!data) return;
-        const key = s.key;
-        // تجاهل الإشارات القديمة (أقدم من 15 ثانية)
-        if (data.timestamp && (Date.now() - data.timestamp > 15000)) {
-          nationalRef('calls/' + selectedWilaya + '/' + key).remove();
-          return;
-        }
-        if (data.type === 'offer' && !gmCallActive) { gmIncomingCallData = { ...data, _key: key }; showGmIncomingCall(gmIncomingCallData); }
-        else if (data.type === 'answer' && gmCallActive) { gmHandleAnswer(data, key); }
-        else if (data.type === 'ice-candidate' && gmCallActive) { gmHandleIceCandidate(data); }
-        else if (data.type === 'hangup' && gmCallActive) { gmRemoteHungUp(data.from); }
-        else if (data.type === 'join-room' && gmCallActive && data.roomId === gmRoomId) { gmHandleNewParticipant(data); }
-        // نظف الإشارة بعد معالجتها
-        nationalRef('calls/' + selectedWilaya + '/' + key).remove();
-      });
-    });
-  }
-  renderGmConvList(); updateGmBadge();
-}
-
-function activateBannerAlert() {
-  const banner = document.getElementById('directorateBanner');
-  if (banner) { banner.classList.add('alert-active'); setTimeout(() => banner.classList.remove('alert-active'), 8000); }
-}
-
-function selectGmRoom(code) {
-  gmSelectedRecipient = code || 'all';
-  document.getElementById('gmRoomBtn')?.classList.toggle('active', code === 'all');
-  renderGmConvList(); showGmIdle();
-}
-
-function selectGmConversation(code) {
-  gmSelectedRecipient = code;
-  document.getElementById('gmRoomBtn')?.classList.remove('active');
-  renderGmConvList(); showGmIdle();
-}
-
-function showGmIdle() {
-  document.getElementById('gmIdle').style.display = 'flex';
-  document.getElementById('gmCallActive').style.display = 'none';
-  document.getElementById('gmIncoming').style.display = 'none';
-  const groupBtn = document.getElementById('gmGroupCallBtn');
-  if (groupBtn) groupBtn.style.display = gmSelectedRecipient === 'all' ? 'inline-flex' : 'none';
-}
-
-// ========== الحصول على الوسائط (اختياري — لا يشترط) ==========
-async function gmTryGetMedia(withVideo) {
-  try {
-    const constraints = { audio: true, video: withVideo ? { width: 640, height: 480 } : false };
-    gmLocalStream = await navigator.mediaDevices.getUserMedia(constraints);
-    gmHasMedia = true;
-    gmMicOn = true; gmCamOn = withVideo;
-    document.getElementById('gmLocalVideo').srcObject = gmLocalStream;
-    document.getElementById('gmLocalOff').style.display = withVideo ? 'none' : 'flex';
-  } catch (err) {
-    console.warn('لم يتم الوصول للكاميرا/المايك، المتابعة بدون وسائط:', err.message);
-    gmLocalStream = null; gmHasMedia = false; gmMicOn = false; gmCamOn = false;
-    document.getElementById('gmLocalVideo').srcObject = null;
-    document.getElementById('gmLocalOff').style.display = 'flex';
-  }
-  gmUpdateControlBtns();
-}
-
-// ========== إنشاء اتصال P2P مع مشارك ==========
-function gmCreatePeerConnection(targetWilaya) {
-  const pc = new RTCPeerConnection({ iceServers: GM_ICE_SERVERS });
-  // إضافة المسار المحلي
-  if (gmLocalStream) gmLocalStream.getTracks().forEach(t => pc.addTrack(t, gmLocalStream));
-  pc.ontrack = e => {
-    gmRemoteStreams[targetWilaya] = e.streams[0];
-    gmRenderVideoTiles();
-  };
-  pc.onicecandidate = e => {
-    if (e.candidate) nationalRef('calls/' + targetWilaya).push({ type: 'ice-candidate', candidate: JSON.stringify(e.candidate), from: selectedWilaya, roomId: gmRoomId, timestamp: firebase.database.ServerValue.TIMESTAMP });
-  };
-  pc.onconnectionstatechange = () => {
-    if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
-      delete gmPeerConnections[targetWilaya]; delete gmRemoteStreams[targetWilaya];
-      gmRenderVideoTiles(); gmUpdateParticipantCount();
-    }
-  };
-  gmPeerConnections[targetWilaya] = pc;
-  return pc;
-}
-
-// ========== عرض بلاطات الفيديو لكل المشاركين ==========
-function gmRenderVideoTiles() {
-  const grid = document.getElementById('gmVideoGrid');
-  // إزالة البلاطات القديمة (ماعدا المحلي)
-  grid.querySelectorAll('.gm-remote-tile').forEach(el => el.remove());
-  const participants = Object.keys(gmPeerConnections);
-  participants.forEach(code => {
-    const tile = document.createElement('div');
-    tile.className = 'gm-video-tile gm-remote-tile';
-    tile.id = 'gmTile_' + code;
-    const video = document.createElement('video');
-    video.autoplay = true; video.playsInline = true;
-    if (gmRemoteStreams[code]) { video.srcObject = gmRemoteStreams[code]; }
-    const off = document.createElement('div');
-    off.className = 'gm-tile-off';
-    off.id = 'gmOff_' + code;
-    off.innerHTML = `<div class="gm-tile-avatar">${code}</div><span>${escapeHtml(getWilayaName(code))}</span>`;
-    off.style.display = gmRemoteStreams[code] ? 'none' : 'flex';
-    const name = document.createElement('div');
-    name.className = 'gm-tile-name';
-    name.textContent = 'مديرية ' + getWilayaName(code);
-    tile.appendChild(video); tile.appendChild(off); tile.appendChild(name);
-    grid.appendChild(tile);
-  });
-  gmUpdateParticipantCount();
-}
-
-function gmUpdateParticipantCount() {
-  const count = Object.keys(gmPeerConnections).length + 1; // +1 لنفسي
-  const el = document.getElementById('gmParticipantCount');
-  if (el) { el.innerHTML = `<i class="fa-solid fa-users"></i> ${count}`; el.style.display = gmCallActive ? 'inline-block' : 'none'; }
-}
-
-// ========== بدء مكالمة ==========
-async function gmStartCall(withVideo, mode) {
-  gmCallMode = mode || 'private';
-  gmRoomId = gmCallMode === 'group' ? 'room_' + selectedWilaya + '_' + Date.now() : 'p2p_' + selectedWilaya + '_' + gmSelectedRecipient;
-  await gmTryGetMedia(withVideo);
-  
-  if (gmCallMode === 'private' && gmSelectedRecipient !== 'all') {
-    // مكالمة فردية
-    const pc = gmCreatePeerConnection(gmSelectedRecipient);
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    nationalRef('calls/' + gmSelectedRecipient).push({ type: 'offer', sdp: JSON.stringify(offer), from: selectedWilaya, withVideo, wilayaName: getWilayaName(selectedWilaya), roomId: gmRoomId, mode: 'private', timestamp: firebase.database.ServerValue.TIMESTAMP });
-  } else {
-    // مكالمة جماعية — إشعار لجميع المديريات
-    Object.keys(WILAYAS_NAMES).filter(c => c !== selectedWilaya).forEach(code => {
-      nationalRef('calls/' + code).push({ type: 'offer', from: selectedWilaya, withVideo, wilayaName: getWilayaName(selectedWilaya), roomId: gmRoomId, mode: 'group', timestamp: firebase.database.ServerValue.TIMESTAMP });
-    });
-  }
-  gmCallActive = true;
-  gmShowCallUI();
-}
-
-function gmShowCallUI() {
-  document.getElementById('gmIdle').style.display = 'none';
-  document.getElementById('gmCallActive').style.display = 'flex';
-  document.getElementById('gmIncoming').style.display = 'none';
-  document.getElementById('gmLiveBadge').style.display = 'inline-flex';
-  hideIncomingCallPopup();
-  gmCallSeconds = 0;
-  clearInterval(gmCallTimerInterval);
-  gmCallTimerInterval = setInterval(() => { gmCallSeconds++; const m = String(Math.floor(gmCallSeconds / 60)).padStart(2, '0'); const s = String(gmCallSeconds % 60).padStart(2, '0'); document.getElementById('gmCallTimer').textContent = m + ':' + s; document.getElementById('gmCallTimer').style.display = 'inline-block'; }, 1000);
-  nationalRef('presence/' + selectedWilaya).update({ inCall: true, callRoom: gmRoomId });
-  gmRenderVideoTiles();
-}
-
-// ========== استقبال مكالمة ==========
-let popupTimerInterval = null;
-let popupElapsed = 0;
-
-function showGmIncomingCall(data) {
-  gmIncomingCallData = data;
-  document.getElementById('gmIdle').style.display = 'none';
-  document.getElementById('gmCallActive').style.display = 'none';
-  document.getElementById('gmIncoming').style.display = 'flex';
-  document.getElementById('gmIncomingName').textContent = 'مديرية ' + escapeHtml(data.wilayaName || getWilayaName(data.from));
-  document.getElementById('gmIncomingAvatar').textContent = data.from || '?';
-  document.getElementById('gmIncomingType').textContent = (data.mode === 'group' ? '📞 مكالمة جماعية' : data.withVideo ? '📹 مكالمة مرئية' : '📞 مكالمة صوتية') + ' واردة من مديرية ' + escapeHtml(data.wilayaName || getWilayaName(data.from));
-  activateBannerAlert();
-
-  // 🔴 إظهار الإشعار المنبثق الأحمر
-  showIncomingCallPopup(data);
-
-  if (!isMuted) playNotificationSound();
-}
-
-function showIncomingCallPopup(data) {
-  const popup = document.getElementById('incomingCallPopup');
-  const icon = document.getElementById('popupRingIcon');
-  const title = document.getElementById('popupTitle');
-  const badge = document.getElementById('popupBadge');
-  const subtitle = document.getElementById('popupSubtitle');
-  const timer = document.getElementById('popupTimer');
-
-  // تحديد نوع المكالمة
-  const isGroup = data.mode === 'group';
-  const isVideo = data.withVideo;
-  const callerName = 'مديرية ' + escapeHtml(data.wilayaName || getWilayaName(data.from));
-
-  if (isGroup) {
-    icon.textContent = '📞';
-    badge.textContent = 'جماعية';
-    badge.style.background = 'rgba(255,193,7,0.4)';
-  } else if (isVideo) {
-    icon.textContent = '📹';
-    badge.textContent = 'فيديو';
-    badge.style.background = 'rgba(255,255,255,0.25)';
-  } else {
-    icon.textContent = '📞';
-    badge.textContent = 'صوتية';
-    badge.style.background = 'rgba(41,121,255,0.4)';
-  }
-
-  subtitle.textContent = callerName;
-
-  // بدء عداد الوقت
-  popupElapsed = 0;
-  timer.textContent = '00:00';
-  if (popupTimerInterval) clearInterval(popupTimerInterval);
-  popupTimerInterval = setInterval(() => {
-    popupElapsed++;
-    const m = String(Math.floor(popupElapsed / 60)).padStart(2, '0');
-    const s = String(popupElapsed % 60).padStart(2, '0');
-    timer.textContent = m + ':' + s;
-  }, 1000);
-
-  // إظهار الإشعار
-  popup.classList.add('popup-show');
-
-  // تشغيل صوت الإشعار بشكل متكرر
-  if (!isMuted) {
-    playPopupRingSound();
-  }
-}
-
-function hideIncomingCallPopup() {
-  const popup = document.getElementById('incomingCallPopup');
-  popup.classList.remove('popup-show');
-  if (popupTimerInterval) { clearInterval(popupTimerInterval); popupTimerInterval = null; }
-  stopPopupRingSound();
-}
-
-function playPopupRingSound() {
-  try {
-    if (window._popupRingAudio) { window._popupRingAudio.pause(); window._popupRingAudio = null; }
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    window._popupRingCtx = ctx;
-    function beep(time) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = 880;
-      osc.type = 'sine';
-      gain.gain.setValueAtTime(0.3, ctx.currentTime + time);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + time + 0.3);
-      osc.start(ctx.currentTime + time);
-      osc.stop(ctx.currentTime + time + 0.3);
-    }
-    // تشغيل نغمتين متتاليتين كل ثانيتين
-    let t = 0;
-    function scheduleBeeps() {
-      for (let i = 0; i < 10; i++) {
-        beep(t);
-        t += 0.4;
-        beep(t);
-        t += 1.6;
-      }
-    }
-    scheduleBeeps();
-    window._popupRingTimer = setTimeout(() => {
-      if (document.getElementById('incomingCallPopup').classList.contains('popup-show')) {
-        t = ctx.currentTime;
-        scheduleBeeps();
-        window._popupRingTimer = setTimeout(arguments.callee, 20000);
-      }
-    }, 20000);
-  } catch(e) {}
-}
-
-function stopPopupRingSound() {
-  try {
-    if (window._popupRingCtx) { window._popupRingCtx.close(); window._popupRingCtx = null; }
-    if (window._popupRingTimer) { clearTimeout(window._popupRingTimer); window._popupRingTimer = null; }
-  } catch(e) {}
-}
-
-// أزرار الإشعار المنبثق
-function popupAcceptVideo() {
-  hideIncomingCallPopup();
-  switchTab('gm-chat');
-  gmAcceptCall(true);
-}
-
-function popupAcceptAudio() {
-  hideIncomingCallPopup();
-  switchTab('gm-chat');
-  gmAcceptCall(false);
-}
-
-function popupAcceptText() {
-  hideIncomingCallPopup();
-  switchTab('gm-chat');
-  gmAcceptCallText();
-}
-
-function popupReject() {
-  hideIncomingCallPopup();
-  gmRejectCall();
-}
-
-async function gmAcceptCall(withVideo) {
-  if (!gmIncomingCallData) return;
-  const data = gmIncomingCallData;
-  gmSelectedRecipient = data.from;
-  gmRoomId = data.roomId || ('p2p_' + data.from + '_' + selectedWilaya);
-  gmCallMode = data.mode || 'private';
-  await gmTryGetMedia(withVideo);
-  
-  if (data.sdp) {
-    // هناك SDP — مكالمة P2P حقيقية
-    const pc = gmCreatePeerConnection(data.from);
-    const offer = JSON.parse(data.sdp);
-    await pc.setRemoteDescription(new RTCSessionDescription(offer));
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
-    nationalRef('calls/' + data.from).push({ type: 'answer', sdp: JSON.stringify(answer), from: selectedWilaya, roomId: gmRoomId, timestamp: firebase.database.ServerValue.TIMESTAMP });
-  }
-  // إذا مكالمة جماعية — أنشئ اتصال مع المرسل
-  else if (data.mode === 'group') {
-    const pc = gmCreatePeerConnection(data.from);
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    nationalRef('calls/' + data.from).push({ type: 'offer', sdp: JSON.stringify(offer), from: selectedWilaya, wilayaName: getWilayaName(selectedWilaya), roomId: gmRoomId, timestamp: firebase.database.ServerValue.TIMESTAMP });
-  }
-  
-  gmCallActive = true;
-  gmShowCallUI();
-  gmIncomingCallData = null;
-}
-
-async function gmAcceptCallText() {
-  // انضمام بدون كاميرا/مايك
-  gmLocalStream = null; gmHasMedia = false; gmMicOn = false; gmCamOn = false;
-  if (!gmIncomingCallData) return;
-  const data = gmIncomingCallData;
-  gmSelectedRecipient = data.from;
-  gmRoomId = data.roomId || ('p2p_' + data.from + '_' + selectedWilaya);
-  gmCallMode = data.mode || 'private';
-  
-  if (data.sdp) {
-    const pc = gmCreatePeerConnection(data.from);
-    const offer = JSON.parse(data.sdp);
-    await pc.setRemoteDescription(new RTCSessionDescription(offer));
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
-    nationalRef('calls/' + data.from).push({ type: 'answer', sdp: JSON.stringify(answer), from: selectedWilaya, roomId: gmRoomId, timestamp: firebase.database.ServerValue.TIMESTAMP });
-  }
-  document.getElementById('gmLocalVideo').srcObject = null;
-  document.getElementById('gmLocalOff').style.display = 'flex';
-  gmUpdateControlBtns();
-  gmCallActive = true;
-  gmShowCallUI();
-  gmIncomingCallData = null;
-  showToast('💬 انضممت بالدردشة', 'أنت في المكالمة بدون صوت/صورة، يمكنك الدردشة');
-}
-
-function gmRejectCall() {
-  if (gmIncomingCallData) {
-    nationalRef('calls/' + gmIncomingCallData.from).push({ type: 'hangup', from: selectedWilaya, timestamp: firebase.database.ServerValue.TIMESTAMP });
-    gmIncomingCallData = null;
-  }
-  document.getElementById('gmIncoming').style.display = 'none';
-  hideIncomingCallPopup();
-  showGmIdle();
-}
-
-// ========== معالجة إشارات WebRTC ==========
-async function gmHandleAnswer(data, key) {
-  try {
-    const pc = gmPeerConnections[data.from];
-    if (pc && data.sdp) await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(data.sdp)));
-  } catch (err) { console.error('خطأ في معالجة الرد:', err); }
-}
-
-async function gmHandleIceCandidate(data) {
-  try {
-    const pc = gmPeerConnections[data.from];
-    if (pc && data.candidate) await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(data.candidate)));
-  } catch (err) { console.error('خطأ ICE:', err); }
-}
-
-function gmHandleNewParticipant(data) {
-  // مشارك جديد في الغرفة الجماعية — أنشئ اتصال معه
-  if (!gmPeerConnections[data.from]) {
-    (async () => {
-      const pc = gmCreatePeerConnection(data.from);
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      nationalRef('calls/' + data.from).push({ type: 'offer', sdp: JSON.stringify(offer), from: selectedWilaya, wilayaName: getWilayaName(selectedWilaya), roomId: gmRoomId, timestamp: firebase.database.ServerValue.TIMESTAMP });
-    })();
-  }
-}
-
-function gmRemoteHungUp(fromCode) {
-  if (gmPeerConnections[fromCode]) { gmPeerConnections[fromCode].close(); delete gmPeerConnections[fromCode]; }
-  delete gmRemoteStreams[fromCode];
-  gmRenderVideoTiles();
-  // إذا لم يبق أحد، أنهِ المكالمة
-  if (Object.keys(gmPeerConnections).length === 0 && gmCallMode === 'private') { gmEndCall(true); showToast('📵 انتهت المكالمة', 'أغلق الطرف الآخر المكالمة'); }
-}
-
-// ========== إنهاء المكالمة ==========
-function gmEndCall(silent) {
-  Object.keys(gmPeerConnections).forEach(code => {
-    nationalRef('calls/' + code).push({ type: 'hangup', from: selectedWilaya, timestamp: firebase.database.ServerValue.TIMESTAMP });
-    gmPeerConnections[code].close();
-  });
-  if (gmLocalStream) { gmLocalStream.getTracks().forEach(t => t.stop()); gmLocalStream = null; }
-  gmPeerConnections = {}; gmRemoteStreams = {};
-  gmCallActive = false; gmHasMedia = false;
-  clearInterval(gmCallTimerInterval);
-  document.getElementById('gmLiveBadge').style.display = 'none';
-  document.getElementById('gmCallTimer').style.display = 'none';
-  document.getElementById('gmParticipantCount').style.display = 'none';
-  document.getElementById('gmLocalVideo').srcObject = null;
-  document.getElementById('gmChatPanel').style.display = 'none';
-  document.getElementById('gmChatPanel')?.classList.remove('minimized');
-  document.getElementById('gmAttachArea')?.classList.remove('active');
-  gmPendingAttachment = null;
-  gmUnreadChatInCall = 0;
-  nationalRef('presence/' + selectedWilaya).update({ inCall: false, callRoom: null });
-  nationalRef('calls/' + selectedWilaya).remove();
-  // إزالة بلاطات المشاركين
-  document.querySelectorAll('.gm-remote-tile').forEach(el => el.remove());
-  hideIncomingCallPopup();
-  if (!silent) showToast('📵 تم إنهاء المكالمة', 'تم إغلاق المكالمة بنجاح');
-  showGmIdle();
-}
-
-// ========== أزرار التحكم ==========
-function gmToggleMic() {
-  if (!gmLocalStream) { showToast('ℹ️ تنبيه', 'لا يوجد مايكروفون متاح'); return; }
-  gmMicOn = !gmMicOn;
-  gmLocalStream.getAudioTracks().forEach(t => t.enabled = gmMicOn);
-  gmUpdateControlBtns();
-}
-
-function gmToggleCam() {
-  if (!gmLocalStream) { showToast('ℹ️ تنبيه', 'لا توجد كاميرا متاحة'); return; }
-  gmCamOn = !gmCamOn;
-  gmLocalStream.getVideoTracks().forEach(t => t.enabled = gmCamOn);
-  document.getElementById('gmLocalOff').style.display = gmCamOn ? 'none' : 'flex';
-  gmUpdateControlBtns();
-}
-
-async function gmToggleScreen() {
-  if (!gmScreenOn) {
-    try {
-      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-      const screenTrack = screenStream.getVideoTracks()[0];
-      // استبدال مسار الفيديو في كل اتصال
-      Object.values(gmPeerConnections).forEach(pc => { const sender = pc.getSenders().find(s => s.track?.kind === 'video'); if (sender && screenTrack) sender.replaceTrack(screenTrack); });
-      document.getElementById('gmLocalVideo').srcObject = screenStream;
-      document.getElementById('gmLocalOff').style.display = 'none';
-      screenTrack.onended = () => { gmScreenOn = false; if (gmLocalStream) { const camTrack = gmLocalStream.getVideoTracks()[0]; Object.values(gmPeerConnections).forEach(pc => { const sender = pc.getSenders().find(s => s.track?.kind === 'video'); if (camTrack && sender) sender.replaceTrack(camTrack); }); document.getElementById('gmLocalVideo').srcObject = gmLocalStream; document.getElementById('gmLocalOff').style.display = gmCamOn ? 'none' : 'flex'; } gmUpdateControlBtns(); };
-      gmScreenOn = true;
-    } catch (err) { showToast('⚠️ تنبيه', 'تعذر مشاركة الشاشة'); }
-  } else {
-    if (gmLocalStream) { const camTrack = gmLocalStream.getVideoTracks()[0]; Object.values(gmPeerConnections).forEach(pc => { const sender = pc.getSenders().find(s => s.track?.kind === 'video'); if (camTrack && sender) sender.replaceTrack(camTrack); }); document.getElementById('gmLocalVideo').srcObject = gmLocalStream; document.getElementById('gmLocalOff').style.display = gmCamOn ? 'none' : 'flex'; }
-    gmScreenOn = false;
-  }
-  gmUpdateControlBtns();
-}
-
-function gmUpdateControlBtns() {
-  const micBtn = document.getElementById('gmMicBtn');
-  const camBtn = document.getElementById('gmCamBtn');
-  const screenBtn = document.getElementById('gmScreenBtn');
-  if (micBtn) { micBtn.className = 'gm-ctrl-btn' + (gmMicOn ? '' : ' muted') + (!gmHasMedia ? ' disabled' : ''); micBtn.innerHTML = '<i class="fa-solid fa-microphone' + (gmMicOn ? '' : '-slash') + '"></i>'; }
-  if (camBtn) { camBtn.className = 'gm-ctrl-btn' + (gmCamOn ? '' : ' cam-off') + (!gmHasMedia ? ' disabled' : ''); camBtn.innerHTML = '<i class="fa-solid fa-video' + (gmCamOn ? '' : '-slash') + '"></i>'; }
-  if (screenBtn) { screenBtn.className = 'gm-ctrl-btn' + (gmScreenOn ? ' screen-on' : ''); }
-}
-
-let gmPendingAttachment = null; // مرفق معلق
-
-// ========== تحريك النافذة العائمة ==========
-(function() {
-  let dragging = false, offX = 0, offY = 0;
-  document.addEventListener('mousedown', e => {
-    const head = e.target.closest?.('#gmChatPanelHead');
-    if (!head) return;
-    if (e.target.closest('button')) return; // لا تتحرك عند الضغط على زر
-    dragging = true;
-    const panel = document.getElementById('gmChatPanel');
-    const rect = panel.getBoundingClientRect();
-    offX = e.clientX - rect.left;
-    offY = e.clientY - rect.top;
-    e.preventDefault();
-  });
-  document.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const panel = document.getElementById('gmChatPanel');
-    if (!panel) return;
-    let x = e.clientX - offX;
-    let y = e.clientY - offY;
-    x = Math.max(0, Math.min(x, window.innerWidth - panel.offsetWidth));
-    y = Math.max(0, Math.min(y, window.innerHeight - panel.offsetHeight));
-    panel.style.left = x + 'px';
-    panel.style.top = y + 'px';
-    panel.style.right = 'auto';
-  });
-  document.addEventListener('mouseup', () => { dragging = false; });
-  // دعم اللمس
-  document.addEventListener('touchstart', e => {
-    const head = e.target.closest?.('#gmChatPanelHead');
-    if (!head) return;
-    if (e.target.closest('button')) return;
-    dragging = true;
-    const panel = document.getElementById('gmChatPanel');
-    const rect = panel.getBoundingClientRect();
-    const t = e.touches[0];
-    offX = t.clientX - rect.left;
-    offY = t.clientY - rect.top;
-  }, { passive: false });
-  document.addEventListener('touchmove', e => {
-    if (!dragging) return;
-    const panel = document.getElementById('gmChatPanel');
-    if (!panel) return;
-    const t = e.touches[0];
-    let x = t.clientX - offX;
-    let y = e.clientY - offY;
-    x = Math.max(0, Math.min(x, window.innerWidth - panel.offsetWidth));
-    y = Math.max(0, Math.min(y, window.innerHeight - panel.offsetHeight));
-    panel.style.left = x + 'px';
-    panel.style.top = y + 'px';
-    panel.style.right = 'auto';
-    e.preventDefault();
-  }, { passive: false });
-  document.addEventListener('touchend', () => { dragging = false; });
-})();
-
-function gmToggleChatPanel() {
-  const panel = document.getElementById('gmChatPanel');
-  const isHidden = panel.style.display === 'none';
-  if (isHidden) {
-    panel.style.display = 'flex';
-    panel.classList.remove('minimized');
-    gmUnreadChatInCall = 0;
-    updateGmChatBadge();
-    renderGmCallChat();
-    setTimeout(() => document.getElementById('gmChatPanelInput')?.focus(), 100);
-  } else {
-    panel.style.display = 'none';
-    panel.classList.remove('minimized');
-  }
-}
-
-function gmMinimizeChatPanel() {
-  const panel = document.getElementById('gmChatPanel');
-  panel.classList.toggle('minimized');
-}
-
-function gmToggleAttachArea() {
-  const area = document.getElementById('gmAttachArea');
-  area.classList.toggle('active');
-}
-
-function gmHandleAttach(e, type) {
-  const f = e.target.files[0];
-  if (!f) return;
-  if (f.size > 5 * 1024 * 1024) {
-    showToast('⚠️ ملف كبير', 'الحد الأقصى للمرفق هو 5 ميغابايت');
-    e.target.value = '';
-    return;
-  }
-  const r = new FileReader();
-  r.onload = x => {
-    gmPendingAttachment = { name: f.name, type: f.type, data: x.target.result, category: type };
-    renderGmAttachPreview();
-    // إظهار زر المرفق كمفعّل
-    document.getElementById('gmAttachToggle')?.classList.add('has-attachment');
-  };
-  r.readAsDataURL(f);
-  e.target.value = '';
-}
-
-function renderGmAttachPreview() {
-  const box = document.getElementById('gmAttachPreview');
-  if (!box || !gmPendingAttachment) { if (box) box.innerHTML = ''; return; }
-  const a = gmPendingAttachment;
-  let thumb = '';
-  if (a.category === 'image') {
-    thumb = `<img src="${a.data}" class="gm-attach-thumb" alt="">`;
-  } else if (a.category === 'video') {
-    thumb = `<video src="${a.data}" class="gm-attach-thumb" muted></video>`;
-  } else if (a.category === 'audio') {
-    thumb = `<div class="gm-attach-thumb" style="display:flex;align-items:center;justify-content:center;background:rgba(0,122,61,0.1);border-radius:8px;"><i class="fa-solid fa-music" style="font-size:22px;color:var(--algeria-green);"></i></div>`;
-  } else {
-    thumb = `<div class="gm-attach-thumb" style="display:flex;align-items:center;justify-content:center;background:rgba(0,122,61,0.1);border-radius:8px;"><i class="fa-solid fa-file" style="font-size:22px;color:var(--algeria-green);"></i></div>`;
-  }
-  const sizeStr = (a.data.length * 0.75 / 1024).toFixed(0) + ' KB';
-  box.innerHTML = `<div class="gm-attach-preview">${thumb}<div class="gm-attach-info">${escapeHtml(a.name)}<small>${a.type} — ${sizeStr}</small></div><button class="gm-attach-remove" onclick="gmRemoveAttachment()" title="حذف"><i class="fa-solid fa-xmark"></i></button></div>`;
-}
-
-function gmRemoveAttachment() {
-  gmPendingAttachment = null;
-  document.getElementById('gmAttachPreview').innerHTML = '';
-  document.getElementById('gmAttachToggle')?.classList.remove('has-attachment');
-}
-
-function renderGmCallChat() {
-  const box = document.getElementById('gmChatPanelMsgs');
-  if (!box) return;
-  const msgs = gmCurrentThread();
-  let html = '';
-  msgs.forEach(m => {
-    const isMe = m.from === selectedWilaya;
-    const sender = isMe ? 'أنت' : 'مديرية ' + escapeHtml(getWilayaName(m.from));
-    const time = new Date(m.time || Date.now()).toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
-    let attachHtml = '';
-    if (m.attachment && m.attachment.data) {
-      const cat = m.attachment.category || guessAttachmentCategory(m.attachment.type);
-      if (cat === 'image') {
-        attachHtml = `<div class="gm-cp-attachment"><img src="${m.attachment.data}" alt="${escapeHtml(m.attachment.name || '')}" onclick="window.open(this.src,'_blank')"></div>`;
-      } else if (cat === 'video') {
-        attachHtml = `<div class="gm-cp-attachment"><video src="${m.attachment.data}" controls preload="metadata"></video></div>`;
-      } else if (cat === 'audio') {
-        attachHtml = `<div class="gm-cp-attachment"><audio src="${m.attachment.data}" controls preload="metadata"></audio></div>`;
-      } else {
-        attachHtml = `<div class="gm-cp-attachment"><a class="gm-cp-file-link" href="${m.attachment.data}" download="${escapeHtml(m.attachment.name || 'ملف')}"><i class="fa-solid fa-file-arrow-down"></i>${escapeHtml(m.attachment.name || 'ملف')}</a></div>`;
-      }
-    }
-    html += `<div class="gm-cp-msg ${isMe ? 'me' : 'other'}"><div class="gm-cp-sender">${sender} <span class="gm-cp-time">${time}</span></div>${m.text ? '<p style="margin:0">' + escapeHtml(m.text) + '</p>' : ''}${attachHtml}</div>`;
-  });
-  box.innerHTML = html || '<div style="text-align:center;color:var(--text-dim);padding:30px;font-size:14px;"><i class="fa-solid fa-comments" style="font-size:40px;display:block;margin-bottom:12px;opacity:0.3;"></i>لا توجد رسائل بعد</div>';
-  box.scrollTop = box.scrollHeight;
-}
-
-function guessAttachmentCategory(mimeType) {
-  if (!mimeType) return 'file';
-  if (mimeType.startsWith('image/')) return 'image';
-  if (mimeType.startsWith('video/')) return 'video';
-  if (mimeType.startsWith('audio/')) return 'audio';
-  return 'file';
-}
-
-function sendGmCallMessage() {
-  const input = document.getElementById('gmChatPanelInput');
-  const text = (input?.value || '').trim();
-  if (!text && !gmPendingAttachment) return;
-  nationalRef('messages').push({
-    from: selectedWilaya,
-    to: gmSelectedRecipient === 'all' ? 'all' : gmSelectedRecipient,
-    text: text || null,
-    attachment: gmPendingAttachment || null,
-    time: firebase.database.ServerValue.TIMESTAMP,
-    readBy: { [selectedWilaya]: true }
-  }).then(() => {
-    input.value = '';
-    gmRemoveAttachment();
-    // إخفاء منطقة المرفقات
-    document.getElementById('gmAttachArea')?.classList.remove('active');
-    renderGmCallChat();
-  }).catch(() => showToast('❌ تعذر الإرسال', 'تحقق من الاتصال وقواعد Firebase'));
-}
-
-function updateGmChatBadge() {
-  const b = document.getElementById('gmChatBadge');
-  const bf = document.getElementById('gmChatBadgeFloat');
-  const val = gmUnreadChatInCall;
-  if (b) { b.textContent = val; b.style.display = val > 0 ? 'flex' : 'none'; }
-  if (bf) { bf.textContent = val; bf.style.display = val > 0 ? 'flex' : 'none'; }
-}
-
 // ========== 🎬 الفيديوهات التعليمية ==========
 let eduVideos = [];
 let eduPendingFile = null;
@@ -9493,48 +7879,6 @@ function deleteEduVideo(key) {
   nationalRef('eduVideos/' + key).remove().then(() => showToast('🗑️ تم الحذف', 'تم حذف الفيديو'));
 }
 
-// ========== قائمة المديريات ==========
-function renderGmConvList() {
-  const box = document.getElementById('gmConvList');
-  if (!box) return;
-  const q = (document.getElementById('gmSearchInput')?.value || '').trim().toLowerCase();
-  const now = Date.now();
-  let html = '';
-  Object.entries(WILAYAS_NAMES).filter(([c, n]) => c !== selectedWilaya && (!q || c.includes(q) || n.toLowerCase().includes(q))).forEach(([c, n]) => {
-    const p = idnPresence[c];
-    const online = p && p.online && (now - (p.lastSeen || now) < 180000);
-    const inCall = p && p.inCall;
-    const unread = idnMessages.filter(m => m.from === c && m.to === selectedWilaya && !(m.readBy && m.readBy[selectedWilaya])).length;
-    const isActive = gmSelectedRecipient === c;
-    html += `<div class="gm-conv-item ${isActive ? 'active' : ''} ${online ? 'online' : ''} ${unread ? 'unread' : ''}" onclick="selectGmConversation('${c}')">
-      <div class="gm-conv-avatar">${c}</div>
-      <div class="gm-conv-info"><div class="gm-conv-name">مديرية ${escapeHtml(n)}</div><div class="gm-conv-status">${inCall ? '🔴 في مكالمة' : online ? '● متصلة' : 'غير متصلة'}</div></div>
-      <span class="gm-conv-badge">${unread}</span>
-    </div>`;
-  });
-  box.innerHTML = html || '<div style="text-align:center;color:var(--text-dim);padding:20px;font-size:13px;">لا توجد مديريات مطابقة</div>';
-}
-
-function gmCurrentThread() {
-  return idnMessages.filter(m => {
-    if (gmSelectedRecipient === 'all') return m.to === 'all';
-    return (m.from === selectedWilaya && m.to === gmSelectedRecipient) || (m.from === gmSelectedRecipient && m.to === selectedWilaya);
-  });
-}
-
-function updateGmBadge() {
-  const unread = idnMessages.filter(m => idnMessageVisible(m) && m.from !== selectedWilaya && !(m.readBy && m.readBy[selectedWilaya])).length;
-  const b = document.getElementById('navBadgeGm');
-  if (b) { b.textContent = unread; b.style.display = unread ? 'inline-flex' : 'none'; }
-}
-
-function markGmRead() {
-  gmCurrentThread().filter(m => m.from !== selectedWilaya && !(m.readBy && m.readBy[selectedWilaya])).forEach(m => {
-    nationalRef('messages/' + m._key + '/readBy/' + selectedWilaya).set(true);
-  });
-}
-
-
 // ============================================================
 // 🌐 WINDOW ONLOAD
 // ============================================================
@@ -9617,5 +7961,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1b3cfd3d884b6d4',t:'MTc4NDA2NjU0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1bb90be5ac9b6ce',t:'MTc4NDE0Nzg0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c393f468de336f',t:'MTc4NDIzMTg2Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c3cff62ffe336f',t:'MTc4NDIzNDMyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c3f095ee55b6bf',t:'MTc4NDIzNTY2MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
