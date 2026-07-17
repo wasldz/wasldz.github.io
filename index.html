@@ -2184,6 +2184,46 @@ tbody td:last-child {
 .ticker-panel .btn-close { background: #ddd; color: #555; font-size: 14px; padding: 8px 12px; flex: 0 0 auto; }
 [data-theme="dark"] .ticker-panel .btn-close { background: #2e3f54; color: #ccc; }
 
+
+/* ============ 💾 بطاقة مراقبة تخزين Firebase الحقيقية (للمديرية) ============ */
+.storage-monitor-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 26px; margin-bottom: 26px; box-shadow: var(--shadow-light); position: relative; overflow: hidden; }
+.storage-monitor-card::before { content: ''; position: absolute; top: 0; right: 0; left: 0; height: 4px; background: var(--grad-gold); }
+.storage-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.storage-head h3 { font-size: 20px; font-weight: 900; color: var(--text); display: flex; align-items: center; gap: 12px; margin: 0; }
+.storage-head h3 i { color: var(--algeria-green); }
+.storage-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+.storage-item { background: var(--bg-card-2); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 14px 16px; text-align: center; transition: var(--transition); }
+.storage-item:hover { border-color: var(--algeria-green); transform: translateY(-2px); }
+.storage-item .s-label { display: block; font-size: 14px; color: var(--text-dim); font-weight: 700; margin-bottom: 6px; }
+.storage-item .s-value { display: block; font-size: 24px; font-weight: 900; color: var(--text); direction: ltr; }
+.storage-item .s-value.s-used { color: var(--algeria-red); }
+.storage-item .s-value.s-free { color: var(--algeria-green); }
+.storage-item .s-value.s-pct { color: #9a7418; }
+.storage-bar-wrap { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.storage-bar-track { flex: 1; height: 18px; background: var(--bg-card-3); border-radius: 99px; overflow: hidden; border: 1px solid var(--border-light); }
+.storage-bar-fill { height: 100%; width: 0%; border-radius: 99px; transition: width 0.9s ease, background 0.4s ease; }
+.storage-bar-fill.ok { background: var(--grad-brand); }
+.storage-bar-fill.warn { background: linear-gradient(90deg, #f1b30c, #e8830f); }
+.storage-bar-fill.danger { background: var(--grad-red); }
+.storage-bar-pct { font-size: 16px; font-weight: 900; color: var(--text); min-width: 70px; text-align: left; direction: ltr; }
+.storage-note { font-size: 14px; color: var(--text-dim); font-weight: 600; margin: 0; line-height: 1.9; }
+.storage-note i { color: var(--algeria-green); margin-left: 4px; }
+@media (max-width: 1100px) { .storage-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .storage-grid { grid-template-columns: 1fr; } }
+
+/* 💾 ودجت التخزين المصغر في الشريط الجانبي (للمديرية فقط) */
+.sidebar-storage-widget { background: var(--bg-card-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 12px; }
+.ssw-title { font-size: 14px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ssw-title i { color: var(--algeria-green); }
+.ssw-bar { height: 10px; background: var(--bg-card-3); border-radius: 99px; overflow: hidden; border: 1px solid var(--border-light); margin-bottom: 6px; }
+.ssw-fill { height: 100%; width: 0%; border-radius: 99px; transition: width 0.9s ease, background 0.4s ease; }
+.ssw-fill.ok { background: var(--grad-brand); }
+.ssw-fill.warn { background: linear-gradient(90deg, #f1b30c, #e8830f); }
+.ssw-fill.danger { background: var(--grad-red); }
+.ssw-text { font-size: 12.5px; color: var(--text-dim); font-weight: 700; line-height: 1.8; }
+.ssw-text strong { color: var(--algeria-green); direction: ltr; display: inline-block; }
+.sidebar.collapsed .sidebar-storage-widget { display: none !important; }
+
 </style>
 </head>
 <body>
@@ -2472,6 +2512,12 @@ tbody td:last-child {
     <ul class="nav-list" id="navList"></ul>
     <button class="nav-btn" onclick="reloadPage()"><i class="fa-solid fa-arrows-rotate"></i> إعادة تحميل الصفحة</button>
     <button class="nav-btn logout-btn" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> تسجيل الخروج</button>
+    <!-- 💾 ودجت تخزين Firebase المصغر (يظهر في جهة المديرية فقط) -->
+    <div class="sidebar-storage-widget" id="sidebarStorageWidget" style="display:none;">
+      <div class="ssw-title"><i class="fa-solid fa-database"></i> تخزين Firebase</div>
+      <div class="ssw-bar"><div class="ssw-fill ok" id="sswFill"></div></div>
+      <div class="ssw-text" id="sswText">جارٍ قياس الحجم الحقيقي...</div>
+    </div>
     <div class="sidebar-footer"><span class="fares-logo" style="font-size:14px;">✦ وَصْل ✦</span><br>منصة ربط المديرية بالمؤسسات 🇩🇿<br>🎁 هدية خاصة من الزميل: فارس مراح</div>
   </aside>
 
@@ -2505,6 +2551,26 @@ tbody td:last-child {
         <div class="kpi-card kpi-done"><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div><div class="kpi-label">تم تسويتها</div><div class="kpi-value" id="kpi-done">0</div></div>
         <div class="kpi-card kpi-efficiency"><div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div><div class="kpi-label">معدل الكفاءة</div><div class="kpi-value" id="kpi-efficiency">0%</div></div>
       </div>
+
+      <!-- 💾 بطاقة مراقبة تخزين Firebase الحقيقية — خاصة بالمديرية -->
+      <div class="storage-monitor-card" id="firebaseStorageCard">
+        <div class="storage-head">
+          <h3><i class="fa-solid fa-database"></i> تخزين قاعدة بيانات Firebase <span class="pill pill-normal" style="font-size:13px;">قياس حقيقي من الخادم</span></h3>
+          <button class="btn-mini" type="button" id="storageRefreshBtn" onclick="refreshFirebaseStorageUsage(true)"><i class="fa-solid fa-rotate"></i> تحديث القياس</button>
+        </div>
+        <div class="storage-grid">
+          <div class="storage-item"><span class="s-label">المساحة المستعملة الآن</span><span class="s-value s-used" id="storageUsedVal">—</span></div>
+          <div class="storage-item"><span class="s-label">المساحة المتبقية</span><span class="s-value s-free" id="storageFreeVal">—</span></div>
+          <div class="storage-item"><span class="s-label">السعة الإجمالية (خطة Spark)</span><span class="s-value" id="storageQuotaVal">1.00 GB</span></div>
+          <div class="storage-item"><span class="s-label">نسبة الاستعمال</span><span class="s-value s-pct" id="storagePctVal">—</span></div>
+        </div>
+        <div class="storage-bar-wrap">
+          <div class="storage-bar-track"><div class="storage-bar-fill ok" id="storageBarFill"></div></div>
+          <span class="storage-bar-pct" id="storageBarPct">—</span>
+        </div>
+        <p class="storage-note" id="storageNote"><i class="fa-solid fa-circle-info"></i> سيتم قياس الحجم الحقيقي لقاعدة البيانات تلقائياً عند فتح لوحة التحكم.</p>
+      </div>
+
       <div class="chart-card"><canvas id="analyticsChart"></canvas></div>
       <div class="chart-card" style="margin-top:20px; height:300px;">
         <h3 style="margin:0 0 12px; font-size:18px; color:var(--text-dim);"><i class="fa-solid fa-chart-line"></i> اتجاه الإنشغالات خلال آخر 14 يوماً</h3>
@@ -4280,6 +4346,8 @@ function setupInterface() {
     populateDeptFilters();
     document.getElementById('page-dashboard').classList.remove('hidden');
     switchTab('dashboard');
+    // 💾 تشغيل مراقبة تخزين Firebase الحقيقية (للمديرية فقط)
+    initFirebaseStorageMonitor();
 
   } else if (currentRole === 'department') {
     document.getElementById('institutionsPanel').style.display = 'none';
@@ -4288,6 +4356,7 @@ function setupInterface() {
     document.getElementById('page-dept-dashboard').classList.remove('hidden');
     renderDeptIssuesForDepartment();
     switchTab('dept-dashboard');
+    stopFirebaseStorageMonitor();
   } else {
     document.getElementById('institutionsPanel').style.display = 'none';
     document.getElementById('fileTypesPanel').style.display = 'block';
@@ -4298,6 +4367,7 @@ function setupInterface() {
     document.getElementById('page-send-panel').classList.remove('hidden');
     switchTab('send-panel');
     setupPasteFeature();
+    stopFirebaseStorageMonitor();
   }
   
   setInterval(checkForNewMessages, 3000);
@@ -4399,6 +4469,7 @@ function switchTab(tab) {
   if (tab === 'inter-directorates' && currentRole === 'directorate') initInterDirectorates();
   if (tab === 'edu-videos') initEduVideos();
   if (tab === 'teachers') initTeachersPage();
+  if (tab === 'dashboard' && currentRole === 'directorate') refreshFirebaseStorageUsage('silent');
 }
 
 // ============================================================
@@ -7940,6 +8011,7 @@ function closeLightbox() { document.getElementById('lightboxOverlay').classList.
 function logout() {
   if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
     if (_passwordDirectorateRef) { _passwordDirectorateRef.off(); _passwordDirectorateRef = null; }
+    stopFirebaseStorageMonitor();
     document.getElementById('passwordRequestStack')?.remove();
     document.getElementById('incomingIssueChat')?.remove();
     _incomingIssueQueue.length = 0; _incomingIssueOpenCode = null; _incomingCurrentIssue = null;
@@ -8221,6 +8293,110 @@ function deleteEduVideo(key) {
 }
 
 // ============================================================
+// 💾 مراقبة حجم تخزين Firebase الحقيقية (Realtime Database) — للمديرية فقط
+// القياس حقيقي 100%: تنزيل قاعدة البيانات كاملة من خادم Firebase
+// وحساب حجمها الفعلي بالبايت، وليس تقديراً أو رقماً وهمياً.
+// ============================================================
+const RTDB_QUOTA_BYTES = 1024 * 1024 * 1024; // سعة خطة Spark المجانية = 1 جيجابايت (غيّرها إذا رقّيت الخطة)
+let _fbStorageBusy = false;
+let _fbStorageTimer = null;
+
+// تنسيق البايتات إلى صيغة مقروءة B / KB / MB / GB
+function formatStorageBytes(bytes) {
+  if (!isFinite(bytes) || bytes < 0) return '—';
+  if (bytes === 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let i = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+  const v = bytes / Math.pow(1024, i);
+  return (v >= 100 ? v.toFixed(0) : v.toFixed(2)) + ' ' + units[i];
+}
+
+// ✅ القياس الحقيقي من خادم Firebase وحساب الحجم الفعلي بالبايت
+async function measureFirebaseDbBytes() {
+  try {
+    const res = await fetch(firebaseConfig.databaseURL + '/.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const buf = await res.arrayBuffer();
+    return buf.byteLength;
+  } catch (restErr) {
+    // احتياط عبر SDK إن تعذر REST (نفس البيانات الحقيقية القادمة من الخادم)
+    console.warn('[Storage] تعذر القياس عبر REST — نستخدم SDK:', restErr);
+    const snap = await originalRef.call(database, '/').once('value');
+    return new Blob([JSON.stringify(snap.val() || {})]).size;
+  }
+}
+
+// جلب القياس الحقيقي وتحديث بطاقة لوحة التحكم + ودجت الشريط الجانبي
+async function refreshFirebaseStorageUsage(manual) {
+  if (currentRole !== 'directorate') return;
+  if (_fbStorageBusy) return;
+  _fbStorageBusy = true;
+  const btn = document.getElementById('storageRefreshBtn');
+  const note = document.getElementById('storageNote');
+  const oldBtn = btn ? btn.innerHTML : '';
+  if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ القياس...';
+  if (note && manual === true) note.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ تنزيل قاعدة البيانات من خادم Firebase وقياس حجمها الحقيقي...';
+  try {
+    const used = await measureFirebaseDbBytes();
+    const free = Math.max(0, RTDB_QUOTA_BYTES - used);
+    const pct = RTDB_QUOTA_BYTES > 0 ? Math.min(100, (used / RTDB_QUOTA_BYTES) * 100) : 0;
+    const pctStr = (pct > 0 && pct < 0.01) ? '0.01' : pct.toFixed(2);
+
+    const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    setTxt('storageUsedVal', formatStorageBytes(used));
+    setTxt('storageFreeVal', formatStorageBytes(free));
+    setTxt('storageQuotaVal', formatStorageBytes(RTDB_QUOTA_BYTES));
+    setTxt('storagePctVal', pctStr + ' %');
+    setTxt('storageBarPct', pctStr + ' %');
+
+    const level = pct >= 85 ? 'danger' : (pct >= 60 ? 'warn' : 'ok');
+    const fill = document.getElementById('storageBarFill');
+    if (fill) { fill.style.width = Math.max(pct, used > 0 ? 1.2 : 0) + '%'; fill.className = 'storage-bar-fill ' + level; }
+
+    const timeStr = new Date().toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
+    if (note) note.innerHTML = '<i class="fa-solid fa-circle-check"></i> قياس حقيقي مباشر من خادم Firebase (إجمالي بيانات المشروع: ' + formatStorageBytes(used) + ') — آخر تحديث: ' + timeStr + ' • السعة القصوى المعروضة حسب خطة Spark المجانية (1 جيجابايت).';
+
+    // تحديث الودجت المصغر في الشريط الجانبي
+    const sswFill = document.getElementById('sswFill');
+    const sswText = document.getElementById('sswText');
+    if (sswFill) { sswFill.style.width = Math.max(pct, used > 0 ? 3 : 0) + '%'; sswFill.className = 'ssw-fill ' + level; }
+    if (sswText) sswText.innerHTML = 'المتبقي: <strong>' + formatStorageBytes(free) + '</strong><br>المستعمل: ' + formatStorageBytes(used) + ' من ' + formatStorageBytes(RTDB_QUOTA_BYTES) + ' (' + pctStr + '%)';
+
+    // تنبيه عند اقتراب امتلاء السعة
+    if (pct >= 85 && manual !== 'silent') showToast('🔴 تنبيه التخزين', 'تخزين Firebase شبه ممتلئ — تبقى ' + formatStorageBytes(free) + ' فقط! يُنصح بحذف المرفقات القديمة.');
+    if (manual === true && pct < 85) showToast('💾 تم القياس', 'المستعمل: ' + formatStorageBytes(used) + ' — المتبقي: ' + formatStorageBytes(free));
+  } catch (err) {
+    console.error('[Storage] فشل قياس حجم التخزين:', err);
+    if (note) note.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--algeria-red)"></i> تعذر قياس التخزين الآن — تحقق من الاتصال بالإنترنت ثم اضغط تحديث القياس.';
+    const sswText = document.getElementById('sswText');
+    if (sswText) sswText.textContent = 'تعذر القياس — اضغط تحديث من لوحة التحكم.';
+    if (manual === true) showToast('⚠️ تعذر القياس', 'لم نتمكن من قياس حجم التخزين الآن.');
+  } finally {
+    _fbStorageBusy = false;
+    if (btn) btn.innerHTML = oldBtn;
+  }
+}
+
+// تشغيل المراقبة (للمديرية): قياس فوري + تحديث تلقائي كل 10 دقائق عند ظهور الصفحة
+function initFirebaseStorageMonitor() {
+  const widget = document.getElementById('sidebarStorageWidget');
+  if (widget) widget.style.display = 'block';
+  refreshFirebaseStorageUsage('silent');
+  clearInterval(_fbStorageTimer);
+  _fbStorageTimer = setInterval(() => {
+    if (document.visibilityState === 'visible' && currentRole === 'directorate') refreshFirebaseStorageUsage('silent');
+  }, 10 * 60 * 1000);
+}
+
+// إيقاف المراقبة وإخفاء الودجت (عند الخروج أو للأدوار الأخرى)
+function stopFirebaseStorageMonitor() {
+  clearInterval(_fbStorageTimer);
+  _fbStorageTimer = null;
+  const widget = document.getElementById('sidebarStorageWidget');
+  if (widget) widget.style.display = 'none';
+}
+
+// ============================================================
 // 🌐 WINDOW ONLOAD
 // ============================================================
 window.onload = function() {
@@ -8445,5 +8621,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c43b7d99dfb6c1',t:'MTc4NDIzODcyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c443d3dfe7b6c1',t:'MTc4NDIzOTA3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c8bb122f27336f',t:'MTc4NDI4NTg5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c8bb122f27336f',t:'MTc4NDI4NTg5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c9f54eef2ab6d1',t:'MTc4NDI5ODc2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
