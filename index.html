@@ -3659,6 +3659,9 @@ function forceSync() {
 
 function updateUI() {
   updateNavBadges();
+  const activeBtn = document.querySelector('.nav-btn.active');
+  const activeTab = activeBtn ? activeBtn.getAttribute('data-tab') : null;
+
   if (currentRole === 'directorate') {
     renderKPIs();
     updateChart();
@@ -3671,6 +3674,8 @@ function updateUI() {
     populateDeptFilters();
     populateCenterTargetDepts();
     populateDropdowns();
+    if (activeTab === 'broadcast') renderBroadcastPage();
+    if (activeTab === 'user-guides') renderUserGuidesPage();
   } else if (currentRole === 'department') {
     renderDepartmentIssues();
     renderDeptKPIs();
@@ -3680,6 +3685,8 @@ function updateUI() {
     refreshCenterUI();
     populateCenterTargetDepts();
     populateDropdowns();
+    if (activeTab === 'broadcast') renderBroadcastPage();
+    if (activeTab === 'user-guides') renderUserGuidesPage();
   }
 }
 
@@ -6755,7 +6762,8 @@ function handleBroadcastFileAttach(e, category) {
       type: file.type,
       data: ev.target.result,
       category: category || guessAttachmentCategory(file.type),
-      size: file.size
+      size: file.size,
+      file: file // تخزين كائن الملف الأصلي لتجنب التحويل الثقيل
     };
     renderBroadcastAttachPreview();
   };
@@ -6795,7 +6803,8 @@ function handleGuideFileAttach(e, category) {
       type: file.type,
       data: ev.target.result,
       category: category || guessAttachmentCategory(file.type),
-      size: file.size
+      size: file.size,
+      file: file // تخزين كائن الملف الأصلي لتجنب التحويل الثقيل
     };
     renderGuideAttachPreview();
   };
@@ -6841,38 +6850,128 @@ function renderAttachmentPreviewHtml(attachment, removeFnName) {
 // 🗄️ ذاكرة مؤقتة للمرفقات المحمَّلة من التخزين المستقل (تُعبّأ عند التحميل الكسول)
 const _attachmentCache = {};
 
+function dataURLtoBlob(dataurl) {
+  try {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+  } catch(e) {
+    console.error('Error converting dataURL to Blob:', e);
+    return null;
+  }
+}
+
+function withTimeout(promise, ms) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('timeout')), ms);
+    promise.then(
+      res => { clearTimeout(timer); resolve(res); },
+      err => { clearTimeout(timer); reject(err); }
+    );
+  });
+}
+
+function uploadFileToCloud(attachment) {
+  let blob = attachment.file || dataURLtoBlob(attachment.data);
+  if (!blob) return Promise.reject(new Error('conversion-failed'));
+
+  // المحاولة الأولى: tempfile.org (رابط مباشر مع دعم الـ streaming للفيديو 100%)
+  const body1 = new FormData();
+  body1.append("files", blob, attachment.name || "file");
+  body1.append("expiryHours", "168"); // الحفاظ على الملف لمدة 7 أيام كاملة
+
+  console.log('[سحابي] نحاول الرفع إلى tempfile.org للحصول على رابط مباشر...');
+  return fetch("https://tempfile.org/api/upload/local", {
+    method: "POST",
+    body: body1
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("tempfile-failed");
+    return res.json();
+  })
+  .then(json => {
+    if (json && json.success && json.files && json.files.length > 0) {
+      const directUrl = "https://tempfile.org/" + json.files[0].id + "/download";
+      return { url: directUrl, storageType: 'tempfile' };
+    }
+    throw new Error("tempfile-invalid-response");
+  })
+  .catch(err => {
+    console.warn('[سحابي] فشل الرفع لـ tempfile، نجرب السيرفر البديل tmpfiles:', err);
+    // المحاولة الثانية: tmpfiles.org كخيار بديل
+    const body2 = new FormData();
+    body2.append("file", blob, attachment.name || "file");
+    
+    return fetch("https://tmpfiles.org/api/v1/upload", {
+      method: "POST",
+      body: body2
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("tmpfiles-failed");
+      return res.json();
+    })
+    .then(json => {
+      if (json && json.status === "success" && json.data && json.data.url) {
+        // رابط مباشر لـ tmpfiles.org
+        const directUrl = json.data.url.replace("tmpfiles.org/", "tmpfiles.org/dl/");
+        return { url: directUrl, storageType: 'tmpfiles' };
+      }
+      throw new Error("tmpfiles-invalid-response");
+    });
+  });
+}
+
 // 📤 رفع مرفق المراسلة (فيديو/صورة/ملف) إلى مسار تخزين مستقل:
-// أولاً Firebase Storage (للأحجام الكبيرة)، وإن تعذّر نخزّنه في عقدة مستقلة داخل قاعدة البيانات —
-// في الحالتين بعيداً عن مصفوفة الانشغالات حتى لا تتجاوز الكتابة الواحدة حد Firebase البالغ 16MB.
 function storeCorrespondenceAttachment(refKey, attachment) {
-  if (!refKey || !attachment) return Promise.resolve();
+  if (!refKey || !attachment) return Promise.resolve(null);
   const wilayaCode = selectedWilaya || '00';
   const metaBase = { name: attachment.name || 'مرفق', type: attachment.type || '', category: attachment.category || 'file', size: attachment.size || 0, refKey: refKey };
 
-  showToast('⏳ جاري رفع المرفق', 'يتم الآن رفع "' + metaBase.name + '" إلى خادم Firebase...');
+  showToast('⏳ جاري رفع المرفق', 'يتم الآن رفع "' + metaBase.name + '" سحابياً...');
 
+  // نجرّب أولاً Firebase Storage إن كان متاحاً في المتصفح وسريعاً
   const viaCloudStorage = window.firebaseStorage
     ? window.firebaseStorage.ref('attachments/' + wilayaCode + '/' + refKey)
         .putString(attachment.data, 'data_url')
         .then(snap => snap.ref.getDownloadURL())
-        .then(url => database.ref('issueAttachments/' + refKey).set({ ...metaBase, url: url, storageType: 'firebase-storage' }))
+        .then(url => {
+          const payload = { ...metaBase, url: url, storageType: 'firebase-storage' };
+          return database.ref('issueAttachments/' + refKey).set(payload).then(() => payload);
+        })
     : Promise.reject(new Error('storage-sdk-unavailable'));
 
-  return viaCloudStorage
+  return withTimeout(viaCloudStorage, 10000)
     .catch(err => {
-      console.warn('[مرفق المراسلة] Firebase Storage غير متاح — نستخدم قاعدة البيانات مباشرة:', err);
-      if ((attachment.data || '').length > 15 * 1024 * 1024) throw new Error('attachment-too-large');
-      return database.ref('issueAttachments/' + refKey).set({ ...metaBase, data: attachment.data, storageType: 'rtdb' });
-    })
-    .then(() => {
-      showToast('✅ تم رفع المرفق', '"' + metaBase.name + '" أصبح متاحاً الآن لجميع المؤسسات.');
+      console.warn('[سحابي] Firebase Storage غير متوفر أو معطل، نستخدم قنوات الرفع السريع البديلة المباشرة:', err);
+      return uploadFileToCloud(attachment)
+        .then(res => {
+          const payload = { ...metaBase, url: res.url, storageType: res.storageType };
+          return database.ref('issueAttachments/' + refKey).set(payload).then(() => payload);
+        });
     })
     .catch(err => {
-      console.error('[مرفق المراسلة] فشل رفع المرفق:', err);
-      const why = (err && err.message === 'attachment-too-large')
-        ? 'الملف كبير جداً والتخزين السحابي غير مفعّل في مشروع Firebase'
-        : 'تحقق من الاتصال بالإنترنت ثم أعد المحاولة';
-      showToast('⚠️ وصلت المراسلة بدون مرفق', 'تعذر رفع المرفق: ' + why);
+      console.warn('[سحابي] فشل الرفع البديل أيضاً، نتحقق من الحجم لحفظه محلياً كـ base64 كخيار أخير:', err);
+      const dataLength = (attachment.data || '').length;
+      if (dataLength > 5 * 1024 * 1024) {
+        throw new Error('file-too-large-for-rtdb');
+      }
+      const payload = { ...metaBase, data: attachment.data, storageType: 'rtdb' };
+      return database.ref('issueAttachments/' + refKey).set(payload).then(() => payload);
+    })
+    .then(payload => {
+      showToast('✅ تم رفع المرفق بنجاح', '"' + metaBase.name + '" أصبح متاحاً الآن لجميع المؤسسات.');
+      return payload;
+    })
+    .catch(err => {
+      console.error('[سحابي] فشل كامل في الرفع:', err);
+      const why = (err && err.message === 'file-too-large-for-rtdb')
+        ? 'حجم المرفق كبير جداً (أكبر من 5 ميغابايت) والتخزين السحابي غير مفعّل في خادمك'
+        : 'تعذر الرفع، يرجى التحقق من اتصالك بالإنترنت';
+      showToast('⚠️ وصلت بدون مرفق', 'تعذر رفع المرفق: ' + why);
+      return null;
     });
 }
 
@@ -7166,13 +7265,14 @@ function sendCorrespondence() {
   renderBroadcastPage();
 }
 
-// 🔄 دالة إرسال متزامن: تنتظر اكتمال رفع المرفق قبل حفظ المراسلة
+// 🔄 دالة إرسال المراسلات والمهام: ترفع المرفق أولاً ثم تحفظ المراسلة
 async function sendCorrespondenceWithSyncUpload() {
   const title = (document.getElementById('broadcast-title')?.value || '').trim();
   const content = (document.getElementById('broadcast-content')?.value || '').trim();
   const priority = document.getElementById('broadcast-priority')?.value || 'عادي';
+
   if (!title || !content) {
-    showToast("⚠️ بيانات ناقصة", "يرجى كتابة عنوان ونص المراسلة أو المهمة قبل الإرسال.");
+    showToast("⚠️ بيانات ناقصة", "يرجى كتابة عنوان ونص المراسلة.");
     return;
   }
 
@@ -7202,21 +7302,43 @@ async function sendCorrespondenceWithSyncUpload() {
   const timestamp = Date.now();
   const isSingleTarget = broadcastTarget === 'single';
   const primaryTarget = isSingleTarget ? targets[0] : null;
-
   const attachmentToUpload = broadcastPendingAttachment || null;
 
-  // 📤 الخطوة 1: رفع المرفق أولاً (متزامن) لضمان توفره للمؤسسات فوراً
+  // 📤 الخطوة 1: رفع المرفق أولاً (إن وُجد) — ننتظر حتى يكتمل
+  let finalAttachments = [];
   if (attachmentToUpload) {
-    showToast('⏳ جاري رفع المرفق', `يتم رفع "${attachmentToUpload.name}" الآن...`);
     try {
-      await storeCorrespondenceAttachment(batchCode, attachmentToUpload);
+      const uploadedMeta = await storeCorrespondenceAttachment(batchCode, attachmentToUpload);
+      if (uploadedMeta) {
+        finalAttachments = [{
+          name: uploadedMeta.name,
+          type: uploadedMeta.type,
+          category: uploadedMeta.category,
+          size: uploadedMeta.size,
+          refKey: batchCode
+        }];
+      } else {
+        // ملجأ أخير للملفات الصغيرة جداً كـ Base64 مضمن
+        if (attachmentToUpload.size < 5 * 1024 * 1024) {
+          finalAttachments = [{
+            name: attachmentToUpload.name,
+            type: attachmentToUpload.type,
+            category: attachmentToUpload.category,
+            size: attachmentToUpload.size,
+            data: attachmentToUpload.data
+          }];
+        } else {
+          showToast('⚠️ ملف كبير جداً', 'تعذر رفع الفيديو سحابياً، وهو كبير جداً لرفعه مباشرة.');
+          return;
+        }
+      }
     } catch(err) {
-      console.warn('[إرسال متزامن] فشل رفع المرفق:', err);
-      showToast('⚠️ المرفق لم يُرفع', 'تم إرسال المراسلة بدون المرفق. يمكنك إعادة إرسال المرفق لاحقاً.');
+      console.warn('[إرسال] فشل رفع المرفق:', err);
+      showToast('⚠️ تنبيه', 'تعذر رفع المرفق. سيتم إرسال المراسلة بدون مرفق.');
     }
   }
 
-  // الخطوة 2: حفظ المراسلة بعد تأكيد رفع المرفق
+  // الخطوة 2: إنشاء المراسلة وحفظها فوراً
   const issue = {
     code: code + '-' + (isSingleTarget ? (primaryTarget.code || 'TARGET') : String(broadcastTarget).toUpperCase()),
     batchCode: batchCode,
@@ -7233,7 +7355,7 @@ async function sendCorrespondenceWithSyncUpload() {
     status: "قيد المعالجة 🔄",
     createdAt: timestamp,
     source: 'directorate',
-    attachments: attachmentToUpload ? [{ name: attachmentToUpload.name, type: attachmentToUpload.type, category: attachmentToUpload.category, size: attachmentToUpload.size, refKey: batchCode }] : [],
+    attachments: finalAttachments,
     isBroadcast: true,
     readBy: {},
     department: '',
@@ -7241,22 +7363,33 @@ async function sendCorrespondenceWithSyncUpload() {
   };
 
   activeIssues.unshift(issue);
-  // ⚡ نستخدم _pushToFirebaseNow() مباشرة (بدل debounced) لضمان الحفظ الفوري المتزامن
-  await _pushToFirebaseNow();
 
+  // 💾 حفظ فوري في Firebase (بدون debounce لضمان وصول المراسلة للمؤسسات فوراً)
+  try {
+    await _pushToFirebaseNow();
+  } catch(err) {
+    console.error('[إرسال] فشل حفظ المراسلة:', err);
+    showToast('⚠️ خطأ', 'تعذر حفظ المراسلة. تحقق من الاتصال.');
+    return;
+  }
+
+  // ✅ نجاح
   renderKPIs();
   updateChart();
   renderList();
   showToast("✅ تم الإرسال", `تم إرسال المراسلة بنجاح إلى ${targets.length} مؤسسة`);
+
   document.getElementById('broadcast-title').value = '';
   document.getElementById('broadcast-content').value = '';
   removeBroadcastAttachment();
+
   if (broadcastTarget === 'single') {
     const sel = document.getElementById('broadcast-single-select');
     if (sel) sel.value = '';
     const searchInput = document.getElementById('broadcast-search-inst');
     if (searchInput) searchInput.value = '';
   }
+
   updateBroadcastCount();
   renderBroadcastPage();
 }
@@ -7355,26 +7488,39 @@ async function publishUserGuide() {
   const attachmentToUpload = guidePendingAttachment || null;
 
   // 📤 الخطوة 1: رفع المرفق أولاً (متزامن) لضمان توفره للمؤسسات فوراً
+  let guideAttachmentMeta = null;
   if (attachmentToUpload) {
-    showToast('⏳ جاري رفع المرفق', `يتم رفع "${attachmentToUpload.name}" الآن...`);
     try {
-      await storeGuideAttachment(guideId, attachmentToUpload);
+      const uploadedMeta = await storeGuideAttachment(guideId, attachmentToUpload);
+      if (uploadedMeta) {
+        guideAttachmentMeta = {
+          name: uploadedMeta.name,
+          type: uploadedMeta.type,
+          category: uploadedMeta.category,
+          size: uploadedMeta.size,
+          refKey: guideId
+        };
+      } else {
+        // ملجأ أخير للملفات الصغيرة جداً كـ Base64 مضمن
+        if (attachmentToUpload.size < 5 * 1024 * 1024) {
+          guideAttachmentMeta = {
+            name: attachmentToUpload.name,
+            type: attachmentToUpload.type,
+            category: attachmentToUpload.category,
+            size: attachmentToUpload.size,
+            data: attachmentToUpload.data,
+            refKey: guideId
+          };
+        } else {
+          showToast('⚠️ ملف كبير جداً', 'تعذر رفع الفيديو سحابياً، وهو كبير جداً لرفعه كبيانات مباشرة.');
+          return;
+        }
+      }
     } catch(err) {
       console.warn('[نشر الدليل] فشل رفع المرفق:', err);
       showToast('⚠️ المرفق لم يُرفع', 'تم نشر الدليل بدون المرفق. يرجى حذفه وإعادة النشر مع المرفق.');
     }
   }
-
-  // الخطوة 2: حفظ الدليل بعد تأكيد رفع المرفق
-  const guideAttachmentMeta = attachmentToUpload
-    ? {
-        name: attachmentToUpload.name,
-        type: attachmentToUpload.type,
-        category: attachmentToUpload.category,
-        size: attachmentToUpload.size,
-        refKey: guideId
-      }
-    : null;
 
   const guide = {
     id: guideId,
@@ -7412,40 +7558,51 @@ async function publishUserGuide() {
 
 // 📤 رفع مرفق دليل الاستعمال إلى مسار تخزين مستقل (مثل مرفقات المراسلات تماماً)
 function storeGuideAttachment(refKey, attachment) {
-  if (!refKey || !attachment) return Promise.resolve();
+  if (!refKey || !attachment) return Promise.resolve(null);
   const wilayaCode = selectedWilaya || '00';
-  const metaBase = {
-    name: attachment.name || 'مرفق دليل',
-    type: attachment.type || '',
-    category: attachment.category || 'file',
-    size: attachment.size || 0,
-    refKey: refKey
-  };
+  const metaBase = { name: attachment.name || 'مرفق دليل', type: attachment.type || '', category: attachment.category || 'file', size: attachment.size || 0, refKey: refKey };
 
-  showToast('⏳ جاري رفع المرفق', 'يتم الآن رفع "' + metaBase.name + '" إلى خادم Firebase...');
+  showToast('⏳ جاري رفع المرفق', 'يتم الآن رفع "' + metaBase.name + '" سحابياً...');
 
   const viaCloudStorage = window.firebaseStorage
     ? window.firebaseStorage.ref('guideAttachments/' + wilayaCode + '/' + refKey)
         .putString(attachment.data, 'data_url')
         .then(snap => snap.ref.getDownloadURL())
-        .then(url => database.ref('guideAttachments/' + refKey).set({ ...metaBase, url: url, storageType: 'firebase-storage' }))
+        .then(url => {
+          const payload = { ...metaBase, url: url, storageType: 'firebase-storage' };
+          return database.ref('guideAttachments/' + refKey).set(payload).then(() => payload);
+        })
     : Promise.reject(new Error('storage-sdk-unavailable'));
 
-  return viaCloudStorage
+  return withTimeout(viaCloudStorage, 10000)
     .catch(err => {
-      console.warn('[مرفق الدليل] Firebase Storage غير متاح — نستخدم قاعدة البيانات مباشرة:', err);
-      if ((attachment.data || '').length > 15 * 1024 * 1024) throw new Error('attachment-too-large');
-      return database.ref('guideAttachments/' + refKey).set({ ...metaBase, data: attachment.data, storageType: 'rtdb' });
-    })
-    .then(() => {
-      showToast('✅ تم رفع المرفق', '"' + metaBase.name + '" أصبح متاحاً الآن لجميع المؤسسات.');
+      console.warn('[سحابي] Firebase Storage غير متوفر أو معطل، نستخدم قنوات الرفع السريع البديلة المباشرة:', err);
+      return uploadFileToCloud(attachment)
+        .then(res => {
+          const payload = { ...metaBase, url: res.url, storageType: res.storageType };
+          return database.ref('guideAttachments/' + refKey).set(payload).then(() => payload);
+        });
     })
     .catch(err => {
-      console.error('[مرفق الدليل] فشل رفع المرفق:', err);
-      const why = (err && err.message === 'attachment-too-large')
-        ? 'الملف كبير جداً والتخزين السحابي غير مفعّل في مشروع Firebase'
-        : 'تحقق من الاتصال بالإنترنت ثم أعد المحاولة';
-      showToast('⚠️ وصلت الدليل بدون مرفق', 'تعذر رفع المرفق: ' + why);
+      console.warn('[سحابي] فشل الرفع البديل أيضاً، نتحقق من الحجم لحفظه محلياً كـ base64 كخيار أخير:', err);
+      const dataLength = (attachment.data || '').length;
+      if (dataLength > 5 * 1024 * 1024) {
+        throw new Error('file-too-large-for-rtdb');
+      }
+      const payload = { ...metaBase, data: attachment.data, storageType: 'rtdb' };
+      return database.ref('guideAttachments/' + refKey).set(payload).then(() => payload);
+    })
+    .then(payload => {
+      showToast('✅ تم رفع المرفق بنجاح', '"' + metaBase.name + '" أصبح متاحاً الآن لجميع المؤسسات.');
+      return payload;
+    })
+    .catch(err => {
+      console.error('[سحابي] فشل كامل في الرفع:', err);
+      const why = (err && err.message === 'file-too-large-for-rtdb')
+        ? 'حجم المرفق كبير جداً (أكبر من 5 ميغابايت) والتخزين السحابي غير مفعّل في خادمك'
+        : 'تعذر الرفع، يرجى التحقق من اتصالك بالإنترنت';
+      showToast('⚠️ وصل الدليل بدون مرفق', 'تعذر رفع المرفق: ' + why);
+      return null;
     });
 }
 
@@ -8780,5 +8937,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c43b7d99dfb6c1',t:'MTc4NDIzODcyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c443d3dfe7b6c1',t:'MTc4NDIzOTA3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c8bb122f27336f',t:'MTc4NDI4NTg5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ca2320ced0b6be',t:'MTc4NDMwMDY0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ca402cad783351',t:'MTc4NDMwMTgzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c8bb122f27336f',t:'MTc4NDI4NTg5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ca2320ced0b6be',t:'MTc4NDMwMDY0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ca54f0fa533351',t:'MTc4NDMwMjY4Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1caab8559e13363',t:'MTc4NDMwNjIzMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
