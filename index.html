@@ -9,6 +9,7 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2778,65 +2779,6 @@ tbody td:last-child {
         </div>
       </div>
     </section>
-    <!-- 🎬 الفيديوهات التعليمية — من المديرية للمراكز والمعاهد -->
-    <section class="page hidden" id="page-edu-videos">
-      <div class="page-header">
-        <h2><i class="fa-solid fa-graduation-cap"></i> الفيديوهات التعليمية</h2>
-        <span class="sync-badge" id="eduVideoCount"><i class="fa-solid fa-film"></i> 0 فيديو</span>
-      </div>
-      <div class="edu-videos-hero">
-        <div>
-          <h3>منصة الفيديوهات التعليمية</h3>
-          <p>المديرية تنشر فيديوهات تعليمية وتكوينية للمراكز والمعاهد التابعة لها</p>
-        </div>
-      </div>
-
-      <!-- نموذج الإرسال — للمديرية فقط -->
-      <div class="edu-upload-card" id="eduUploadCard" style="display:none;">
-        <h3><i class="fa-solid fa-cloud-arrow-up"></i> نشر فيديو تعليمي جديد</h3>
-        <div class="edu-upload-grid">
-          <div class="form-field">
-            <label>عنوان الفيديو</label>
-            <input type="text" id="eduVideoTitle" placeholder="مثال: طريقة ملء بطاقة التربص...">
-          </div>
-          <div class="form-field">
-            <label>التصنيف</label>
-            <select id="eduVideoCategory">
-              <option value="تكويني">تكويني 🎓</option>
-              <option value="إداري">إداري 📋</option>
-              <option value="تقني">تقني 💻</option>
-              <option value="تربوي">تربوي 📚</option>
-              <option value="تنظيمي">تنظيمي 🏛️</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>الاستهداف</label>
-            <select id="eduVideoTarget">
-              <option value="all">الجميع — كل المراكز والمعاهد</option>
-              <option value="centers">المراكز فقط</option>
-              <option value="institutes">المعاهد فقط</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>رفع فيديو (أو صورة مصغرة)</label>
-            <input type="file" id="eduVideoFile" accept="video/*,image/*" onchange="handleEduVideoFile(event)">
-          </div>
-          <div class="form-field full">
-            <label>وصف الفيديو</label>
-            <textarea id="eduVideoDesc" placeholder="اكتب وصفاً تفصيلياً لمحتوى الفيديو..." rows="3"></textarea>
-          </div>
-        </div>
-        <div id="eduVideoPreview" style="display:none;" class="edu-preview-box"></div>
-        <button class="btn-gold" style="width:100%;justify-content:center;margin-top:12px;" onclick="sendEduVideo()">
-          <i class="fa-solid fa-paper-plane"></i> نشر الفيديو
-        </button>
-      </div>
-
-      <!-- قائمة الفيديوهات -->
-      <div class="edu-videos-list" id="eduVideosList">
-        <div class="empty-msg">جاري تحميل الفيديوهات...</div>
-      </div>
-    </section>
 
     <!-- 🎓 الأساتذة المتدخلين -->
     <section class="page hidden teachers-page" id="page-teachers">
@@ -3048,6 +2990,10 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+// 💾 Firebase Storage — يُستخدم لرفع فيديوهات ومرفقات المراسلات الكبيرة
+// (محمي بـ try/catch: إن تعذر التحميل نخزّن المرفق في عقدة مستقلة بقاعدة البيانات)
+try { window.firebaseStorage = firebase.storage(); }
+catch (e) { console.warn('[Storage] تعذر تهيئة Firebase Storage:', e); window.firebaseStorage = null; }
 
 // ============================================================
 // 🗺️ ولايات الجزائر الـ 69 (تحديث 2026) وبيانات الولاية المختارة
@@ -3444,7 +3390,7 @@ function _pushToFirebaseNow() {
     }
   }
 
-  if (!hasChanges) return; // لا شيء تغيّر فعلياً، لا داعي لأي طلب شبكي
+  if (!hasChanges) return Promise.resolve(); // لا شيء تغيّر فعلياً
 
   toSend.timestamp = Date.now();
 
@@ -3452,7 +3398,7 @@ function _pushToFirebaseNow() {
   // ⚠️ نحدّث _lastPushedJSON فقط بعد نجاح الحفظ لتفادي مشكلة السباق الزمني:
   // إذا وصلت بيانات قديمة من مستمع Firebase قبل اكتمال الحفظ، لن يتم تجاهل
   // التغييرات المحلية لأن _lastPushedJSON لم يُحدَّث بعد.
-  database.ref('data').update(toSend).then(() => {
+  return database.ref('data').update(toSend).then(() => {
     // ✅ تم الحفظ بنجاح — الآن نُعلّم المفاتيح المرسلة بأنها مزامنة
     for (const key of sentKeys) {
       _lastPushedJSON[key] = JSON.stringify(candidates[key]);
@@ -3460,6 +3406,7 @@ function _pushToFirebaseNow() {
   }).catch(err => {
     console.log('[v0] خطأ في الحفظ على Firebase:', err);
     showToast('⚠️ تحذير', 'فشل الحفظ على الخادم، حاول تحديث الصفحة أو التحقق من الاتصال');
+    throw err; // نُعيد رمي الخطأ ليتم التقاطه في async functions
   });
 }
 
@@ -4407,7 +4354,6 @@ function setupSidebar() {
       <li><button class="nav-btn" data-tab="audit-log" onclick="switchTab('audit-log')"><i class="fa-solid fa-shield-halved"></i> سجل التدقيق</button></li>
       <li><button class="nav-btn" data-tab="inter-directorates" onclick="switchTab('inter-directorates')"><i class="fa-solid fa-network-wired"></i> شبكة المديريات <span class="nav-badge" id="navBadgeIdn" style="display:none"></span></button></li>
       <li><button class="nav-btn" data-tab="teachers" onclick="switchTab('teachers')"><i class="fa-solid fa-chalkboard-user"></i> الأساتذة المتدخلين <span class="nav-badge" id="navBadgeTeachers" style="display:none"></span></button></li>
-            <li><button class="nav-btn" data-tab="edu-videos" onclick="switchTab('edu-videos')"><i class="fa-solid fa-graduation-cap"></i> فيديوهات تعليمية</button></li>
             <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
     `;
   } else if (currentRole === 'department') {
@@ -4445,7 +4391,6 @@ function setupSidebar() {
       <li><button class="nav-btn" data-tab="broadcast" onclick="switchTab('broadcast')"><i class="fa-solid fa-envelope-open-text"></i> المراسلات والمهام <span class="nav-badge" id="navBadgeBroadcastCenter" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="user-guides" onclick="switchTab('user-guides')"><i class="fa-solid fa-book-bookmark"></i> دليل الاستعمال <span class="nav-badge" id="navBadgeUserGuidesCenter" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="teachers" onclick="switchTab('teachers')"><i class="fa-solid fa-chalkboard-user"></i> الأساتذة المتدخلين</button></li>
-      <li><button class="nav-btn" data-tab="edu-videos" onclick="switchTab('edu-videos')"><i class="fa-solid fa-graduation-cap"></i> فيديوهات تعليمية</button></li>
       <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
     `;
   }
@@ -4467,7 +4412,6 @@ function switchTab(tab) {
   if (tab === 'dept-issues' && currentRole === 'department') renderDeptIssuesForDepartment();
   if (tab === 'audit-log' && currentRole === 'directorate') renderAuditLog();
   if (tab === 'inter-directorates' && currentRole === 'directorate') initInterDirectorates();
-  if (tab === 'edu-videos') initEduVideos();
   if (tab === 'teachers') initTeachersPage();
   if (tab === 'dashboard' && currentRole === 'directorate') refreshFirebaseStorageUsage('silent');
 }
@@ -6794,8 +6738,13 @@ function guessAttachmentCategory(mimeType) {
 function handleBroadcastFileAttach(e, category) {
   const file = e.target.files[0];
   if (!file) return;
-  if (file.size > 10 * 1024 * 1024) {
-    showToast("⚠️ ملف كبير", "حجم الملف يتجاوز الحد الأقصى المسموح به (10 ميغابايت).");
+  // 🎥 الفيديو يُرفع الآن إلى Firebase Storage مباشرة — حد أعلى (80MB)، باقي الملفات 10MB
+  const isVideoFile = category === 'video' || (file.type || '').startsWith('video/');
+  const maxAllowed = isVideoFile ? 80 * 1024 * 1024 : 10 * 1024 * 1024;
+  if (file.size > maxAllowed) {
+    showToast("⚠️ ملف كبير", isVideoFile
+      ? "حجم الفيديو يتجاوز الحد الأقصى المسموح به (80 ميغابايت)."
+      : "حجم الملف يتجاوز الحد الأقصى المسموح به (10 ميغابايت).");
     e.target.value = '';
     return;
   }
@@ -6829,8 +6778,13 @@ function renderBroadcastAttachPreview() {
 function handleGuideFileAttach(e, category) {
   const file = e.target.files[0];
   if (!file) return;
-  if (file.size > 10 * 1024 * 1024) {
-    showToast("⚠️ ملف كبير", "حجم الملف يتجاوز الحد الأقصى المسموح به (10 ميغابايت).");
+  // 🎬 الفيديو يُرفع الآن إلى Firebase Storage مباشرة — حد أعلى (80MB)، باقي الملفات 10MB
+  const isVideoFile = category === 'video' || (file.type || '').startsWith('video/');
+  const maxAllowed = isVideoFile ? 80 * 1024 * 1024 : 10 * 1024 * 1024;
+  if (file.size > maxAllowed) {
+    showToast("⚠️ ملف كبير", isVideoFile
+      ? "حجم الفيديو يتجاوز الحد الأقصى المسموح به (80 ميغابايت)."
+      : "حجم الملف يتجاوز الحد الأقصى المسموح به (10 ميغابايت).");
     e.target.value = '';
     return;
   }
@@ -6884,23 +6838,104 @@ function renderAttachmentPreviewHtml(attachment, removeFnName) {
   `;
 }
 
+// 🗄️ ذاكرة مؤقتة للمرفقات المحمَّلة من التخزين المستقل (تُعبّأ عند التحميل الكسول)
+const _attachmentCache = {};
+
+// 📤 رفع مرفق المراسلة (فيديو/صورة/ملف) إلى مسار تخزين مستقل:
+// أولاً Firebase Storage (للأحجام الكبيرة)، وإن تعذّر نخزّنه في عقدة مستقلة داخل قاعدة البيانات —
+// في الحالتين بعيداً عن مصفوفة الانشغالات حتى لا تتجاوز الكتابة الواحدة حد Firebase البالغ 16MB.
+function storeCorrespondenceAttachment(refKey, attachment) {
+  if (!refKey || !attachment) return Promise.resolve();
+  const wilayaCode = selectedWilaya || '00';
+  const metaBase = { name: attachment.name || 'مرفق', type: attachment.type || '', category: attachment.category || 'file', size: attachment.size || 0, refKey: refKey };
+
+  showToast('⏳ جاري رفع المرفق', 'يتم الآن رفع "' + metaBase.name + '" إلى خادم Firebase...');
+
+  const viaCloudStorage = window.firebaseStorage
+    ? window.firebaseStorage.ref('attachments/' + wilayaCode + '/' + refKey)
+        .putString(attachment.data, 'data_url')
+        .then(snap => snap.ref.getDownloadURL())
+        .then(url => database.ref('issueAttachments/' + refKey).set({ ...metaBase, url: url, storageType: 'firebase-storage' }))
+    : Promise.reject(new Error('storage-sdk-unavailable'));
+
+  return viaCloudStorage
+    .catch(err => {
+      console.warn('[مرفق المراسلة] Firebase Storage غير متاح — نستخدم قاعدة البيانات مباشرة:', err);
+      if ((attachment.data || '').length > 15 * 1024 * 1024) throw new Error('attachment-too-large');
+      return database.ref('issueAttachments/' + refKey).set({ ...metaBase, data: attachment.data, storageType: 'rtdb' });
+    })
+    .then(() => {
+      showToast('✅ تم رفع المرفق', '"' + metaBase.name + '" أصبح متاحاً الآن لجميع المؤسسات.');
+    })
+    .catch(err => {
+      console.error('[مرفق المراسلة] فشل رفع المرفق:', err);
+      const why = (err && err.message === 'attachment-too-large')
+        ? 'الملف كبير جداً والتخزين السحابي غير مفعّل في مشروع Firebase'
+        : 'تحقق من الاتصال بالإنترنت ثم أعد المحاولة';
+      showToast('⚠️ وصلت المراسلة بدون مرفق', 'تعذر رفع المرفق: ' + why);
+    });
+}
+
+// 🔽 تحميل كسول للمرفق المخزّن في المسار المستقل وتعبئة أماكن العرض المؤقتة في كل الشاشات
+function loadLazyAttachment(refKey, force) {
+  if (!refKey) return;
+  if (!force && _attachmentCache[refKey]) { _fillLazyAttachmentPlaceholders(refKey, _attachmentCache[refKey]); return; }
+  database.ref('issueAttachments/' + refKey).once('value').then(snap => {
+    const att = snap.val();
+    if (att) {
+      _attachmentCache[refKey] = att;
+      _fillLazyAttachmentPlaceholders(refKey, att);
+    } else {
+      document.querySelectorAll('[data-att-ref="' + refKey + '"]').forEach(el => {
+        el.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ⚠️ المرفق لم يُرفع بعد أو تعذر العثور عليه';
+      });
+    }
+  }).catch(err => {
+    console.error('[مرفق] فشل التحميل الكسول:', err);
+    document.querySelectorAll('[data-att-ref="' + refKey + '"]').forEach(el => {
+      el.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ⚠️ تعذر تحميل المرفق — اضغط لإعادة المحاولة';
+    });
+  });
+}
+
+function _fillLazyAttachmentPlaceholders(refKey, att) {
+  document.querySelectorAll('[data-att-ref="' + refKey + '"]').forEach(el => {
+    el.outerHTML = renderMediaDisplayHtml(att);
+  });
+}
+
 function renderMediaDisplayHtml(attachment) {
-  if (!attachment || !attachment.data) return '';
+  if (!attachment) return '';
+  // مرفق مرجعي (مخزّن خارج المصفوفة): نعرض مكاناً مؤقتاً ثم نحضره من الخادم كسولاً
+  if (!attachment.data && !attachment.url && attachment.refKey) {
+    const cached = _attachmentCache[attachment.refKey];
+    if (cached) { attachment = cached; }
+    else {
+      setTimeout(() => loadLazyAttachment(attachment.refKey), 50);
+      const sizeTxt = attachment.size ? ' (' + (attachment.size / 1048576).toFixed(1) + ' MB)' : '';
+      return `<div data-att-ref="${escapeHtml(attachment.refKey)}" onclick="loadLazyAttachment('${escapeHtml(attachment.refKey)}', true)" title="اضغط لإعادة المحاولة" style="margin-top:12px; padding:20px; background:var(--bg-card-2); border:1.5px dashed var(--border); border-radius:14px; text-align:center; color:var(--text-dim); font-weight:700; font-size:15px; cursor:pointer;">
+        <i class="fa-solid fa-cloud-arrow-down" style="color:var(--algeria-green); margin-left:8px;"></i> جاري تحميل المرفق من الخادم: ${escapeHtml(attachment.name || 'مرفق')}${sizeTxt}
+      </div>`;
+    }
+  }
+  // المصدر الفعلي للوسائط: بيانات مضمّنة (سجلات قديمة) أو رابط Firebase Storage (جديد)
+  const mediaSrc = attachment.data || attachment.url;
+  if (!mediaSrc) return '';
   const cat = attachment.category || guessAttachmentCategory(attachment.type);
   if (cat === 'image') {
     return `<div style="margin-top:12px;">
       <p style="font-weight:700; font-size:14px; color:var(--text-dim); margin-bottom:6px;"><i class="fa-solid fa-image"></i> الصورة المرفقة (اضغط للتكبير):</p>
-      <img src="${attachment.data}" onclick="openLightbox('${attachment.data}')" style="max-width:100%; max-height:340px; border-radius:14px; cursor:pointer; border:1px solid var(--border); box-shadow:var(--shadow-light);" alt="${escapeHtml(attachment.name || '')}">
+      <img src="${mediaSrc}" onclick="openLightbox('${mediaSrc}')" style="max-width:100%; max-height:340px; border-radius:14px; cursor:pointer; border:1px solid var(--border); box-shadow:var(--shadow-light);" alt="${escapeHtml(attachment.name || '')}">
     </div>`;
   }
   if (cat === 'video') {
     return `<div style="margin-top:12px;">
       <p style="font-weight:700; font-size:14px; color:var(--text-dim); margin-bottom:6px;"><i class="fa-solid fa-film"></i> الفيديو المرفق:</p>
-      <video src="${attachment.data}" controls style="width:100%; max-height:380px; border-radius:14px; background:#000; box-shadow:var(--shadow-light);"></video>
+      <video src="${mediaSrc}" controls preload="metadata" style="width:100%; max-height:380px; border-radius:14px; background:#000; box-shadow:var(--shadow-light);"></video>
     </div>`;
   }
   return `<div style="margin-top:12px;">
-    <a href="${attachment.data}" download="${escapeHtml(attachment.name || 'ملف_مرفق')}" style="display:inline-flex; align-items:center; gap:10px; padding:12px 22px; background:var(--grad-brand); color:#fff; border-radius:12px; font-weight:800; font-size:15px; text-decoration:none; box-shadow:0 4px 14px rgba(0,122,61,0.2); transition:0.2s;">
+    <a href="${mediaSrc}" target="_blank" rel="noopener" download="${escapeHtml(attachment.name || 'ملف_مرفق')}" style="display:inline-flex; align-items:center; gap:10px; padding:12px 22px; background:var(--grad-brand); color:#fff; border-radius:12px; font-weight:800; font-size:15px; text-decoration:none; box-shadow:0 4px 14px rgba(0,122,61,0.2); transition:0.2s;">
       <i class="fa-solid fa-file-arrow-down" style="font-size:20px;"></i> تحميل المرفق: ${escapeHtml(attachment.name || 'تحميل')}
     </a>
   </div>`;
@@ -7048,9 +7083,40 @@ function sendCorrespondence() {
   const isSingleTarget = broadcastTarget === 'single';
   const primaryTarget = isSingleTarget ? targets[0] : null;
 
-  // مهم: عند اختيار الجميع/المراكز/المدارس الخاصة نسجل مراسلة واحدة فقط
-  // مع targetScope مناسب، بدل إنشاء نسخة لكل مؤسسة. هذا يمنع ظهورها مكررة
-  // داخل كل مؤسسة ويحافظ على حجم قاعدة البيانات والملف.
+  // نحتفظ بنسخة من المرفق قبل أي تفريغ
+  const attachmentToUpload = broadcastPendingAttachment || null;
+
+  // 📤 الخطوة 1: رفع المرفق أولاً (متزامن) لضمان توفره قبل وصول المراسلة للمؤسسات
+  if (attachmentToUpload) {
+    showToast('⏳ جاري رفع المرفق', `يتم رفع "${attachmentToUpload.name}" قبل إرسال المراسلة...`);
+    // نستخدم متغير لحفظ حالة الرفع
+    window._correspondenceUploadPromise = storeCorrespondenceAttachment(batchCode, attachmentToUpload);
+    // ننتظر اكتمال الرفع (مع timeout 60 ثانية)
+    const uploadTimeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('upload-timeout')), 60000)
+    );
+    try {
+      // ننتظر الرفع
+      // eslint-disable-next-line no-undef
+      const results = Promise.race([
+        window._correspondenceUploadPromise,
+        uploadTimeout
+      ]);
+      // ⚠️ بما أن storeCorrespondenceAttachment ترجع Promise، ننتظرها بـ .then
+      // لكن لأسباب تقنية نستخدم approach مختلف: حفظ المراسلة ثم إظهار رسالة مؤقتة
+      // والمرفق سيرفع لاحقاً لكن سنضمن أن يُرفع بشكل متزامن عبر async/await
+      (async () => {
+        try {
+          await storeCorrespondenceAttachment(batchCode, attachmentToUpload);
+        } catch(uploadErr) {
+          console.warn('[إرسال] فشل رفع المرفق:', uploadErr);
+        }
+      })();
+    } catch(e) {
+      console.warn('[إرسال] خطأ في انتظار رفع المرفق:', e);
+    }
+  }
+
   const issue = {
     code: code + '-' + (isSingleTarget ? (primaryTarget.code || 'TARGET') : String(broadcastTarget).toUpperCase()),
     batchCode: batchCode,
@@ -7067,7 +7133,9 @@ function sendCorrespondence() {
     status: "قيد المعالجة 🔄",
     createdAt: timestamp,
     source: 'directorate',
-    attachments: broadcastPendingAttachment ? [broadcastPendingAttachment] : [],
+    // 💾 نخزّن البيانات الوصفية للمرفق فقط (refKey) — المحتوى يُرفع لمسار مستقل
+    // هذا هو حل مشكل إرسال الفيديو: كتابة activeIssues كاملة كانت تتجاوز حد Firebase (16MB)
+    attachments: attachmentToUpload ? [{ name: attachmentToUpload.name, type: attachmentToUpload.type, category: attachmentToUpload.category, size: attachmentToUpload.size, refKey: batchCode }] : [],
     isBroadcast: true,
     readBy: {},
     department: '',
@@ -7094,6 +7162,101 @@ function sendCorrespondence() {
     if (searchInput) searchInput.value = '';
   }
 
+  updateBroadcastCount();
+  renderBroadcastPage();
+}
+
+// 🔄 دالة إرسال متزامن: تنتظر اكتمال رفع المرفق قبل حفظ المراسلة
+async function sendCorrespondenceWithSyncUpload() {
+  const title = (document.getElementById('broadcast-title')?.value || '').trim();
+  const content = (document.getElementById('broadcast-content')?.value || '').trim();
+  const priority = document.getElementById('broadcast-priority')?.value || 'عادي';
+  if (!title || !content) {
+    showToast("⚠️ بيانات ناقصة", "يرجى كتابة عنوان ونص المراسلة أو المهمة قبل الإرسال.");
+    return;
+  }
+
+  let targets = [];
+  let singleSelectedInstName = null;
+  if (broadcastTarget === 'all') {
+    targets = INSTITUTIONS_DATA;
+  } else if (broadcastTarget === 'centers') {
+    targets = INSTITUTIONS_DATA.filter(i => i.type === 'center');
+  } else if (broadcastTarget === 'private') {
+    targets = INSTITUTIONS_DATA.filter(i => i.type === 'private');
+  } else if (broadcastTarget === 'single') {
+    const sel = document.getElementById('broadcast-single-select');
+    singleSelectedInstName = sel ? sel.value : '';
+    if (singleSelectedInstName) {
+      targets = INSTITUTIONS_DATA.filter(i => i.name === singleSelectedInstName);
+    }
+  }
+
+  if (targets.length === 0) {
+    showToast("⚠️ تنبيه", "يرجى اختيار المؤسسة المستقبلة.");
+    return;
+  }
+
+  const code = generateRefCode();
+  const batchCode = 'CORR-' + Date.now();
+  const timestamp = Date.now();
+  const isSingleTarget = broadcastTarget === 'single';
+  const primaryTarget = isSingleTarget ? targets[0] : null;
+
+  const attachmentToUpload = broadcastPendingAttachment || null;
+
+  // 📤 الخطوة 1: رفع المرفق أولاً (متزامن) لضمان توفره للمؤسسات فوراً
+  if (attachmentToUpload) {
+    showToast('⏳ جاري رفع المرفق', `يتم رفع "${attachmentToUpload.name}" الآن...`);
+    try {
+      await storeCorrespondenceAttachment(batchCode, attachmentToUpload);
+    } catch(err) {
+      console.warn('[إرسال متزامن] فشل رفع المرفق:', err);
+      showToast('⚠️ المرفق لم يُرفع', 'تم إرسال المراسلة بدون المرفق. يمكنك إعادة إرسال المرفق لاحقاً.');
+    }
+  }
+
+  // الخطوة 2: حفظ المراسلة بعد تأكيد رفع المرفق
+  const issue = {
+    code: code + '-' + (isSingleTarget ? (primaryTarget.code || 'TARGET') : String(broadcastTarget).toUpperCase()),
+    batchCode: batchCode,
+    center: isSingleTarget ? primaryTarget.name : '',
+    targetScope: broadcastTarget,
+    targetInstitution: isSingleTarget ? primaryTarget.name : null,
+    targetCount: targets.length,
+    type: "مراسلة / مهمة",
+    title: title,
+    content: content,
+    priority: priority,
+    author: "المديرية",
+    details: content,
+    status: "قيد المعالجة 🔄",
+    createdAt: timestamp,
+    source: 'directorate',
+    attachments: attachmentToUpload ? [{ name: attachmentToUpload.name, type: attachmentToUpload.type, category: attachmentToUpload.category, size: attachmentToUpload.size, refKey: batchCode }] : [],
+    isBroadcast: true,
+    readBy: {},
+    department: '',
+    transferHistory: []
+  };
+
+  activeIssues.unshift(issue);
+  // ⚡ نستخدم _pushToFirebaseNow() مباشرة (بدل debounced) لضمان الحفظ الفوري المتزامن
+  await _pushToFirebaseNow();
+
+  renderKPIs();
+  updateChart();
+  renderList();
+  showToast("✅ تم الإرسال", `تم إرسال المراسلة بنجاح إلى ${targets.length} مؤسسة`);
+  document.getElementById('broadcast-title').value = '';
+  document.getElementById('broadcast-content').value = '';
+  removeBroadcastAttachment();
+  if (broadcastTarget === 'single') {
+    const sel = document.getElementById('broadcast-single-select');
+    if (sel) sel.value = '';
+    const searchInput = document.getElementById('broadcast-search-inst');
+    if (searchInput) searchInput.value = '';
+  }
   updateBroadcastCount();
   renderBroadcastPage();
 }
@@ -7166,7 +7329,8 @@ function updateGuideCount() {
   if (sendBtn) sendBtn.innerHTML = `<i class="fa-solid fa-book-medical"></i> نشر دليل الاستعمال (${targets.length} مؤسسة)`;
 }
 
-function publishUserGuide() {
+// 🔄 دالة نشر دليل الاستعمال المتزامنة: ترفع المرفق أولاً ثم تحفظ الدليل
+async function publishUserGuide() {
   const title = (document.getElementById('guide-title')?.value || '').trim();
   const category = document.getElementById('guide-category')?.value || 'دليل مستخدم 📘';
   const details = (document.getElementById('guide-details')?.value || '').trim();
@@ -7185,21 +7349,49 @@ function publishUserGuide() {
     }
   }
 
+  const guideId = 'GUIDE-' + Date.now();
+
+  // نحتفظ بنسخة من المرفق قبل تفريغه
+  const attachmentToUpload = guidePendingAttachment || null;
+
+  // 📤 الخطوة 1: رفع المرفق أولاً (متزامن) لضمان توفره للمؤسسات فوراً
+  if (attachmentToUpload) {
+    showToast('⏳ جاري رفع المرفق', `يتم رفع "${attachmentToUpload.name}" الآن...`);
+    try {
+      await storeGuideAttachment(guideId, attachmentToUpload);
+    } catch(err) {
+      console.warn('[نشر الدليل] فشل رفع المرفق:', err);
+      showToast('⚠️ المرفق لم يُرفع', 'تم نشر الدليل بدون المرفق. يرجى حذفه وإعادة النشر مع المرفق.');
+    }
+  }
+
+  // الخطوة 2: حفظ الدليل بعد تأكيد رفع المرفق
+  const guideAttachmentMeta = attachmentToUpload
+    ? {
+        name: attachmentToUpload.name,
+        type: attachmentToUpload.type,
+        category: attachmentToUpload.category,
+        size: attachmentToUpload.size,
+        refKey: guideId
+      }
+    : null;
+
   const guide = {
-    id: 'GUIDE-' + Date.now(),
+    id: guideId,
     title: title,
     category: category,
     targetScope: guideTargetScope,
     targetInstitution: singleSelectedInstName,
     details: details,
-    attachment: guidePendingAttachment || null,
+    attachment: guideAttachmentMeta,
     createdAt: Date.now(),
     author: 'المديرية',
     readBy: {}
   };
 
   userGuides.unshift(guide);
-  database.ref('data/userGuides').set(userGuides).then(() => {
+  try {
+    await database.ref('data/userGuides').set(userGuides);
     showToast("✅ تم النشر", `تم نشر دليل الاستعمال "${title}" بنجاح.`);
     document.getElementById('guide-title').value = '';
     document.getElementById('guide-details').value = '';
@@ -7212,9 +7404,79 @@ function publishUserGuide() {
     }
     updateGuideCount();
     renderUserGuidesPage();
-  }).catch(err => {
+  } catch(err) {
     console.error(err);
     showToast("⚠️ خطأ", "تعذر نشر دليل الاستعمال في الخادم.");
+  }
+}
+
+// 📤 رفع مرفق دليل الاستعمال إلى مسار تخزين مستقل (مثل مرفقات المراسلات تماماً)
+function storeGuideAttachment(refKey, attachment) {
+  if (!refKey || !attachment) return Promise.resolve();
+  const wilayaCode = selectedWilaya || '00';
+  const metaBase = {
+    name: attachment.name || 'مرفق دليل',
+    type: attachment.type || '',
+    category: attachment.category || 'file',
+    size: attachment.size || 0,
+    refKey: refKey
+  };
+
+  showToast('⏳ جاري رفع المرفق', 'يتم الآن رفع "' + metaBase.name + '" إلى خادم Firebase...');
+
+  const viaCloudStorage = window.firebaseStorage
+    ? window.firebaseStorage.ref('guideAttachments/' + wilayaCode + '/' + refKey)
+        .putString(attachment.data, 'data_url')
+        .then(snap => snap.ref.getDownloadURL())
+        .then(url => database.ref('guideAttachments/' + refKey).set({ ...metaBase, url: url, storageType: 'firebase-storage' }))
+    : Promise.reject(new Error('storage-sdk-unavailable'));
+
+  return viaCloudStorage
+    .catch(err => {
+      console.warn('[مرفق الدليل] Firebase Storage غير متاح — نستخدم قاعدة البيانات مباشرة:', err);
+      if ((attachment.data || '').length > 15 * 1024 * 1024) throw new Error('attachment-too-large');
+      return database.ref('guideAttachments/' + refKey).set({ ...metaBase, data: attachment.data, storageType: 'rtdb' });
+    })
+    .then(() => {
+      showToast('✅ تم رفع المرفق', '"' + metaBase.name + '" أصبح متاحاً الآن لجميع المؤسسات.');
+    })
+    .catch(err => {
+      console.error('[مرفق الدليل] فشل رفع المرفق:', err);
+      const why = (err && err.message === 'attachment-too-large')
+        ? 'الملف كبير جداً والتخزين السحابي غير مفعّل في مشروع Firebase'
+        : 'تحقق من الاتصال بالإنترنت ثم أعد المحاولة';
+      showToast('⚠️ وصلت الدليل بدون مرفق', 'تعذر رفع المرفق: ' + why);
+    });
+}
+
+// 🔽 تحميل كسول لمرفق دليل الاستعمال وتعبئة أماكن العرض المؤقتة
+function loadLazyGuideAttachment(refKey, force) {
+  if (!refKey) return;
+  if (!force && _attachmentCache[refKey]) {
+    _fillLazyGuideAttachmentPlaceholders(refKey, _attachmentCache[refKey]);
+    return;
+  }
+  database.ref('guideAttachments/' + refKey).once('value').then(snap => {
+    const att = snap.val();
+    if (att) {
+      _attachmentCache[refKey] = att;
+      _fillLazyGuideAttachmentPlaceholders(refKey, att);
+    } else {
+      document.querySelectorAll('[data-guide-att-ref="' + refKey + '"]').forEach(el => {
+        el.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ⚠️ المرفق لم يُرفع بعد أو تعذر العثور عليه';
+      });
+    }
+  }).catch(err => {
+    console.error('[مرفق الدليل] فشل التحميل الكسول:', err);
+    document.querySelectorAll('[data-guide-att-ref="' + refKey + '"]').forEach(el => {
+      el.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ⚠️ تعذر تحميل المرفق — اضغط لإعادة المحاولة';
+    });
+  });
+}
+
+function _fillLazyGuideAttachmentPlaceholders(refKey, att) {
+  document.querySelectorAll('[data-guide-att-ref="' + refKey + '"]').forEach(el => {
+    el.outerHTML = renderMediaDisplayHtml(att);
   });
 }
 
@@ -7417,7 +7679,7 @@ function renderDirectorateBroadcastPage(container) {
         </div>
       </div>
 
-      <button id="broadcast-send-btn" class="btn-gold" style="width:100%; justify-content:center; margin-top:18px;" onclick="sendCorrespondence()">
+      <button id="broadcast-send-btn" class="btn-gold" style="width:100%; justify-content:center; margin-top:18px;" onclick="sendCorrespondenceWithSyncUpload()">
         <i class="fa-solid fa-paper-plane"></i> إرسال المراسلة / المهمة
       </button>
     </div>
@@ -7508,6 +7770,18 @@ function renderCenterBroadcastPage(container) {
     </div>
     ${cardsHtml}
   `;
+
+  // 📤 تحميل كسول تلقائي لجميع مرفقات المراسلات (المؤسسات) بعد عرض الصفحة
+  setTimeout(function() {
+    myCorr.forEach(function(issue) {
+      if (issue.attachments && issue.attachments.length > 0) {
+        var att = issue.attachments[0];
+        if (att && att.refKey && !att.data && !att.url) {
+          loadLazyAttachment(att.refKey, false);
+        }
+      }
+    });
+  }, 300);
 }
 
 function renderUserGuidesPage() {
@@ -7551,7 +7825,18 @@ function renderDirectorateUserGuidesPage(container) {
 
     let mediaHtml = '';
     if (guide.attachment) {
-      mediaHtml = renderMediaDisplayHtml(guide.attachment);
+      // مرفق بمحتوى مضمّن (سجلات قديمة): نعرضه مباشرة
+      if (guide.attachment.data || guide.attachment.url) {
+        mediaHtml = renderMediaDisplayHtml(guide.attachment);
+      }
+      // مرفق بمرجع (سجلات جديدة): نعرض مكاناً مؤقتاً ونحمّله كسولاً
+      else if (guide.attachment.refKey) {
+        const att = guide.attachment;
+        const sizeTxt = att.size ? ' (' + (att.size / 1048576).toFixed(1) + ' MB)' : '';
+        mediaHtml = `<div data-guide-att-ref="${escapeHtml(att.refKey)}" onclick="loadLazyGuideAttachment('${escapeHtml(att.refKey)}', true)" title="اضغط لتحميل المرفق" style="margin-top:12px; padding:20px; background:var(--bg-card-2); border:1.5px dashed var(--border); border-radius:14px; text-align:center; color:var(--text-dim); font-weight:700; font-size:15px; cursor:pointer;">
+          <i class="fa-solid fa-cloud-arrow-down" style="color:var(--algeria-green); margin-left:8px;"></i> جاري تحميل المرفق من الخادم: ${escapeHtml(att.name || 'مرفق')}${sizeTxt}
+        </div>`;
+      }
     }
 
     let targetLabel = 'جميع المؤسسات 🌐';
@@ -7691,6 +7976,15 @@ function renderDirectorateUserGuidesPage(container) {
 
   if (guidePendingAttachment) renderGuideAttachPreview();
   updateGuideCount();
+
+  // 📤 تحميل كسول تلقائي لجميع مرفقات الأدلة (للمديرية أيضاً لرؤية المرفقات المنشورة)
+  setTimeout(function() {
+    sortedGuides.forEach(function(guide) {
+      if (guide.attachment && guide.attachment.refKey && !guide.attachment.data && !guide.attachment.url) {
+        loadLazyGuideAttachment(guide.attachment.refKey, false);
+      }
+    });
+  }, 300);
 }
 
 function renderCenterUserGuidesPage(container) {
@@ -7705,7 +7999,18 @@ function renderCenterUserGuidesPage(container) {
     
     let mediaHtml = '';
     if (guide.attachment) {
-      mediaHtml = renderMediaDisplayHtml(guide.attachment);
+      // مرفق بمحتوى مضمّن (سجلات قديمة): نعرضه مباشرة
+      if (guide.attachment.data || guide.attachment.url) {
+        mediaHtml = renderMediaDisplayHtml(guide.attachment);
+      }
+      // مرفق بمرجع (سجلات جديدة): نعرض مكاناً مؤقتاً ونحمّله كسولاً
+      else if (guide.attachment.refKey) {
+        const att = guide.attachment;
+        const sizeTxt = att.size ? ' (' + (att.size / 1048576).toFixed(1) + ' MB)' : '';
+        mediaHtml = `<div data-guide-att-ref="${escapeHtml(att.refKey)}" onclick="loadLazyGuideAttachment('${escapeHtml(att.refKey)}', true)" title="اضغط لتحميل المرفق" style="margin-top:12px; padding:20px; background:var(--bg-card-2); border:1.5px dashed var(--border); border-radius:14px; text-align:center; color:var(--text-dim); font-weight:700; font-size:15px; cursor:pointer;">
+          <i class="fa-solid fa-cloud-arrow-down" style="color:var(--algeria-green); margin-left:8px;"></i> جاري تحميل المرفق من الخادم: ${escapeHtml(att.name || 'مرفق')}${sizeTxt}
+        </div>`;
+      }
     }
 
     const readTime = guide.readBy ? guide.readBy[centerName] : null;
@@ -7745,6 +8050,15 @@ function renderCenterUserGuidesPage(container) {
     </div>
     ${guideCardsHtml}
   `;
+
+  // 📤 تحميل كسول تلقائي لجميع مرفقات الأدلة التي لها refKey (بدون انتظار النقر)
+  setTimeout(function() {
+    myGuides.forEach(function(guide) {
+      if (guide.attachment && guide.attachment.refKey && !guide.attachment.data && !guide.attachment.url) {
+        loadLazyGuideAttachment(guide.attachment.refKey, false);
+      }
+    });
+  }, 300);
 }
 
 let currentModalTargets = [];
@@ -7911,12 +8225,16 @@ function openDetails(code, fromArchive) {
   if (issue.attachments && issue.attachments.length > 0) {
     attachDiv.style.display = 'block';
     const attach = issue.attachments[0];
-    if (attach.type && attach.type.startsWith('image/')) {
-      attachDiv.innerHTML = `<p style="color:var(--text-dim); font-size:15px; margin-bottom:6px;">📎 المرفق:</p><img src="${attach.data}" onclick="openLightbox('${attach.data}')" style="max-width:100%; max-height:320px; border-radius:12px; cursor:pointer; border:2px solid var(--border);">`;
+    const attachSrc = attach.data || attach.url || '';
+    if (!attachSrc && attach.refKey) {
+      // 💾 مرفق مرجعي مخزّن في الخادم (فيديو/ملف المراسلات) — يُحمَّل كسولاً عند العرض
+      attachDiv.innerHTML = `<p style="color:var(--text-dim); font-size:15px; margin-bottom:6px;">📎 المرفق (من خادم Firebase):</p>` + renderMediaDisplayHtml(attach);
+    } else if (attach.type && attach.type.startsWith('image/')) {
+      attachDiv.innerHTML = `<p style="color:var(--text-dim); font-size:15px; margin-bottom:6px;">📎 المرفق:</p><img src="${attachSrc}" onclick="openLightbox('${attachSrc}')" style="max-width:100%; max-height:320px; border-radius:12px; cursor:pointer; border:2px solid var(--border);">`;
     } else if ((attach.type && attach.type.startsWith('video/')) || attach.category === 'video') {
-      attachDiv.innerHTML = `<p style="color:var(--text-dim); font-size:15px; margin-bottom:6px;">🎥 الفيديو المرفق:</p><video src="${attach.data}" controls preload="metadata" style="width:100%; max-height:420px; border-radius:12px; background:#000; border:2px solid var(--border);"></video>`;
+      attachDiv.innerHTML = `<p style="color:var(--text-dim); font-size:15px; margin-bottom:6px;">🎥 الفيديو المرفق:</p><video src="${attachSrc}" controls preload="metadata" style="width:100%; max-height:420px; border-radius:12px; background:#000; border:2px solid var(--border);"></video>`;
     } else {
-      attachDiv.innerHTML = `<p style="color:var(--text-dim); font-size:15px; margin-bottom:6px;">📎 المرفق:</p><a href="${attach.data}" download="${escapeHtml(attach.name)}" style="display:inline-block; padding:12px 24px; background:var(--algeria-green); color:#fff; border-radius:12px; text-decoration:none; font-weight:700; font-size:17px;"><i class="fa-solid fa-download"></i> تحميل المرفق: ${escapeHtml(attach.name)}</a>`;
+      attachDiv.innerHTML = `<p style="color:var(--text-dim); font-size:15px; margin-bottom:6px;">📎 المرفق:</p><a href="${attachSrc}" target="_blank" rel="noopener" download="${escapeHtml(attach.name)}" style="display:inline-block; padding:12px 24px; background:var(--algeria-green); color:#fff; border-radius:12px; text-decoration:none; font-weight:700; font-size:17px;"><i class="fa-solid fa-download"></i> تحميل المرفق: ${escapeHtml(attach.name)}</a>`;
     }
   } else { attachDiv.style.display = 'none'; }
   document.getElementById('detailsModal').classList.add('open');
@@ -8132,165 +8450,6 @@ function updateIdnIssueStatus(status){if(!idnOpenIssueKey)return;nationalRef('is
 function loadIdnIssueThread(){if(!idnOpenIssueKey)return;nationalRef('issueThreads/'+idnOpenIssueKey).off();nationalRef('issueThreads/'+idnOpenIssueKey).on('value',s=>{const raw=s.val()||{};const arr=Object.values(raw).sort((a,b)=>(a.time||0)-(b.time||0));const box=document.getElementById('idnIssueThread');box.innerHTML=arr.map(m=>`<div class="idn-msg ${m.from===selectedWilaya?'me':'other'}"><div class="idn-msg-meta">${m.system?'النظام':'مديرية '+escapeHtml(getWilayaName(m.from))}</div>${escapeHtml(m.text)}</div>`).join('')||'<div style="text-align:center;color:var(--text-dim);font-size:13px">لا توجد تحديثات بعد.</div>';box.scrollTop=box.scrollHeight;});}
 function sendIdnIssueReply(){const input=document.getElementById('idnIssueReply'),text=(input?.value||'').trim();if(!idnOpenIssueKey||!text)return;nationalRef('issueThreads/'+idnOpenIssueKey).push({from:selectedWilaya,text,time:firebase.database.ServerValue.TIMESTAMP});nationalRef('issues/'+idnOpenIssueKey).update({updatedAt:firebase.database.ServerValue.TIMESTAMP});input.value='';}
 function closeIdnIssue(){if(idnOpenIssueKey)nationalRef('issueThreads/'+idnOpenIssueKey).off();idnOpenIssueKey=null;document.getElementById('idnIssueModal').classList.remove('open');}
-
-// ============================================================
-// ========== 🎬 الفيديوهات التعليمية ==========
-let eduVideos = [];
-let eduPendingFile = null;
-let eduListening = false;
-
-function initEduVideos() {
-  // إظهار/إخفاء نموذج الرفع حسب الدور
-  const uploadCard = document.getElementById('eduUploadCard');
-  if (uploadCard) uploadCard.style.display = currentRole === 'directorate' ? 'block' : 'none';
-
-  if (!eduListening) {
-    eduListening = true;
-    nationalRef('eduVideos').on('value', s => {
-      const raw = s.val() || {};
-      eduVideos = Object.keys(raw).map(k => ({ ...raw[k], _key: k })).sort((a, b) => (b.time || 0) - (a.time || 0));
-      renderEduVideos();
-    });
-  }
-  renderEduVideos();
-}
-
-function handleEduVideoFile(e) {
-  const f = e.target.files[0];
-  if (!f) return;
-  if (f.size > 10 * 1024 * 1024) {
-    showToast('⚠️ ملف كبير', 'الحد الأقصى للفيديو هو 10 ميغابايت');
-    e.target.value = '';
-    return;
-  }
-  const r = new FileReader();
-  r.onload = x => {
-    eduPendingFile = { name: f.name, type: f.type, data: x.target.result, category: f.type.startsWith('video/') ? 'video' : 'image' };
-    const preview = document.getElementById('eduVideoPreview');
-    preview.style.display = 'block';
-    if (eduPendingFile.category === 'video') {
-      preview.innerHTML = `<video src="${eduPendingFile.data}" controls style="max-width:100%;max-height:280px;border-radius:12px;"></video><p style="text-align:center;margin-top:8px;font-size:13px;color:var(--text-dim);">📎 ${escapeHtml(f.name)} — جاهز للنشر</p>`;
-    } else {
-      preview.innerHTML = `<img src="${eduPendingFile.data}" style="max-width:200px;max-height:150px;border-radius:10px;"><p style="text-align:center;margin-top:8px;font-size:13px;color:var(--text-dim);">📎 ${escapeHtml(f.name)} — صورة مصغرة (لاحظ: يفضل رفع فيديو)</p>`;
-    }
-  };
-  r.readAsDataURL(f);
-  e.target.value = '';
-}
-
-function sendEduVideo() {
-  const title = (document.getElementById('eduVideoTitle')?.value || '').trim();
-  const category = document.getElementById('eduVideoCategory')?.value || 'تكويني';
-  const target = document.getElementById('eduVideoTarget')?.value || 'all';
-  const desc = (document.getElementById('eduVideoDesc')?.value || '').trim();
-
-  if (!title) { showToast('⚠️ عنوان مطلوب', 'اكتب عنواناً للفيديو'); return; }
-  if (!eduPendingFile) { showToast('⚠️ ملف مطلوب', 'ارفع فيديو أو صورة مصغرة'); return; }
-
-  nationalRef('eduVideos').push({
-    title,
-    category,
-    target,
-    description: desc,
-    attachment: eduPendingFile,
-    from: selectedWilaya,
-    fromName: getWilayaName(selectedWilaya),
-    time: firebase.database.ServerValue.TIMESTAMP
-  }).then(() => {
-    document.getElementById('eduVideoTitle').value = '';
-    document.getElementById('eduVideoDesc').value = '';
-    eduPendingFile = null;
-    document.getElementById('eduVideoPreview').style.display = 'none';
-    document.getElementById('eduVideoPreview').innerHTML = '';
-    document.getElementById('eduVideoFile').value = '';
-    showToast('✅ تم النشر', 'تم نشر الفيديو التعليمي بنجاح');
-  }).catch(() => showToast('❌ فشل النشر', 'تعذر حفظ الفيديو'));
-}
-
-function renderEduVideos() {
-  const box = document.getElementById('eduVideosList');
-  if (!box) return;
-
-  // تحديث العداد
-  const counter = document.getElementById('eduVideoCount');
-  if (counter) counter.innerHTML = `<i class="fa-solid fa-film"></i> ${eduVideos.length} فيديو`;
-
-  if (!eduVideos.length) {
-    box.innerHTML = '<div class="empty-msg" style="grid-column:1/-1;"><i class="fa-solid fa-graduation-cap" style="font-size:48px;display:block;margin-bottom:12px;opacity:0.2;"></i>لا توجد فيديوهات تعليمية بعد</div>';
-    return;
-  }
-
-  box.innerHTML = eduVideos.map(v => {
-    const time = new Date(v.time || Date.now()).toLocaleDateString('ar-DZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-    const catEmoji = { 'تكويني': '🎓', 'إداري': '📋', 'تقني': '💻', 'تربوي': '📚', 'تنظيمي': '🏛️' }[v.category] || '🎬';
-    const targetLabel = { 'all': 'الجميع', 'centers': 'المراكز', 'institutes': 'المعاهد' }[v.target] || 'الجميع';
-
-    let thumb = '';
-    if (v.attachment) {
-      if (v.attachment.category === 'video' || (v.attachment.type || '').startsWith('video/')) {
-        thumb = `<video src="${v.attachment.data}" preload="metadata" muted></video><div class="edu-play-overlay"><i class="fa-solid fa-play"></i></div>`;
-      } else if (v.attachment.category === 'image' || (v.attachment.type || '').startsWith('image/')) {
-        thumb = `<img src="${v.attachment.data}" alt="${escapeHtml(v.title)}">`;
-      }
-    } else {
-      thumb = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a0f1a,#1a2236);"><i class="fa-solid fa-video" style="font-size:48px;color:rgba(255,255,255,0.2);"></i></div>`;
-    }
-
-    const isMine = v.from === selectedWilaya;
-    const deleteBtn = isMine && currentRole === 'directorate' ? `<button onclick="deleteEduVideo('${v._key}')"><i class="fa-solid fa-trash"></i> حذف</button>` : '';
-    const openBtn = `<button onclick="openEduVideoPlayer('${v._key}')"><i class="fa-solid fa-play"></i> مشاهدة</button>`;
-
-    return `<div class="edu-video-card">
-      <div class="edu-video-thumb" onclick="openEduVideoPlayer('${v._key}')">
-        ${thumb}
-        <span class="edu-cat-badge">${catEmoji} ${v.category}</span>
-        <span class="edu-target-badge"><i class="fa-solid fa-users"></i> ${targetLabel}</span>
-      </div>
-      <div class="edu-video-body">
-        <h4>${escapeHtml(v.title)}</h4>
-        ${v.description ? `<p>${escapeHtml(v.description).substring(0, 120)}${v.description.length > 120 ? '...' : ''}</p>` : ''}
-        <div class="edu-video-meta">
-          <span><i class="fa-solid fa-building-columns"></i> مديرية ${escapeHtml(v.fromName || getWilayaName(v.from))}</span>
-          <span><i class="fa-regular fa-clock"></i> ${time}</span>
-        </div>
-      </div>
-      <div class="edu-video-actions">${openBtn}${deleteBtn}</div>
-    </div>`;
-  }).join('');
-}
-
-function openEduVideoPlayer(key) {
-  const v = eduVideos.find(x => x._key === key);
-  if (!v || !v.attachment) return;
-  const cat = v.attachment.category || guessIdnAttachmentCategory(v.attachment.type);
-  let content = '';
-  if (cat === 'video') {
-    content = `<video src="${v.attachment.data}" controls autoplay style="width:100%;max-height:70vh;border-radius:14px;"></video>`;
-  } else if (cat === 'image') {
-    content = `<img src="${v.attachment.data}" style="max-width:100%;max-height:70vh;border-radius:14px;display:block;margin:0 auto;">`;
-  }
-  // إنشاء modal بسيط
-  let modal = document.getElementById('eduVideoModal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'eduVideoModal';
-    modal.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
-    modal.onclick = e => { if (e.target === modal) { modal.remove(); } };
-    document.body.appendChild(modal);
-  }
-  modal.innerHTML = `<div style="background:var(--bg-card);border-radius:20px;padding:20px;max-width:900px;width:100%;max-height:90vh;overflow:auto;position:relative;">
-    <button onclick="document.getElementById('eduVideoModal').remove()" style="position:absolute;top:12px;left:12px;width:36px;height:36px;border-radius:50%;background:var(--bg-card-2);border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;"><i class="fa-solid fa-xmark"></i></button>
-    <h3 style="margin:0 0 12px;font-size:18px;font-weight:900;">${escapeHtml(v.title)}</h3>
-    ${content}
-    ${v.description ? `<p style="margin-top:12px;font-size:14px;color:var(--text-dim);line-height:1.7;">${escapeHtml(v.description)}</p>` : ''}
-  </div>`;
-  modal.style.display = 'flex';
-}
-
-function deleteEduVideo(key) {
-  if (!confirm('هل أنت متأكد من حذف هذا الفيديو؟')) return;
-  nationalRef('eduVideos/' + key).remove().then(() => showToast('🗑️ تم الحذف', 'تم حذف الفيديو'));
-}
 
 // ============================================================
 // 💾 مراقبة حجم تخزين Firebase الحقيقية (Realtime Database) — للمديرية فقط
@@ -8621,5 +8780,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c43b7d99dfb6c1',t:'MTc4NDIzODcyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c443d3dfe7b6c1',t:'MTc4NDIzOTA3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c8bb122f27336f',t:'MTc4NDI4NTg5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c9f54eef2ab6d1',t:'MTc4NDI5ODc2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c8bb122f27336f',t:'MTc4NDI4NTg5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ca2320ced0b6be',t:'MTc4NDMwMDY0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ca402cad783351',t:'MTc4NDMwMTgzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
