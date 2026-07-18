@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl" id="htmlRoot">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>وصل — منصة ربط المديرية بالمؤسسات 🇩🇿</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2716%27 height=%2732%27 fill=%27%23007a3d%27/%3E%3Crect x=%2716%27 width=%2716%27 height=%2732%27 fill=%27%23ffffff%27/%3E%3Ctext x=%2716%27 y=%2721%27 font-size=%2714%27 fill=%27%23d21034%27 text-anchor=%27middle%27%3E%E2%98%AA%3C/text%3E%3C/svg%3E">
 
@@ -2226,6 +2226,279 @@ tbody td:last-child {
 .sidebar.collapsed .sidebar-storage-widget { display: none !important; }
 
 </style>
+
+<style id="responsivePack">
+/* ==========================================================================
+   📱 حزمة التجاوب مع جميع الشاشات — هاتف / لوحي / حاسوب
+   ملاحظة مهمة: هذه الحزمة لا تغيّر أي شيء في واجهة الحاسوب.
+   كل القواعد المؤثرة تعمل فقط داخل نقاط التوقف (max-width: 992px وأقل).
+   القواعد الخاصة بالقائمة المنزلقة لا تعمل إلا بعد جاهزية سكربت الهاتف
+   (html.mobile-nav-on) — فإن تعذّر تشغيله بقي التصميم بوضعه القديم الآمن.
+   ========================================================================== */
+
+/* ---------- تحسينات عامة آمنة (لا تؤثر على مظهر الحاسوب) ---------- */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+button, a, input, select, textarea, label, .nav-btn, .tab-btn { touch-action: manipulation; }
+body { -webkit-tap-highlight-color: transparent; }
+.main-workspace img, .modal-box img, .chat-messages img, .idn-messages img { max-width: 100%; height: auto; }
+.main-workspace video, .modal-box video { max-width: 100%; }
+
+/* عناصر واجهة الهاتف — مخفية افتراضياً على الحاسوب */
+#mobileTopbar { display: none; }
+.sidebar-close-btn { display: none; }
+
+/* ==========================================================================
+   🖥️➡️📱 الشاشات الصغيرة واللوحية (أقل من 993px):
+   القائمة الجانبية تصبح درجاً منزلقاً + شريط علوي ثابت بزر القائمة
+   ========================================================================== */
+@media (max-width: 992px) {
+
+  /* الشريط العلوي الثابت */
+  html.mobile-nav-on #mobileTopbar {
+    display: flex !important; align-items: center; gap: 10px;
+    position: fixed; top: 0; right: 0; left: 0; z-index: 7930;
+    height: calc(58px + env(safe-area-inset-top, 0px));
+    padding: env(safe-area-inset-top, 0px) 12px 0;
+    background: var(--bg-card); border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-light); direction: rtl;
+  }
+  #mobileMenuBtn {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 13px;
+    border: 1px solid var(--border); background: var(--bg-card-2); color: var(--text);
+    font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  #mobileMenuBtn:active { transform: scale(0.93); background: var(--table-hover); }
+  #mobileTopbar .mt-brand {
+    font-size: 20px; font-weight: 900; letter-spacing: 1px;
+    background: linear-gradient(135deg, var(--algeria-green), var(--gold) 60%, var(--algeria-red));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; white-space: nowrap;
+  }
+  #mobileTopbar .mt-sub {
+    font-size: 12px; font-weight: 700; color: var(--text-dim);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* القائمة الجانبية = درج منزلق من اليمين */
+  html.mobile-nav-on .app-flex { flex-direction: row !important; }
+  html.mobile-nav-on .sidebar {
+    position: fixed !important; top: 0 !important; right: 0 !important;
+    width: min(320px, 86vw) !important; max-width: 100vw;
+    height: 100vh !important; height: 100dvh !important;
+    min-height: 0 !important; max-height: none !important;
+    overflow-y: auto !important; overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    z-index: 7950; border-left: 1px solid var(--border); border-bottom: none !important;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
+    transform: translateX(112%); visibility: hidden; opacity: 0;
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, visibility 0s linear 0.32s;
+    box-shadow: -14px 0 48px rgba(0, 0, 0, 0.25);
+  }
+  html.mobile-nav-on .sidebar.mobile-open {
+    transform: translateX(0); visibility: visible; opacity: 1;
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+  }
+  html.mobile-nav-on body.sidebar-open, body.sidebar-open { overflow: hidden !important; }
+
+  /* زر الإغلاق داخل الدرج */
+  html.mobile-nav-on .sidebar-close-btn {
+    display: flex !important; align-items: center; justify-content: center;
+    position: absolute; top: 10px; left: 10px; z-index: 3;
+    width: 40px; height: 40px; border-radius: 12px;
+    background: var(--bg-card-2); border: 1px solid var(--border); color: var(--text-dim);
+    font-size: 16px; cursor: pointer; transition: var(--transition);
+  }
+  html.mobile-nav-on .sidebar-close-btn:active { transform: scale(0.9); color: var(--algeria-red); }
+
+  /* القائمة داخل الدرج: عمودية كاملة (إلغاء وضع التمرير الأفقي القديم) */
+  html.mobile-nav-on .nav-list { display: flex !important; flex-direction: column !important; overflow: visible !important; gap: 4px !important; padding-bottom: 0 !important; flex: 1; }
+  html.mobile-nav-on .nav-list li { flex: none !important; }
+
+  /* الخلفية المعتمة خلف الدرج */
+  html.mobile-nav-on #sidebarOverlay {
+    position: fixed; inset: 0; z-index: 7940;
+    background: rgba(6, 10, 18, 0.5); backdrop-filter: blur(3px);
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  }
+  html.mobile-nav-on #sidebarOverlay.show { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+
+  /* مساحة عمل المحتوى: كامل العرض مع ترك مكان للشريط العلوي */
+  html.mobile-nav-on .main-workspace {
+    width: 100%;
+    padding: calc(58px + env(safe-area-inset-top, 0px) + 14px) 14px 90px !important;
+  }
+
+  /* الإشعارات أسفل الشريط العلوي مباشرة وبعرض الشاشة */
+  html.mobile-nav-on #toast-area {
+    top: calc(58px + env(safe-area-inset-top, 0px) + 8px) !important;
+    right: 10px !important; left: 10px !important;
+    max-width: none !important; gap: 8px; align-items: stretch;
+  }
+  .toast { padding: 14px 16px; border-radius: 14px; }
+  .toast .toast-title { font-size: 15px; }
+  .toast .toast-text { font-size: 13px; }
+  .toast .toast-action { font-size: 12px; }
+
+  /* لوحة الشريط الإخباري لا تتجاوز الشاشة */
+  .ticker-panel { width: min(340px, calc(100vw - 24px)); }
+
+  /* النوافذ المنبثقة تلائم عرض الشاشة دائماً */
+  .modal-overlay { padding: 12px !important; }
+  .modal-box {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+  }
+  #chatModal .modal-box, #interChatModal .modal-box, .modal-box[style*="height"] {
+    height: calc(100vh - 24px) !important;
+    height: calc(100dvh - 24px) !important;
+  }
+}
+
+/* ==========================================================================
+   📱 الهواتف (أقل من 769px): تصغير الخطوط والأبعاد لتلائم العرض
+   (تأتي آخراً لتتغلب على قواعد تكبير الخط القديمة ذات !important)
+   ========================================================================== */
+@media (max-width: 768px) {
+
+  html, body { font-size: 16px; }
+
+  /* العناوين والبطاقات */
+  .page-header { gap: 12px; margin-bottom: 16px; }
+  .page-header h2 { font-size: 20px !important; gap: 8px; }
+  .header-actions { width: 100%; gap: 10px; }
+  .header-actions .btn-primary, .header-actions .btn-secondary,
+  .header-actions .btn-gold, .header-actions .change-pass-btn,
+  .header-actions .btn-mini { flex: 1 1 140px; justify-content: center; text-align: center; }
+  .sync-badge { padding: 8px 16px; font-size: 14px; }
+
+  /* بطاقات الإحصائيات: عمودان بخط أصغر */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px; margin-bottom: 18px; }
+  .kpi-card { padding: 16px 14px; border-radius: 16px; }
+  .kpi-card .kpi-icon { font-size: 28px; left: 10px; top: 10px; }
+  .kpi-label { font-size: 13px !important; }
+  .kpi-value { font-size: 28px !important; }
+  .chart-card { height: 250px !important; padding: 14px; }
+
+  /* الأزرار */
+  .btn-primary, .btn-secondary, .btn-gold { font-size: 15px !important; padding: 13px 20px !important; gap: 8px !important; }
+  .btn-sm { padding: 10px 16px !important; font-size: 14px !important; }
+  .btn-mini { font-size: 13px !important; padding: 9px 14px !important; }
+  .btn-login { padding: 15px !important; font-size: 17px !important; }
+
+  /* النماذج والخانات (16px على الأقل لمنع تكبير آيفون التلقائي عند الكتابة) */
+  .form-card { padding: 18px 14px; border-radius: 16px; }
+  .form-grid { gap: 14px; }
+  .form-field label { font-size: 14px !important; }
+  .form-field input, .form-field select, .form-field textarea { font-size: 16px !important; padding: 12px 14px !important; border-radius: 12px; }
+  .form-field textarea { min-height: 110px; }
+  .filter-bar input, .filter-bar select { font-size: 16px !important; padding: 12px 16px !important; border-radius: 12px; }
+  .teachers-form-card .form-field input,
+  .teachers-form-card .form-field select,
+  .teachers-form-card .form-field textarea { font-size: 16px !important; }
+  .edu-upload-grid input, .edu-upload-grid select, .edu-upload-grid textarea { font-size: 16px !important; }
+  .idn-chat-input input[type="text"] { font-size: 16px !important; padding: 11px 14px !important; }
+  .notes-grid textarea { font-size: 15px !important; }
+
+  /* شارات الحالة والقوائم المنسدلة داخل الجداول */
+  .status-badge, .status-resolved, .status-pending, .pill { font-size: 12px !important; padding: 5px 12px !important; }
+  .status-select { font-size: 13px !important; padding: 7px 10px !important; }
+
+  /* الجداول: تمرير أفقي سلس + خط أصغر */
+  .table-scroll { -webkit-overflow-scrolling: touch; }
+  .table-scroll th, .table-scroll td { font-size: 13px !important; padding: 8px 10px !important; }
+  .chat-hub-table-wrap table { min-width: 640px; }
+
+  /* التبويبات: صف أفقي قابل للتمرير بدل التكديس العمودي */
+  .tabs-container { flex-direction: row !important; flex-wrap: nowrap !important; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 6px; }
+  .tab-btn { flex: 0 0 auto !important; min-width: 0 !important; padding: 10px 16px !important; font-size: 14px !important; white-space: nowrap; }
+  .idn-tab { font-size: 14px !important; padding: 10px 12px !important; min-width: 0 !important; }
+
+  /* القائمة الجانبية المنزلقة بخط مريح */
+  .nav-btn { font-size: 15px !important; padding: 13px 14px !important; gap: 12px !important; }
+  .nav-btn i { font-size: 18px !important; width: 24px !important; }
+  .nav-badge { font-size: 12px !important; min-width: 19px !important; height: 19px !important; }
+  .sidebar-brand .brand-title { font-size: 14px !important; }
+  .sidebar-brand .brand-sub { font-size: 12px !important; }
+  .sidebar-footer { font-size: 12px !important; }
+  .profile-card { padding: 16px 12px; }
+  .profile-card p { font-size: 13px !important; }
+  .role-badge { font-size: 13px !important; padding: 5px 16px !important; }
+
+  /* النوافذ المنبثقة: خط أصغر ومحتوى مريح */
+  .modal-title { font-size: 17px !important; }
+  .modal-body { font-size: 15px !important; }
+  .modal-body input, .modal-body select, .modal-body textarea { font-size: 16px !important; padding: 12px 14px !important; }
+  .modal-actions { flex-wrap: wrap; gap: 8px; }
+  .modal-actions button { font-size: 14px !important; padding: 11px 18px !important; flex: 1 1 auto; }
+
+  /* المحادثات */
+  .chat-bubble { font-size: 15px !important; padding: 11px 14px !important; max-width: 92%; }
+  .chat-sender-label { font-size: 12px !important; }
+  .chat-time { font-size: 11px !important; }
+  .idn-messages { min-height: 260px; max-height: 52vh; padding: 12px; }
+  .idn-msg { max-width: 92% !important; font-size: 14px; }
+  .idn-msg img, .idn-msg video { max-width: 100%; }
+
+  /* بطاقات الأقسام والتخزين */
+  .dept-stats-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .dept-stat-card .stat-item .label { font-size: 12px !important; }
+  .dept-stat-card .stat-item .value { font-size: 20px !important; }
+  .storage-monitor-card { padding: 16px 14px; }
+  .storage-head { flex-wrap: wrap; gap: 10px; }
+
+  /* أقسام الأساتذة والفيديوهات التعليمية */
+  .teachers-hero, .edu-videos-hero { flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px; }
+  .teachers-form-card, .edu-upload-card { padding: 16px; }
+  .teachers-hero h3, .edu-videos-hero h3 { font-size: 17px !important; }
+  .teachers-hero p, .edu-videos-hero p { font-size: 13px !important; }
+  .teachers-form-card h3, .edu-upload-card h3, .edu-video-upload h3 { font-size: 16px !important; }
+
+  /* شاشة الدخول */
+  .login-card { padding: 24px 16px; border-radius: 20px; }
+  .login-card h1 { font-size: 21px; }
+  .login-card .subtitle { font-size: 13px; }
+  .login-logo { width: 64px; height: 64px; font-size: 28px; border-radius: 18px; }
+  .role-selector button { padding: 14px 10px; font-size: 15px; }
+  .role-selector button i { font-size: 16px; margin-left: 8px; }
+  .login-fields-row .login-field input, .login-fields-row .login-field select { font-size: 16px !important; }
+  .login-field .remember label { font-size: 14px; }
+  .login-error, .login-info { font-size: 13px; }
+
+  /* متفرقات */
+  .password-reveal-card { padding: 20px 14px; }
+  .password-reveal-code { font-size: 28px !important; letter-spacing: 5px !important; }
+  #quoteContainer { max-width: calc(100vw - 24px) !important; }
+  .empty-msg { font-size: 15px !important; }
+  .edu-video-card .edu-card-title { font-size: 15px !important; }
+}
+
+/* ==========================================================================
+   📱 الهواتف الضيقة جداً (أقل من 481px)
+   ========================================================================== */
+@media (max-width: 480px) {
+  .modal-overlay { padding: 6px !important; }
+  .modal-box { border-radius: 16px; max-width: calc(100vw - 12px) !important; }
+  .kpi-grid { gap: 10px; }
+  .kpi-value { font-size: 24px !important; }
+  .page-header h2 { font-size: 18px !important; }
+  .btn-primary, .btn-secondary, .btn-gold { font-size: 14px !important; padding: 12px 16px !important; }
+  .password-request-stack { top: auto; bottom: 12px; left: 12px; width: calc(100% - 24px); }
+  ::-webkit-scrollbar { width: 8px !important; height: 8px !important; }
+}
+
+/* ==========================================================================
+   🔄 الوضع الأفقي للهاتف (ارتفاع قليل): تقليل ارتفاع الشريط العلوي
+   ========================================================================== */
+@media (max-width: 992px) and (max-height: 480px) {
+  html.mobile-nav-on #mobileTopbar { height: 48px; }
+  html.mobile-nav-on .main-workspace { padding-top: 62px !important; }
+  html.mobile-nav-on #toast-area { top: 56px !important; }
+}
+
+</style>
 </head>
 <body>
 
@@ -2487,6 +2760,38 @@ tbody td:last-child {
       </div>
 
       <button class="btn-login" onclick="handleLogin()"><i class="fa-solid fa-lock"></i> دخول آمن للنظام</button>
+
+      <!-- ⚙️ زر الإعدادات + لوحة الإدارة المضمنة -->
+      <button id="adminSettingsToggleBtn" onclick="toggleAdminSettingsPanel()" style="width:100%; margin-top:10px; padding:12px; border-radius:14px; border:2px solid var(--border); background:var(--bg-card-2); color:var(--text-dim); font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; gap:8px;" onmouseover="this.style.borderColor='var(--algeria-green)';this.style.color='var(--algeria-green)'" onmouseout="if(!document.getElementById('adminInlinePanel')||document.getElementById('adminInlinePanel').style.display==='none'){this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'}">
+        <i class="fa-solid fa-gear"></i> إعدادات المديرين
+      </button>
+
+      <!-- 📋 لوحة إدارة المديريات (مضمنة في نفس الصفحة) -->
+      <div id="adminInlinePanel" style="display:none; margin-top:14px; border:2px solid var(--algeria-green); border-radius:18px; overflow:hidden; background:var(--bg-card); box-shadow:var(--shadow); animation:pageFade 0.35s ease;">
+        <div style="padding:14px 18px; background:linear-gradient(135deg,rgba(0,122,61,0.12),rgba(212,175,55,0.08)); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <strong style="font-size:16px; color:var(--algeria-green); display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-shield-halved"></i> حسابات المديريات (<span id="adminDirCount">0</span> مديرية)
+          </strong>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button onclick="generateAllAdminPasswords()" style="padding:7px 14px; border-radius:10px; border:none; background:var(--grad-gold); color:#fff; cursor:pointer; font-size:13px; font-weight:800; font-family:inherit;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> توليد الكل
+            </button>
+            <button onclick="saveAllAdminUsers()" style="padding:7px 14px; border-radius:10px; border:none; background:var(--grad-brand); color:#fff; cursor:pointer; font-size:13px; font-weight:800; font-family:inherit;">
+              <i class="fa-solid fa-floppy-disk"></i> حفظ الكل
+            </button>
+            <button onclick="document.getElementById('adminInlinePanel').style.display='none'; document.getElementById('adminSettingsToggleBtn').style.borderColor='var(--border)'; document.getElementById('adminSettingsToggleBtn').style.color='var(--text-dim)';" style="padding:7px 14px; border-radius:10px; border:1px solid var(--border); background:var(--bg-card-2); color:var(--text-dim); cursor:pointer; font-size:13px; font-weight:800; font-family:inherit;">
+              <i class="fa-solid fa-xmark"></i> إغلاق
+            </button>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <input type="text" id="adminSearchInput" placeholder="🔍 ابحث عن ولاية..." oninput="filterAdminTable()" style="width:100%; padding:10px 14px; background:var(--input-bg); border:2px solid var(--border); border-radius:10px; font-size:14px; font-family:inherit; margin-bottom:10px;">
+        </div>
+        <div id="adminTableContainer" style="max-height:400px; overflow-y:auto; overflow-x:auto; padding:0 10px 14px;">
+          <!-- سيُملأ ديناميكياً -->
+        </div>
+      </div>
+
       <div class="login-error" id="loginError" onclick="this.style.display='none'" style="cursor:pointer;">⚠️ بيانات الدخول غير صحيحة!</div>
       <div class="login-info"><span class="fares-logo">✦ وَصْل ✦</span><span style="display:block; font-size:14px; color:var(--text-dim); margin-top:4px;">منصة ربط المديرية بالمؤسسات — النسخة الوطنية 🇩🇿</span></div>
     </div>
@@ -3248,51 +3553,51 @@ const LS_KEYS = {
 const DEFAULT_FILE_TYPES = ["المكلف بالرقمنة","مصلحة التوجيه ( المستشارين )","مصلحة التكوين الحضوري","مصلحة التمهين","مصلحة الإدارة والمالية والوسائل","إنشغالات المداراء"];
 
 const DEFAULT_BBA_INSTITUTIONS = [
-  { name: "المعهد الوطني المتخصص في التكوين المهني ب .ب.ع 01", code: "INSFP001", password: "789012", type: "center" },
-  { name: "المعهد الوطني المتخصص في التكوين المهني ب .ب.ع 02", code: "INSFP002", password: "456789", type: "center" },
-  { name: "المعهد الوطني المتخصص في التكوين المهني رأس الوادي", code: "INSFP003", password: "123456", type: "center" },
-  { name: "مركز التكوين المهني و التمهين برج بوعريريج03", code: "CFPA001", password: "654321", type: "center" },
-  { name: "مركز التكوين المهني و التمهين العش", code: "CFPA002", password: "987654", type: "center" },
-  { name: "مركز التكوين المهني و التمهين برج بوعريريج04", code: "CFPA003", password: "321987", type: "center" },
-  { name: "مركز التكوين المهني و التمهين حسناوة", code: "CFPA004", password: "159753", type: "center" },
-  { name: "مركز التكوين المهني و التمهين الياشير", code: "CFPA005", password: "753951", type: "center" },
-  { name: "مركز التكوين المهني و التمهين بليمور", code: "CFPA006", password: "852456", type: "center" },
-  { name: "مركز التكوين المهني و التمهين الجعافرة", code: "CFPA007", password: "951753", type: "center" },
-  { name: "مركز التكوين المهني و التمهين خليل", code: "CFPA008", password: "357159", type: "center" },
-  { name: "مركز التكوين المهني والتمهين المهير", code: "CFPA009", password: "246813", type: "center" },
-  { name: "مركز التكوين المهني و التمهين الحمادية", code: "CFPA010", password: "579123", type: "center" },
-  { name: "مركز التكوين المهني و التمهين برج الغدير", code: "CFPA011", password: "864209", type: "center" },
-  { name: "مركز التكوين المهني و التمهين عين تاغروت", code: "CFPA012", password: "135790", type: "center" },
-  { name: "مركز التكوين المهني و التمهين العناصر", code: "CFPA013", password: "246801", type: "center" },
-  { name: "مركز التكوين المهني و التمهين راس الوادي", code: "CFPA014", password: "802468", type: "center" },
-  { name: "مركز التكوين المهني و التمهين مجانة", code: "CFPA015", password: "951357", type: "center" },
-  { name: "مركز التكوين المهني و التمهين المنصورة", code: "CFPA016", password: "123789", type: "center" },
-  { name: "مركز التكوين المهني و التمهين برج زمورة", code: "CFPA017", password: "456123", type: "center" },
-  { name: "مركز التكوين المهني والتمهين ذكور", code: "CFPA018", password: "789456", type: "center" },
-  { name: "احمد للتكوين", code: "PRV001", password: "321654", type: "private" },
-  { name: "وشن سكول", code: "PRV002", password: "654987", type: "private" },
-  { name: "لكبير للتكوين المهني", code: "PRV003", password: "987123", type: "private" },
-  { name: "ايكول صخراوي", code: "PRV004", password: "123987", type: "private" },
-  { name: "سعاد ماضوي لتكوين", code: "PRV005", password: "456789", type: "private" },
-  { name: "براح سكول", code: "PRV006", password: "789123", type: "private" },
-  { name: "الأنامل الذهبية", code: "PRV007", password: "147258", type: "private" },
-  { name: "يد الأمل", code: "PRV008", password: "258369", type: "private" },
-  { name: "لبرايجيه", code: "PRV009", password: "369147", type: "private" },
-  { name: "شامل سكول", code: "PRV010", password: "471258", type: "private" },
-  { name: "ملحقة المؤسسة الخاصة للتكوين المهني ايكول صخراوي", code: "PRV011", password: "582369", type: "private" },
-  { name: "المؤسسة الخاصة للتكوين المهني خطوط المستقبل", code: "PRV012", password: "693147", type: "private" },
-  { name: "نوران", code: "PRV013", password: "714258", type: "private" },
-  { name: "داماس", code: "PRV014", password: "825369", type: "private" },
-  { name: "المؤسسة الخاصة للتكوين المهني البصير برو", code: "PRV015", password: "936147", type: "private" },
-  { name: "بلانيت وصال", code: "PRV016", password: "147369", type: "private" },
-  { name: "الأميرة الصغيرة", code: "PRV017", password: "258147", type: "private" },
-  { name: "الملكة الماسية", code: "PRV018", password: "369258", type: "private" },
-  { name: "البيروني", code: "PRV019", password: "471369", type: "private" },
-  { name: "المقراني سكول", code: "PRV020", password: "582147", type: "private" },
-  { name: "المؤسسة الخاصة للتكوين المهني السليل", code: "PRV021", password: "693258", type: "private" },
-  { name: "كوندور اكاديمي", code: "PRV022", password: "714369", type: "private" },
-  { name: "ولد اعمر", code: "PRV023", password: "825147", type: "private" },
-  { name: "المؤسسة الخاصة للتكوين المهني عقباش", code: "PRV024", password: "936258", type: "private" }
+  { name: "المعهد الوطني المتخصص في التكوين المهني ب .ب.ع 01", code: "INSFP001", password: "fa@202601", type: "center" },
+  { name: "المعهد الوطني المتخصص في التكوين المهني ب .ب.ع 02", code: "INSFP002", password: "fa@202602", type: "center" },
+  { name: "المعهد الوطني المتخصص في التكوين المهني رأس الوادي", code: "INSFP003", password: "fa@202603", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج بوعريريج03", code: "CFPA001", password: "fa@245601", type: "center" },
+  { name: "مركز التكوين المهني و التمهين العش", code: "CFPA002", password: "fa@245602", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج بوعريريج04", code: "CFPA003", password: "fa@245603", type: "center" },
+  { name: "مركز التكوين المهني و التمهين حسناوة", code: "CFPA004", password: "fa@245604", type: "center" },
+  { name: "مركز التكوين المهني و التمهين الياشير", code: "CFPA005", password: "fa@245605", type: "center" },
+  { name: "مركز التكوين المهني و التمهين بليمور", code: "CFPA006", password: "fa@245606", type: "center" },
+  { name: "مركز التكوين المهني و التمهين الجعافرة", code: "CFPA007", password: "fa@245607", type: "center" },
+  { name: "مركز التكوين المهني و التمهين خليل", code: "CFPA008", password: "fa@245608", type: "center" },
+  { name: "مركز التكوين المهني والتمهين المهير", code: "CFPA009", password: "fa@245609", type: "center" },
+  { name: "مركز التكوين المهني و التمهين الحمادية", code: "CFPA010", password: "fa@245610", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج الغدير", code: "CFPA011", password: "fa@245611", type: "center" },
+  { name: "مركز التكوين المهني و التمهين عين تاغروت", code: "CFPA012", password: "fa@245612", type: "center" },
+  { name: "مركز التكوين المهني و التمهين العناصر", code: "CFPA013", password: "fa@245613", type: "center" },
+  { name: "مركز التكوين المهني و التمهين راس الوادي", code: "CFPA014", password: "fa@245614", type: "center" },
+  { name: "مركز التكوين المهني و التمهين مجانة", code: "CFPA015", password: "fa@245615", type: "center" },
+  { name: "مركز التكوين المهني و التمهين المنصورة", code: "CFPA016", password: "fa@245616", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج زمورة", code: "CFPA017", password: "fa@245617", type: "center" },
+  { name: "مركز التكوين المهني والتمهين ذكور", code: "CFPA018", password: "fa@245618", type: "center" },
+  { name: "احمد للتكوين", code: "PRV001", password: "fa@783001", type: "private" },
+  { name: "وشن سكول", code: "PRV002", password: "fa@783002", type: "private" },
+  { name: "لكبير للتكوين المهني", code: "PRV003", password: "fa@783003", type: "private" },
+  { name: "ايكول صخراوي", code: "PRV004", password: "fa@783004", type: "private" },
+  { name: "سعاد ماضوي لتكوين", code: "PRV005", password: "fa@783005", type: "private" },
+  { name: "براح سكول", code: "PRV006", password: "fa@783006", type: "private" },
+  { name: "الأنامل الذهبية", code: "PRV007", password: "fa@783007", type: "private" },
+  { name: "يد الأمل", code: "PRV008", password: "fa@783008", type: "private" },
+  { name: "لبرايجيه", code: "PRV009", password: "fa@783009", type: "private" },
+  { name: "شامل سكول", code: "PRV010", password: "fa@783010", type: "private" },
+  { name: "ملحقة المؤسسة الخاصة للتكوين المهني ايكول صخراوي", code: "PRV011", password: "fa@783011", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني خطوط المستقبل", code: "PRV012", password: "fa@783012", type: "private" },
+  { name: "نوران", code: "PRV013", password: "fa@783013", type: "private" },
+  { name: "داماس", code: "PRV014", password: "fa@783014", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني البصير برو", code: "PRV015", password: "fa@783015", type: "private" },
+  { name: "بلانيت وصال", code: "PRV016", password: "fa@783016", type: "private" },
+  { name: "الأميرة الصغيرة", code: "PRV017", password: "fa@783017", type: "private" },
+  { name: "الملكة الماسية", code: "PRV018", password: "fa@783018", type: "private" },
+  { name: "البيروني", code: "PRV019", password: "fa@783019", type: "private" },
+  { name: "المقراني سكول", code: "PRV020", password: "fa@783020", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني السليل", code: "PRV021", password: "fa@783021", type: "private" },
+  { name: "كوندور اكاديمي", code: "PRV022", password: "fa@783022", type: "private" },
+  { name: "ولد اعمر", code: "PRV023", password: "fa@783023", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني عقباش", code: "PRV024", password: "fa@783024", type: "private" }
 ];
 
 let INSTITUTIONS_DATA = [];
@@ -3672,6 +3977,7 @@ function updateUI() {
     renderArchive();
     renderTokensGrid();
     renderFileTypesManageList();
+    renderInstitutionsList();
     renderDepartmentsList();
     renderDeptDashboard();
     populateDeptFilters();
@@ -3827,14 +4133,13 @@ function handleLogin() {
   if (selectedLoginRole === 'directorate') {
     const user = document.getElementById('loginUser').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
-    if ((user === 'hassan' && pass === '102030') || pass === MASTER_PASSWORD) {
+    if (verifyDirectorateLogin(user, pass)) {
       currentRole = 'directorate';
-      document.getElementById('loginUser').value = 'hassan';
       saveSession();
       initApp();
     } else {
       err.style.display = 'block';
-      err.textContent = '⚠️ بيانات الدخول غير صحيحة!';
+      err.textContent = '⚠️ كلمة المرور غير صحيحة، يرجى الاتصال بالمطور 0668694911';
     }
   } else if (selectedLoginRole === 'department') {
     const username = document.getElementById('loginDeptSelect').value;
@@ -4543,8 +4848,9 @@ function updateTeacherRequest(key, status) {
 // 📊 DASHBOARD FUNCTIONS
 // ============================================================
 function renderKPIs() {
-  const actualActive = activeIssues.filter(i => !isCenterIssueRoutedToDepartment(i) && !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم');
-  const actualArchived = archivedIssues.filter(i => !isCenterIssueRoutedToDepartment(i) && !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم');
+  // 🏷️ تصفية حسب الولاية: فقط إنشغالات الولاية الحالية
+  const actualActive = activeIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i) && !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم');
+  const actualArchived = archivedIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i) && !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم');
   const total = actualActive.length + actualArchived.length;
   const pending = actualActive.filter(i => !(i.status && i.status.indexOf('تم الحل') !== -1)).length;
   const done = total - pending;
@@ -4557,8 +4863,8 @@ function renderKPIs() {
 
 function initChart() {
   const ctx = document.getElementById('analyticsChart').getContext('2d');
-  const visibleActive = activeIssues.filter(i => !isCenterIssueRoutedToDepartment(i));
-  const visibleArchived = archivedIssues.filter(i => !isCenterIssueRoutedToDepartment(i));
+  const visibleActive = activeIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i));
+  const visibleArchived = archivedIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i));
   analyticsChartInstance = new Chart(ctx, {
     type: 'bar',
     data: { labels: ['الإجمالي', 'قيد المعالجة', 'المسواة'], datasets: [{ label: 'عدد الإنشغالات', data: [visibleActive.length + visibleArchived.length, visibleActive.length, visibleArchived.length], backgroundColor: ['#006633', '#ffc107', '#28a745'], borderRadius: 8, maxBarThickness: 50 }] },
@@ -4568,8 +4874,8 @@ function initChart() {
 
 function updateChart() {
   if (!analyticsChartInstance) return;
-  const visibleActive = activeIssues.filter(i => !isCenterIssueRoutedToDepartment(i));
-  const visibleArchived = archivedIssues.filter(i => !isCenterIssueRoutedToDepartment(i));
+  const visibleActive = activeIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i));
+  const visibleArchived = archivedIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i));
   const total = visibleActive.length + visibleArchived.length;
   analyticsChartInstance.data.datasets[0].data = [total, visibleActive.length, visibleArchived.length];
   analyticsChartInstance.update();
@@ -4580,7 +4886,7 @@ function getTrendData() {
   const days = 14;
   const labels = [];
   const counts = [];
-  const all = [...activeIssues, ...archivedIssues].filter(i => !isCenterIssueRoutedToDepartment(i));
+  const all = [...activeIssues, ...archivedIssues].filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i));
   const dayKeys = [];
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date();
@@ -5073,6 +5379,8 @@ function renderList() {
   let filtered = [];
   if (currentListTab === 'archived_center') {
     filtered = centerArchived.filter(issue => {
+      // 🏷️ تصفية حسب الولاية
+      if (issue.wilaya && issue.wilaya !== selectedWilaya) return false;
       if (currentRole === 'directorate' && isCenterIssueRoutedToDepartment(issue)) return false;
       const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
       const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
@@ -5081,6 +5389,8 @@ function renderList() {
     });
   } else {
     filtered = activeIssues.filter(issue => {
+      // 🏷️ تصفية حسب الولاية: عرض فقط إنشغالات الولاية الحالية
+      if (issue.wilaya && issue.wilaya !== selectedWilaya) return false;
       // الإنشغال الموجه من مركز إلى مصلحة يظهر عند المصلحة فقط، وليس في حساب المديرية.
       if (currentRole === 'directorate' && isCenterIssueRoutedToDepartment(issue)) return false;
       // 🛑 عدم إظهار المراسلات، المهام، والتعاميم الصادرة في خانة متابعة الإنشغالات
@@ -5238,6 +5548,8 @@ function renderArchive() {
   if (!container) return;
   
   let filtered = archivedIssues.filter(issue => {
+    // 🏷️ تصفية حسب الولاية
+    if (issue.wilaya && issue.wilaya !== selectedWilaya) return false;
     if (currentRole === 'directorate' && isCenterIssueRoutedToDepartment(issue)) return false;
     const matchesSearch = !search || issue.code.toLowerCase().includes(search) || issue.center.toLowerCase().includes(search) || issue.type.toLowerCase().includes(search);
     const matchesSource = !sourceFilter || issue.source === sourceFilter;
@@ -5398,7 +5710,8 @@ function renderDeptIssuesTable() {
   const priorityFilter = document.getElementById('dept-issues-priority')?.value || '';
   const statusFilter = document.getElementById('dept-issues-status')?.value || '';
   
-  let deptIssues = activeIssues.filter(i => i.department === currentDepartment);
+  // 🏷️ تصفية حسب الولاية: فقط إنشغالات الولاية الحالية
+  let deptIssues = activeIssues.filter(i => i.department === currentDepartment && (!i.wilaya || i.wilaya === selectedWilaya));
   
   if (search) {
     deptIssues = deptIssues.filter(i => i.code.toLowerCase().includes(search) || i.center.toLowerCase().includes(search) || i.type.toLowerCase().includes(search));
@@ -5468,7 +5781,8 @@ function toggleDeptIssueStatus(code) {
 }
 
 function renderDeptKPIs() {
-  const deptIssues = activeIssues.filter(i => i.department === currentDepartment);
+  // 🏷️ تصفية حسب الولاية
+  const deptIssues = activeIssues.filter(i => i.department === currentDepartment && (!i.wilaya || i.wilaya === selectedWilaya));
   const total = deptIssues.length;
   const pending = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') === -1).length;
   const resolved = deptIssues.filter(i => i.status && i.status.indexOf('تم الحل') !== -1).length;
@@ -5510,7 +5824,8 @@ function submitNewIssue() {
     details, 
     status: "قيد المعالجة 🔄", 
     createdAt: Date.now(), 
-    source: 'directorate', 
+    source: 'directorate',
+    wilaya: selectedWilaya, // 🏷️ وسم الولاية
     attachments: [],
     department: deptId,
     transferHistory: []
@@ -5638,6 +5953,7 @@ function processSendFromCenter(btn, details, originalBtnHtml) {
       status: "قيد المعالجة 🔄",
       attachments,
       source: 'center',
+      wilaya: selectedWilaya, // 🏷️ وسم الولاية لضمان العزل
       createdAt: Date.now(),
       department: deptId,
       transferHistory: []
@@ -5650,6 +5966,7 @@ function processSendFromCenter(btn, details, originalBtnHtml) {
       status: "قيد المعالجة 🔄",
       createdAt: Date.now(),
       source: 'center',
+      wilaya: selectedWilaya, // 🏷️ وسم الولاية لضمان العزل
       attachments: attachments.length > 0 ? attachments : [],
       department: deptId,
       transferHistory: []
@@ -6036,8 +6353,8 @@ function renderChatHub() {
   const container = document.getElementById('chatHubContainer');
   if (!container) return;
   const centerName = getCenterName();
-  const sentByCenter = centerIssues.filter(issue => issue.center === centerName);
-  const receivedFromDirectorate = activeIssues.filter(issue => issue.center === centerName && issue.source === 'directorate' && !issue.isBroadcast && issue.type !== 'مراسلة / مهمة' && issue.type !== 'تعميم');
+  const sentByCenter = centerIssues.filter(issue => issue.center === centerName && (!issue.wilaya || issue.wilaya === selectedWilaya));
+  const receivedFromDirectorate = activeIssues.filter(issue => issue.center === centerName && issue.source === 'directorate' && (!issue.wilaya || issue.wilaya === selectedWilaya) && !issue.isBroadcast && issue.type !== 'مراسلة / مهمة' && issue.type !== 'تعميم');
   const myIssues = [...receivedFromDirectorate, ...sentByCenter].sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
   
   if (myIssues.length === 0) { 
@@ -6355,8 +6672,8 @@ function addInstitution() {
   const newNum = String(maxNum + 1).padStart(3, '0');
   const code = prefix + newNum;
   
-  // توليد كلمة مرور عشوائية من 6 أرقام
-  const password = String(Math.floor(100000 + Math.random() * 900000));
+  // توليد كلمة مرور قوية بنمط fa@XXXXXX (حروف + رمز + أرقام)
+  const password = generateComplexPassword();
   
   const newInst = { name, code, password, type };
   INSTITUTIONS_DATA.push(newInst);
@@ -6376,19 +6693,35 @@ function editInstitution(idx) {
   const inst = INSTITUTIONS_DATA[idx];
   if (!inst) return;
   
+  // نافذة تعديل شاملة: الاسم، النوع، كلمة السر
   const newName = prompt("تعديل اسم المؤسسة:", inst.name);
-  if (newName !== null && newName.trim() !== '') {
-    const trimmed = newName.trim();
-    if (INSTITUTIONS_DATA.some((i, idx2) => i.name === trimmed && idx2 !== idx)) {
-      showToast("⚠️ تنبيه", "هناك مؤسسة أخرى تحمل هذا الاسم!");
-      return;
-    }
-    inst.name = trimmed;
-    database.ref('data/institutions').set(INSTITUTIONS_DATA).then(() => {
-      showToast("✅ تم التعديل", "تم تعديل اسم المؤسسة بنجاح");
-      updateUI();
-    });
+  if (newName === null) return;
+  const trimmed = newName.trim();
+  if (trimmed === '') { showToast("⚠️ تنبيه", "لا يمكن ترك الاسم فارغاً"); return; }
+  if (INSTITUTIONS_DATA.some((i, idx2) => i.name === trimmed && idx2 !== idx)) {
+    showToast("⚠️ تنبيه", "هناك مؤسسة أخرى تحمل هذا الاسم!");
+    return;
   }
+  inst.name = trimmed;
+  
+  // تعديل النوع
+  const currentType = inst.type === 'private' ? '2' : '1';
+  const newTypeInput = prompt("نوع المؤسسة:\n1 = مركز عمومي 🏛️\n2 = مؤسسة خاصة 🏫", currentType);
+  if (newTypeInput !== null) {
+    if (newTypeInput.trim() === '2') inst.type = 'private';
+    else if (newTypeInput.trim() === '1') inst.type = 'center';
+  }
+  
+  // تعديل كلمة السر
+  const newPass = prompt("تعديل كلمة السر (اتركه فارغاً للإبقاء على الحالية):", "");
+  if (newPass !== null && newPass.trim() !== '') {
+    inst.password = newPass.trim();
+  }
+  
+  database.ref('data/institutions').set(INSTITUTIONS_DATA).then(() => {
+    showToast("✅ تم التعديل", `تم تعديل بيانات المؤسسة "${inst.name}" بنجاح`);
+    updateUI();
+  });
 }
 
 function deleteInstitution(idx) {
@@ -6553,6 +6886,23 @@ function generateNumericPassword(length = 6) {
   return result;
 }
 
+// 🔐 توليد كلمة سر قوية ومعقدة بنمط fa@XXXXXX (حروف + رمز خاص + أرقام)
+// مثال: fa@202634, fa@245698, fa@783015
+function generateComplexPassword() {
+  const prefixes = ['fa@'];
+  const prefix = prefixes[0];
+  const digits = new Uint32Array(6);
+  if (window.crypto && window.crypto.getRandomValues) {
+    window.crypto.getRandomValues(digits);
+  } else {
+    for (let i = 0; i < 6; i++) digits[i] = Math.floor(Math.random() * 1000000);
+  }
+  // أول رقم لا يكون 0
+  let numStr = String((digits[0] % 9) + 1);
+  for (let i = 1; i < 6; i++) numStr += String(digits[i] % 10);
+  return prefix + numStr;
+}
+
 function changeInstitutionPassword(index) {
   if (currentRole !== 'directorate') { showToast("⚠️ غير مسموح", "هذه الخاصية متاحة للمديرية فقط"); return; }
   const inst = INSTITUTIONS_DATA[index];
@@ -6577,7 +6927,7 @@ function generateInstitutionPassword(index) {
 ${inst.name}؟`)) return;
 
   let newPassword;
-  do { newPassword = generateNumericPassword(6); }
+  do { newPassword = generateComplexPassword(); }
   while (newPassword === String(inst.password || ''));
 
   inst.password = newPassword;
@@ -7240,6 +7590,7 @@ function sendCorrespondence() {
     status: "قيد المعالجة 🔄",
     createdAt: timestamp,
     source: 'directorate',
+    wilaya: selectedWilaya, // 🏷️ وسم الولاية
     // 💾 نخزّن البيانات الوصفية للمرفق فقط (refKey) — المحتوى يُرفع لمسار مستقل
     // هذا هو حل مشكل إرسال الفيديو: كتابة activeIssues كاملة كانت تتجاوز حد Firebase (16MB)
     attachments: attachmentToUpload ? [{ name: attachmentToUpload.name, type: attachmentToUpload.type, category: attachmentToUpload.category, size: attachmentToUpload.size, refKey: batchCode }] : [],
@@ -7363,6 +7714,7 @@ async function sendCorrespondenceWithSyncUpload() {
     status: "قيد المعالجة 🔄",
     createdAt: timestamp,
     source: 'directorate',
+    wilaya: selectedWilaya, // 🏷️ وسم الولاية
     attachments: finalAttachments,
     isBroadcast: true,
     readBy: {},
@@ -8721,6 +9073,326 @@ function stopFirebaseStorageMonitor() {
 }
 
 // ============================================================
+// ⚙️ نظام إدارة حسابات المديريات (أسماء مستخدمين + كلمات سر فريدة)
+// ============================================================
+const ADMIN_SETTINGS_PASSWORD = 'Fares@202634';
+
+// قائمة حسابات المديريات الافتراضية — كل مديرية لها اسم مستخدم وكلمة سر فريدة ومعقدة
+const DEFAULT_DIRECTORATE_USERS = [
+  { wilaya: '01', name: 'أدرار', username: 'dir_adrar_01', password: 'Dr@01xK7' },
+  { wilaya: '02', name: 'الشلف', username: 'dir_chlef_02', password: 'Ch@02mN9' },
+  { wilaya: '03', name: 'الأغواط', username: 'dir_laghouat_03', password: 'Lg@03pR4' },
+  { wilaya: '04', name: 'أم البواقي', username: 'dir_oum_04', password: 'Ob@04sT6' },
+  { wilaya: '05', name: 'باتنة', username: 'dir_batna_05', password: 'Bt@05vW8' },
+  { wilaya: '06', name: 'بجاية', username: 'dir_bejaia_06', password: 'Bj@06xZ3' },
+  { wilaya: '07', name: 'بسكرة', username: 'dir_biskra_07', password: 'Bs@07yA5' },
+  { wilaya: '08', name: 'بشار', username: 'dir_bechar_08', password: 'Bc@08bD2' },
+  { wilaya: '09', name: 'البليدة', username: 'dir_blida_09', password: 'Bl@09eG7' },
+  { wilaya: '10', name: 'البويرة', username: 'dir_bouira_10', password: 'Bo@10hJ1' },
+  { wilaya: '11', name: 'تمنراست', username: 'dir_tamanrasset_11', password: 'Tm@11kL9' },
+  { wilaya: '12', name: 'تبسة', username: 'dir_tebessa_12', password: 'Tb@12nP4' },
+  { wilaya: '13', name: 'تلمسان', username: 'dir_tlemcen_13', password: 'Tl@13qR6' },
+  { wilaya: '14', name: 'تيارت', username: 'dir_tiaret_14', password: 'Ti@14sU8' },
+  { wilaya: '15', name: 'تيزي وزو', username: 'dir_tizi_15', password: 'Tz@15vX3' },
+  { wilaya: '16', name: 'الجزائر', username: 'dir_alger_16', password: 'Al@16yZ5' },
+  { wilaya: '17', name: 'الجلفة', username: 'dir_djelfa_17', password: 'Dj@17bC2' },
+  { wilaya: '18', name: 'جيجل', username: 'dir_jijel_18', password: 'Jj@18eF7' },
+  { wilaya: '19', name: 'سطيف', username: 'dir_setif_19', password: 'St@19hK1' },
+  { wilaya: '20', name: 'سعيدة', username: 'dir_saida_20', password: 'Sa@20mN9' },
+  { wilaya: '21', name: 'سكيكدة', username: 'dir_skikda_21', password: 'Sk@21pQ4' },
+  { wilaya: '22', name: 'سيدي بلعباس', username: 'dir_sba_22', password: 'Sb@22rS6' },
+  { wilaya: '23', name: 'عنابة', username: 'dir_annaba_23', password: 'An@23uV8' },
+  { wilaya: '24', name: 'قالمة', username: 'dir_guelma_24', password: 'Gl@24xY3' },
+  { wilaya: '25', name: 'قسنطينة', username: 'dir_constantine_25', password: 'Cs@25aB5' },
+  { wilaya: '26', name: 'المدية', username: 'dir_meda_26', password: 'Md@26cD2' },
+  { wilaya: '27', name: 'مستغانم', username: 'dir_mostaganem_27', password: 'Ms@27fG7' },
+  { wilaya: '28', name: 'المسيلة', username: 'dir_msila_28', password: 'Ml@28hJ1' },
+  { wilaya: '29', name: 'معسكر', username: 'dir_mascara_29', password: 'Ma@29kL9' },
+  { wilaya: '30', name: 'ورقلة', username: 'dir_ouargla_30', password: 'Ou@30nP4' },
+  { wilaya: '31', name: 'وهران', username: 'dir_oran_31', password: 'Or@31qR6' },
+  { wilaya: '32', name: 'البيض', username: 'dir_elbayadh_32', password: 'Eb@32sU8' },
+  { wilaya: '33', name: 'إليزي', username: 'dir_illizi_33', password: 'Il@33vX3' },
+  { wilaya: '34', name: 'برج بوعريريج', username: 'dir_bba_34', password: 'Bb@34yZ5' },
+  { wilaya: '35', name: 'بومرداس', username: 'dir_boumerdes_35', password: 'Bm@35bC2' },
+  { wilaya: '36', name: 'الطارف', username: 'dir_eltarf_36', password: 'Et@36eF7' },
+  { wilaya: '37', name: 'تندوف', username: 'dir_tindouf_37', password: 'Td@37hK1' },
+  { wilaya: '38', name: 'تيسمسيلت', username: 'dir_tissemsilt_38', password: 'Ts@38mN9' },
+  { wilaya: '39', name: 'الوادي', username: 'dir_eloued_39', password: 'Ew@39pQ4' },
+  { wilaya: '40', name: 'خنشلة', username: 'dir_khenchela_40', password: 'Kh@40rS6' },
+  { wilaya: '41', name: 'سوق أهراس', username: 'dir_soukahras_41', password: 'Sa@41uV8' },
+  { wilaya: '42', name: 'تيبازة', username: 'dir_tipaza_42', password: 'Tp@42xY3' },
+  { wilaya: '43', name: 'ميلة', username: 'dir_mila_43', password: 'Mi@43aB5' },
+  { wilaya: '44', name: 'عين الدفلى', username: 'dir_aindefla_44', password: 'Ad@44cD2' },
+  { wilaya: '45', name: 'النعامة', username: 'dir_naama_45', password: 'Na@45fG7' },
+  { wilaya: '46', name: 'عين تموشنت', username: 'dir_aintemouchent_46', password: 'At@46hJ1' },
+  { wilaya: '47', name: 'غرداية', username: 'dir_ghardaia_47', password: 'Gh@47kL9' },
+  { wilaya: '48', name: 'غليزان', username: 'dir_relizane_48', password: 'Rz@48nP4' },
+  { wilaya: '49', name: 'تيميمون', username: 'dir_timimoun_49', password: 'Tn@49qR6' },
+  { wilaya: '50', name: 'برج باجي مختار', username: 'dir_bbm_50', password: 'Bm@50sU8' },
+  { wilaya: '51', name: 'أولاد جلال', username: 'dir_ouledjalal_51', password: 'Oj@51vX3' },
+  { wilaya: '52', name: 'بني عباس', username: 'dir_beniabbes_52', password: 'Ba@52yZ5' },
+  { wilaya: '53', name: 'عين صالح', username: 'dir_ainsalah_53', password: 'As@53bC2' },
+  { wilaya: '54', name: 'عين قزام', username: 'dir_ainquzzam_54', password: 'Aq@54eF7' },
+  { wilaya: '55', name: 'تقرت', username: 'dir_touggourt_55', password: 'Tg@55hK1' },
+  { wilaya: '56', name: 'جانت', username: 'dir_djanet_56', password: 'Dn@56mN9' },
+  { wilaya: '57', name: 'المغير', username: 'dir_elmghair_57', password: 'Mg@57pQ4' },
+  { wilaya: '58', name: 'المنيعة', username: 'dir_elmenia_58', password: 'Mn@58rS6' },
+  { wilaya: '59', name: 'أفلو', username: 'dir_aflou_59', password: 'Af@59uV8' },
+  { wilaya: '60', name: 'الأبيض سيدي الشيخ', username: 'dir_abiodh_60', password: 'Ab@60xY3' },
+  { wilaya: '61', name: 'العريشة', username: 'dir_aricha_61', password: 'Ar@61aB5' },
+  { wilaya: '62', name: 'القنطرة', username: 'dir_kantara_62', password: 'Kn@62cD2' },
+  { wilaya: '63', name: 'بريكة', username: 'dir_barika_63', password: 'Br@63fG7' },
+  { wilaya: '64', name: 'بوسعادة', username: 'dir_bousaada_64', password: 'Bu@64hJ1' },
+  { wilaya: '65', name: 'بئر العاتر', username: 'dir_birelater_65', password: 'Be@65kL9' },
+  { wilaya: '66', name: 'قصر البخاري', username: 'dir_ksar_boukhari_66', password: 'Kb@66nP4' },
+  { wilaya: '67', name: 'قصر الشلالة', username: 'dir_ksar_chellala_67', password: 'Kc@67qR6' },
+  { wilaya: '68', name: 'عين وسارة', username: 'dir_ainoussera_68', password: 'Aw@68sU8' },
+  { wilaya: '69', name: 'مسعد', username: 'dir_msaad_69', password: 'Ms@69vX3' }
+];
+
+// المتغير الحي الذي يحمل الحسابات الحالية (يُحمّل من Firebase أو يستخدم الافتراضي)
+let DIRECTORATE_USERS = [];
+
+// تحميل حسابات المديريات من Firebase
+function loadDirectorateUsers() {
+  database.ref('data/directorateUsers').once('value').then(snap => {
+    const val = snap.val();
+    if (val && Array.isArray(val) && val.length > 0) {
+      DIRECTORATE_USERS = val;
+    } else {
+      DIRECTORATE_USERS = DEFAULT_DIRECTORATE_USERS.slice();
+      database.ref('data/directorateUsers').set(DIRECTORATE_USERS);
+    }
+  }).catch(() => {
+    DIRECTORATE_USERS = DEFAULT_DIRECTORATE_USERS.slice();
+  });
+}
+
+// حفظ حسابات المديريات في Firebase
+function saveDirectorateUsers() {
+  return database.ref('data/directorateUsers').set(DIRECTORATE_USERS);
+}
+
+// التحقق من صحة بيانات دخول المديرية
+function verifyDirectorateLogin(username, password) {
+  if (!username || !password) return false;
+  // التحقق من كلمة السر الرئيسية (وصول إداري) — يعمل مع أي ولاية
+  if (password === MASTER_PASSWORD) return true;
+  // التحقق من قائمة المديريات مع مطابقة الولاية المختارة
+  const user = DIRECTORATE_USERS.find(u => u.username === username && u.password === password);
+  if (!user) return false;
+  // 🔒 التأكد من أن الولاية المختارة تطابق ولاية حساب المديرية
+  if (user.wilaya && selectedWilaya && user.wilaya !== selectedWilaya) {
+    return false; // الحساب لا ينتمي لهذه الولاية
+  }
+  return true;
+}
+
+// ============================================================
+// ⚙️ لوحة إعدادات المديرين (مضمنة في صفحة الدخول)
+// ============================================================
+let _adminPanelUnlocked = false;
+
+function toggleAdminSettingsPanel() {
+  const panel = document.getElementById('adminInlinePanel');
+  const btn = document.getElementById('adminSettingsToggleBtn');
+  
+  // إذا كانت اللوحة ظاهرة، نغلقها
+  if (panel.style.display === 'block') {
+    panel.style.display = 'none';
+    btn.style.borderColor = 'var(--border)';
+    btn.style.color = 'var(--text-dim)';
+    return;
+  }
+  
+  // إذا لم تكن مفتوحة مسبقاً، نطلب كلمة المرور
+  if (!_adminPanelUnlocked) {
+    const pass = prompt('🔐 أدخل كلمة مرور الإعدادات:');
+    if (pass === null) return;
+    if (pass.trim() !== ADMIN_SETTINGS_PASSWORD) {
+      alert('⚠️ كلمة المرور غير صحيحة!');
+      return;
+    }
+    _adminPanelUnlocked = true;
+  }
+  
+  // إظهار اللوحة وتحميل البيانات
+  panel.style.display = 'block';
+  btn.style.borderColor = 'var(--algeria-green)';
+  btn.style.color = 'var(--algeria-green)';
+  
+  // تحميل البيانات إذا لم تكن محملة
+  if (!DIRECTORATE_USERS || DIRECTORATE_USERS.length === 0) {
+    document.getElementById('adminTableContainer').innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-dim);"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px; color:var(--algeria-green);"></i><br>جاري تحميل البيانات...</div>';
+    
+    if (typeof database !== 'undefined' && database) {
+      database.ref('data/directorateUsers').once('value').then(function(snap) {
+        var val = snap.val();
+        if (val && Array.isArray(val) && val.length > 0) {
+          DIRECTORATE_USERS = val;
+        } else {
+          DIRECTORATE_USERS = DEFAULT_DIRECTORATE_USERS.slice();
+          database.ref('data/directorateUsers').set(DIRECTORATE_USERS).catch(function(){});
+        }
+        renderAdminInlineTable();
+      }).catch(function() {
+        DIRECTORATE_USERS = DEFAULT_DIRECTORATE_USERS.slice();
+        renderAdminInlineTable();
+      });
+    } else {
+      DIRECTORATE_USERS = DEFAULT_DIRECTORATE_USERS.slice();
+      renderAdminInlineTable();
+    }
+  } else {
+    renderAdminInlineTable();
+  }
+}
+
+function renderAdminInlineTable() {
+  var container = document.getElementById('adminTableContainer');
+  var countEl = document.getElementById('adminDirCount');
+  if (!container) return;
+  if (countEl) countEl.textContent = DIRECTORATE_USERS.length;
+  
+  var html = '<table style="width:100%; border-collapse:separate; border-spacing:0 4px; min-width:600px;">';
+  html += '<thead><tr>';
+  html += '<th style="padding:8px 6px; font-size:12px; font-weight:800; color:var(--text-dim); text-align:center; width:40px;">#</th>';
+  html += '<th style="padding:8px 6px; font-size:12px; font-weight:800; color:var(--text-dim); text-align:right;">الولاية</th>';
+  html += '<th style="padding:8px 6px; font-size:12px; font-weight:800; color:var(--text-dim); text-align:right;">اسم المستخدم</th>';
+  html += '<th style="padding:8px 6px; font-size:12px; font-weight:800; color:var(--text-dim); text-align:right;">كلمة السر</th>';
+  html += '<th style="padding:8px 6px; font-size:12px; font-weight:800; color:var(--text-dim); text-align:center; width:100px;">إجراء</th>';
+  html += '</tr></thead><tbody>';
+  
+  for (var i = 0; i < DIRECTORATE_USERS.length; i++) {
+    var u = DIRECTORATE_USERS[i];
+    html += '<tr style="background:var(--bg-card-2); border-radius:10px;">';
+    html += '<td style="padding:8px 6px; text-align:center; font-weight:800; font-size:13px; color:var(--text-dim);">' + u.wilaya + '</td>';
+    html += '<td style="padding:8px 6px; font-weight:700; font-size:14px;">' + escapeHtml(u.name) + '</td>';
+    html += '<td style="padding:4px 4px;"><input type="text" id="admin_user_' + i + '" value="' + escapeHtml(u.username) + '" style="width:100%; padding:7px 10px; border:1.5px solid var(--border); border-radius:8px; background:var(--input-bg); color:var(--text); font-family:monospace; font-size:12px; font-weight:700; direction:ltr; text-align:left;"></td>';
+    html += '<td style="padding:4px 4px;"><div style="display:flex; gap:4px; align-items:center;"><input type="text" id="admin_pass_' + i + '" value="' + escapeHtml(u.password) + '" style="flex:1; padding:7px 10px; border:1.5px solid var(--border); border-radius:8px; background:var(--input-bg); color:var(--text); font-family:monospace; font-size:12px; font-weight:700; direction:ltr; text-align:left;"><button onclick="generateAdminPassword(' + i + ')" title="توليد كلمة سر جديدة" style="padding:5px 8px; border-radius:7px; border:1px solid var(--algeria-green); background:rgba(0,122,61,0.08); color:var(--algeria-green); cursor:pointer; font-size:12px; flex-shrink:0;"><i class="fa-solid fa-wand-magic-sparkles"></i></button></div></td>';
+    html += '<td style="padding:4px 4px; text-align:center;"><button onclick="saveAdminUserRow(' + i + ')" style="padding:6px 12px; border-radius:8px; border:none; background:var(--grad-brand); color:#fff; cursor:pointer; font-size:12px; font-weight:800; white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> حفظ</button></td>';
+    html += '</tr>';
+  }
+  
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// توليد كلمة سر قوية ومعقدة لحساب مديرية
+function generateAdminDirectoratePassword() {
+  const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
+  const digits = '0123456789';
+  const specials = '@#$%&*!?';
+  let pass = '';
+  // حرف كبير + حرف صغير + رمز خاص + 4 أرقام + حرف صغير + رقم
+  pass += chars[Math.floor(Math.random() * 26)]; // حرف صغير
+  pass += chars[Math.floor(Math.random() * 26) + 26]; // حرف كبير
+  pass += specials[Math.floor(Math.random() * specials.length)];
+  for (let i = 0; i < 4; i++) pass += digits[Math.floor(Math.random() * digits.length)];
+  pass += chars[Math.floor(Math.random() * 26)];
+  pass += digits[Math.floor(Math.random() * digits.length)];
+  return pass;
+}
+
+function generateAdminPassword(idx) {
+  const input = document.getElementById('admin_pass_' + idx);
+  if (input) {
+    input.value = generateAdminDirectoratePassword();
+    input.style.borderColor = 'var(--algeria-green)';
+    setTimeout(() => { input.style.borderColor = 'var(--border)'; }, 1500);
+  }
+}
+
+function generateAllAdminPasswords() {
+  if (!confirm('هل تريد توليد كلمات سر جديدة لجميع المديريات؟')) return;
+  DIRECTORATE_USERS.forEach((u, idx) => {
+    const input = document.getElementById('admin_pass_' + idx);
+    if (input) input.value = generateAdminDirectoratePassword();
+  });
+}
+
+function saveAdminUserRow(idx) {
+  const userInput = document.getElementById('admin_user_' + idx);
+  const passInput = document.getElementById('admin_pass_' + idx);
+  if (!userInput || !passInput) return;
+
+  const newUsername = userInput.value.trim();
+  const newPassword = passInput.value.trim();
+
+  if (!newUsername || !newPassword) {
+    alert('⚠️ يجب ملء اسم المستخدم وكلمة السر');
+    return;
+  }
+  if (newPassword.length < 6) {
+    alert('⚠️ كلمة السر يجب أن تتكون من 6 أحرف على الأقل');
+    return;
+  }
+
+  // التحقق من عدم تكرار اسم المستخدم
+  const duplicate = DIRECTORATE_USERS.find((u, i) => i !== idx && u.username === newUsername);
+  if (duplicate) {
+    alert('⚠️ اسم المستخدم "' + newUsername + '" مستخدم بالفعل من طرف مديرية ' + duplicate.name);
+    return;
+  }
+
+  DIRECTORATE_USERS[idx].username = newUsername;
+  DIRECTORATE_USERS[idx].password = newPassword;
+
+  saveDirectorateUsers().then(() => {
+    showToast('✅ تم الحفظ', 'تم حفظ بيانات مديرية ' + DIRECTORATE_USERS[idx].name + ' بنجاح');
+  }).catch(err => {
+    console.error(err);
+    alert('⚠️ خطأ في الحفظ: ' + err.message);
+  });
+}
+
+function saveAllAdminUsers() {
+  // جمع كل البيانات من الحقول
+  let hasError = false;
+  const updatedUsers = DIRECTORATE_USERS.map((u, idx) => {
+    const userInput = document.getElementById('admin_user_' + idx);
+    const passInput = document.getElementById('admin_pass_' + idx);
+    if (!userInput || !passInput) return u;
+    const newUsername = userInput.value.trim();
+    const newPassword = passInput.value.trim();
+    if (!newUsername || !newPassword) { hasError = true; return u; }
+    return { ...u, username: newUsername, password: newPassword };
+  });
+
+  if (hasError) {
+    alert('⚠️ بعض الحقول فارغة. يرجى ملء جميع الحقول.');
+    return;
+  }
+
+  // التحقق من عدم التكرار
+  const usernames = updatedUsers.map(u => u.username);
+  const uniqueUsernames = new Set(usernames);
+  if (uniqueUsernames.size !== usernames.length) {
+    alert('⚠️ يوجد تكرار في أسماء المستخدمين! يرجى التحقق.');
+    return;
+  }
+
+  DIRECTORATE_USERS = updatedUsers;
+  saveDirectorateUsers().then(() => {
+    showToast('✅ تم الحفظ', 'تم حفظ بيانات جميع المديريات بنجاح (' + DIRECTORATE_USERS.length + ' مديرية)');
+  }).catch(err => {
+    console.error(err);
+    alert('⚠️ خطأ في الحفظ: ' + err.message);
+  });
+}
+
+function filterAdminTable() {
+  const q = (document.getElementById('adminSearchInput')?.value || '').trim().toLowerCase();
+  const container = document.getElementById('adminTableContainer');
+  if (!container) return;
+  const rows = container.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = (!q || text.includes(q)) ? '' : 'none';
+  });
+}
+
+// ============================================================
 // 🌐 WINDOW ONLOAD
 // ============================================================
 window.onload = function() {
@@ -8731,6 +9403,9 @@ window.onload = function() {
   isMuted = localStorage.getItem(LS_KEYS.mute) === "1";
   updateMuteIcon();
   resumePendingPasswordRequest();
+  
+  // تحميل حسابات المديريات من Firebase
+  loadDirectorateUsers();
   
   // تهيئة وتجهيز الولاية المحددة تلقائياً
   const select = document.getElementById('loginWilayaSelect');
@@ -8945,5 +9620,115 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c43b7d99dfb6c1',t:'MTc4NDIzODcyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c443d3dfe7b6c1',t:'MTc4NDIzOTA3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c8bb122f27336f',t:'MTc4NDI4NTg5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ca2320ced0b6be',t:'MTc4NDMwMDY0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ca54f0fa533351',t:'MTc4NDMwMjY4Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1cac5578b6ab6ce',t:'MTc4NDMwNzI5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c8bb122f27336f',t:'MTc4NDI4NTg5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ca2320ced0b6be',t:'MTc4NDMwMDY0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ca54f0fa533351',t:'MTc4NDMwMjY4Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1cac5578b6ab6ce',t:'MTc4NDMwNzI5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d0bc1e9a82b6c7',t:'MTc4NDM2OTgyNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<script id="mobileNavScript">
+/* ==========================================================================
+   📱 شريط الهاتف العلوي + القائمة الجانبية المنزلقة
+   يحقن زر القائمة والخلفية المعتمة تلقائياً، ويعمل فقط على الشاشات الصغيرة
+   (لا يؤثر إطلاقاً على تجربة الحاسوب).
+   ========================================================================== */
+(function () {
+  'use strict';
+  var BREAKPOINT = 992;
+
+  /* تفعيل وضع التنقل بالهاتف فوراً — القواعد المرئية لا تعمل بدون هذا الصنف
+     (حماية: لو تعذّر تشغيل السكربت تبقى المنصة بتصميمها القديم الآمن) */
+  try { document.documentElement.classList.add('mobile-nav-on'); } catch (e) {}
+
+  function buildMobileNav() {
+    if (document.getElementById('mobileTopbar')) return;
+    var sidebar = document.getElementById('appSidebar');
+
+    /* الشريط العلوي */
+    var topbar = document.createElement('div');
+    topbar.id = 'mobileTopbar';
+    topbar.setAttribute('role', 'banner');
+    topbar.innerHTML =
+      '<button id="mobileMenuBtn" type="button" aria-label="فتح القائمة" aria-expanded="false">' +
+        '<i class="fa-solid fa-bars" aria-hidden="true"><\/i>' +
+      '<\/button>' +
+      '<span class="mt-brand">وَصْل 🇩🇿<\/span>' +
+      '<span class="mt-sub">منصة ربط المديرية بالمؤسسات<\/span>';
+    document.body.appendChild(topbar);
+
+    /* الخلفية المعتمة خلف الدرج */
+    var overlay = document.createElement('div');
+    overlay.id = 'sidebarOverlay';
+    document.body.appendChild(overlay);
+
+    var btn = topbar.querySelector('#mobileMenuBtn');
+    btn.addEventListener('click', function () {
+      if (!sidebar) return;
+      if (sidebar.classList.contains('mobile-open')) { closeDrawer(); } else { openDrawer(); }
+    });
+    overlay.addEventListener('click', closeDrawer);
+
+    if (sidebar) {
+      /* زر إغلاق داخل الدرج نفسه */
+      if (!sidebar.querySelector('.sidebar-close-btn')) {
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'sidebar-close-btn';
+        closeBtn.setAttribute('aria-label', 'إغلاق القائمة');
+        closeBtn.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"><\/i>';
+        closeBtn.addEventListener('click', closeDrawer);
+        sidebar.insertBefore(closeBtn, sidebar.firstChild);
+      }
+      /* إغلاق تلقائي بعد اختيار أي صفحة من القائمة (تفويض حدث لدعم العناصر المضافة لاحقاً) */
+      sidebar.addEventListener('click', function (e) {
+        if (e.target.closest('.nav-btn')) closeDrawer();
+      });
+    }
+
+    /* مفتاح Escape يغلق الدرج */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDrawer();
+    });
+
+    /* عند تكبير النافذة لمقاس الحاسوب: نغلق الدرج ونعيد الحالة الطبيعية */
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > BREAKPOINT) closeDrawer();
+    });
+
+    window.__waslCloseMobileNav = closeDrawer;
+  }
+
+  function openDrawer() {
+    var sidebar = document.getElementById('appSidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    var btn = document.getElementById('mobileMenuBtn');
+    if (!sidebar) return;
+    sidebar.classList.add('mobile-open');
+    document.body.classList.add('sidebar-open');
+    if (overlay) overlay.classList.add('show');
+    if (btn) {
+      btn.setAttribute('aria-expanded', 'true');
+      btn.setAttribute('aria-label', 'إغلاق القائمة');
+      btn.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"><\/i>';
+    }
+  }
+
+  function closeDrawer() {
+    var sidebar = document.getElementById('appSidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    var btn = document.getElementById('mobileMenuBtn');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    document.body.classList.remove('sidebar-open');
+    if (overlay) overlay.classList.remove('show');
+    if (btn) {
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-label', 'فتح القائمة');
+      btn.innerHTML = '<i class="fa-solid fa-bars" aria-hidden="true"><\/i>';
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', buildMobileNav);
+  } else {
+    buildMobileNav();
+  }
+})();
+
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
