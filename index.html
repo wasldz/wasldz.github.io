@@ -147,7 +147,6 @@ table td { font-size: 17px !important; padding: 14px 16px !important; }
 .modal-body input, .modal-body select, .modal-body textarea { font-size: 18px !important; }
 .modal-actions button { font-size: 17px !important; padding: 14px 28px !important; }
 .chat-bubble { font-size: 18px !important; padding: 14px 18px !important; }
-.inter-chat-recipient .recipient-badge { font-size: 16px !important; }
 .dept-stat-card .stat-item .label { font-size: 15px !important; }
 .dept-stat-card .stat-item .value { font-size: 26px !important; }
 ::-webkit-scrollbar { width: 14px !important; height: 14px !important; }
@@ -289,7 +288,8 @@ body::before {
 .role-selector button { padding: 17px 14px; border-radius: 16px; font-weight: 800; font-size: 18px; background: var(--bg-card-2); border: 2px solid var(--border); color: var(--text-dim); transition: var(--transition); cursor: pointer; font-family: inherit; }
 .role-selector button i { margin-left: 12px; font-size: 20px; }
 .role-selector button:hover { border-color: var(--algeria-green); color: var(--text); transform: translateY(-2px); }
-.role-selector button.active { border-color: var(--algeria-green); background: linear-gradient(135deg, rgba(0,122,61,0.12), rgba(0,166,81,0.05)); color: var(--algeria-green); box-shadow: 0 8px 22px rgba(0,122,61,0.14); }
+.role-selector button.active, .role-selector select.role-dropdown.active { border-color: var(--algeria-green); background: linear-gradient(135deg, rgba(0,122,61,0.12), rgba(0,166,81,0.05)); color: var(--algeria-green); box-shadow: 0 8px 22px rgba(0,122,61,0.14); }
+.role-selector select.role-dropdown { padding:17px 14px; border-radius:16px; font-weight:800; font-size:18px; background:var(--bg-card-2); border:2px solid var(--border); color:var(--text-dim); transition:var(--transition); cursor:pointer; font-family:inherit; width:100%; }
 
 .login-fields-row { display: flex; flex-direction: row; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
 .login-fields-row .login-field { flex: 1; min-width: 180px; margin-bottom: 0; }
@@ -599,7 +599,6 @@ tbody tr:hover { background: var(--table-hover) !important; }
 .modal-box { background: var(--bg-card); border-radius: var(--radius); width: 100%; max-width: 660px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: var(--shadow); animation: modalIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1); border: 1px solid var(--border); }
 @keyframes modalIn { from { transform: scale(0.95) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
 #chatModal .modal-box { max-width: 540px; height: 580px; }
-#interChatModal .modal-box { max-width: 580px; height: 600px; }
 
 .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
 .modal-head h3 { font-size: 22px; font-weight: 800; color: var(--text); }
@@ -636,12 +635,6 @@ tbody tr:hover { background: var(--table-hover) !important; }
 .broadcast-options button.active { border-color: var(--algeria-green); background: rgba(0, 122, 61, 0.08); color: var(--algeria-green); }
 .broadcast-textarea { width: 100%; min-height: 120px; padding: 16px 20px; background: var(--input-bg); border: 2px solid var(--border); border-radius: 14px; color: var(--text); font-size: 19px; font-family: inherit; resize: vertical; }
 .broadcast-textarea:focus { border-color: var(--algeria-green); outline: none; }
-
-.inter-chat-recipient { padding: 10px 14px; margin-bottom: 12px; background: var(--bg-card-2); border-radius: 12px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.inter-chat-recipient label { font-size: 16px; font-weight: 700; color: var(--text-dim); }
-.inter-chat-recipient select { flex: 1; padding: 12px 16px; background: var(--input-bg); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 17px; font-family: inherit; min-width: 180px; }
-.inter-chat-recipient select:focus { border-color: var(--algeria-green); outline: none; }
-.inter-chat-recipient .recipient-badge { padding: 6px 16px; border-radius: 24px; font-size: 14px; font-weight: 800; background: var(--grad-brand); color: #fff; }
 
 .dept-stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
 .dept-stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; transition: var(--transition); }
@@ -2212,7 +2205,7 @@ tbody td:last-child {
 @media (max-width: 1100px) { .storage-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .storage-grid { grid-template-columns: 1fr; } }
 
-/* 💾 ودجت التخزين المصغر في الشريط الجانبي (للمديرية فقط) */
+/* 💾 ودجت التخزين المصغر في الشريط الجانبي */
 .sidebar-storage-widget { background: var(--bg-card-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 12px; }
 .ssw-title { font-size: 14px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .ssw-title i { color: var(--algeria-green); }
@@ -2224,6 +2217,124 @@ tbody td:last-child {
 .ssw-text { font-size: 12.5px; color: var(--text-dim); font-weight: 700; line-height: 1.8; }
 .ssw-text strong { color: var(--algeria-green); direction: ltr; display: inline-block; }
 .sidebar.collapsed .sidebar-storage-widget { display: none !important; }
+
+/* المدير الولائي فقط: شريط الإعلانات للعرض دون أدوات تعديل */
+body.wilaya-manager-mode .ticker-admin-btn,
+body.wilaya-manager-mode .ticker-panel { display: none !important; }
+
+/* ============ 🚨 رسالة المدير الولائي المخيفة (أحمر — منتصف الشاشة — 15 ثانية) ============ */
+.wilaya-manager-alert-overlay {
+  position: fixed; inset: 0; z-index: 12000;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: wmaOverlayIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes wmaOverlayIn {
+  from { opacity:0; } to { opacity:1; }
+}
+.wilaya-manager-alert-card {
+  position: relative;
+  width: min(700px, 95vw);
+  background: linear-gradient(145deg, #1a0000, #2d0a0a, #1a0000);
+  border: 3px solid #ff1744;
+  border-radius: 28px;
+  padding: 36px 32px 28px;
+  text-align: center;
+  box-shadow:
+    0 0 80px rgba(255,23,68,0.45),
+    0 0 0 6px rgba(255,23,68,0.12),
+    inset 0 0 60px rgba(255,23,68,0.08);
+  animation: wmaCardIn 0.5s cubic-bezier(0.34,1.56,0.64,1), wmaPulse 1.8s ease-in-out infinite;
+  overflow: hidden;
+}
+@keyframes wmaCardIn {
+  from { transform: scale(0.7) translateY(30px); opacity:0; }
+  to { transform: scale(1) translateY(0); opacity:1; }
+}
+@keyframes wmaPulse {
+  0%, 100% { box-shadow: 0 0 80px rgba(255,23,68,0.45), 0 0 0 6px rgba(255,23,68,0.12); }
+  50% { box-shadow: 0 0 100px rgba(255,23,68,0.65), 0 0 0 12px rgba(255,23,68,0.22); }
+}
+.wilaya-manager-alert-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 28px;
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 20px,
+    rgba(255,23,68,0.03) 20px, rgba(255,23,68,0.03) 40px
+  );
+  pointer-events: none;
+}
+.wma-close-btn {
+  position: absolute; top: 14px; left: 14px;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: rgba(255,255,255,0.10); border: 2px solid rgba(255,255,255,0.25);
+  color: #fff; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.25s ease; z-index: 2;
+}
+.wma-close-btn:hover { background: rgba(255,23,68,0.5); transform: rotate(90deg) scale(1.1); }
+.wma-icon {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: linear-gradient(135deg, #ff1744, #d50000);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; color: #fff; margin: 0 auto 18px;
+  box-shadow: 0 0 40px rgba(255,23,68,0.5);
+  animation: wmaIconPulse 1.2s ease-in-out infinite;
+  border: 3px solid rgba(255,255,255,0.2);
+}
+@keyframes wmaIconPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(255,23,68,0.5); }
+  50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(255,23,68,0.7); }
+}
+.wma-sender {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, rgba(255,23,68,0.25), rgba(213,0,0,0.15));
+  border: 1px solid rgba(255,23,68,0.4);
+  padding: 8px 22px; border-radius: 99px;
+  font-size: 16px; font-weight: 900; color: #ff5252;
+  margin-bottom: 16px; letter-spacing: 0.5px;
+}
+.wma-sender i { font-size: 18px; }
+.wma-target-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  padding: 5px 16px; border-radius: 99px;
+  font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.6);
+  margin-bottom: 16px;
+}
+.wma-message {
+  font-size: 26px; font-weight: 900; color: #fff;
+  line-height: 1.9; margin: 14px 0 20px;
+  text-shadow: 0 2px 12px rgba(255,23,68,0.3);
+  word-break: break-word; white-space: pre-wrap;
+  max-height: 50vh; overflow-y: auto;
+}
+.wma-countdown {
+  font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.45);
+  margin-top: 10px;
+}
+.wma-countdown span { color: #ff5252; font-size: 18px; }
+.wma-bar {
+  width: 80%; max-width: 400px; height: 5px;
+  background: rgba(255,255,255,0.1); border-radius: 99px;
+  margin: 14px auto 0; overflow: hidden;
+}
+.wma-bar-fill {
+  height: 100%; width: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, #ff1744, #d50000);
+  transform-origin: left;
+  animation: wmaBarShrink 15s linear forwards;
+}
+@keyframes wmaBarShrink {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+@media (max-width: 600px) {
+  .wilaya-manager-alert-card { padding: 24px 18px 20px; border-radius: 20px; }
+  .wma-message { font-size: 20px; }
+  .wma-icon { width: 68px; height: 68px; font-size: 32px; }
+}
 
 </style>
 
@@ -2351,7 +2462,7 @@ body { -webkit-tap-highlight-color: transparent; }
     max-height: calc(100vh - 24px) !important;
     max-height: calc(100dvh - 24px) !important;
   }
-  #chatModal .modal-box, #interChatModal .modal-box, .modal-box[style*="height"] {
+  #chatModal .modal-box, .modal-box[style*="height"] {
     height: calc(100vh - 24px) !important;
     height: calc(100dvh - 24px) !important;
   }
@@ -2705,16 +2816,25 @@ body { -webkit-tap-highlight-color: transparent; }
       </div>
 
       <div class="role-selector">
-        <button class="active" id="loginRoleDirectorate" onclick="selectLoginRole('directorate')"><i class="fa-solid fa-building-columns"></i> المديرية</button>
+        <select class="role-dropdown active" id="loginRoleDirectorate" onchange="selectDirectorateAccess(this.value)" aria-label="نوع الدخول إلى المديرية">
+          <option value="digitization">خلية الرقمنة</option>
+          <option value="wilayaManager">المدير الولائي</option>
+        </select>
         <button id="loginRoleDepartment" onclick="selectLoginRole('department')"><i class="fa-solid fa-users-gear"></i> مصالح المديرية</button>
         <button id="loginRoleCenter" onclick="selectLoginRole('center')"><i class="fa-solid fa-school"></i> مركز/معهد/مدرسة </button>
       </div>
 
       <!-- حقول المديرية -->
       <div id="directorateFields">
-        <div class="login-fields-row">
+        <div id="digitizationAccessFields" class="login-fields-row">
           <div class="login-field"><label><i class="fa-solid fa-user"></i> اسم المستخدم</label><input type="text" id="loginUser" placeholder="أدخل اسم المستخدم" onkeyup="if(event.key==='Enter')handleLogin()"></div>
-          <div class="login-field"><label><i class="fa-solid fa-key"></i> كلمة المرور</label><input type="password" id="loginPass" placeholder="أدخل كلمة المرور" onkeyup="if(event.key==='Enter')handleLogin()"></div>
+          <div class="login-field"><label><i class="fa-solid fa-key"></i> كلمة المرور</label><input type="password" id="loginPass" placeholder="أدخل كلمة المرور الخاصة بخلية الرقمنة" onkeyup="if(event.key==='Enter')handleLogin()"></div>
+        </div>
+        <div id="wilayaManagerAccessFields" class="login-fields-row" style="display:none;">
+          <div class="login-field" style="flex:1 1 100%;">
+            <label><i class="fa-solid fa-key"></i> كلمة سر المدير الولائي</label>
+            <input type="password" id="loginManagerPass" placeholder="أدخل كلمة سر المدير الولائي" onkeyup="if(event.key==='Enter')handleLogin()">
+          </div>
         </div>
       </div>
 
@@ -2812,7 +2932,7 @@ body { -webkit-tap-highlight-color: transparent; }
     <div class="profile-card">
       <div class="profile-avatar" id="profileAvatar"><i class="fa-solid fa-user-tie"></i></div>
       <h3 id="profileName">المديرية</h3>
-      <p id="profileTitle">المسؤول عن الرقمنة: بلحاج</p>
+      <p id="profileTitle">مرحبا بالسادة : بلحاج وبوفليح ☺</p>
       <span class="role-badge directorate" id="profileRoleBadge">المديرية</span>
     </div>
     <ul class="nav-list" id="navList"></ul>
@@ -2884,6 +3004,31 @@ body { -webkit-tap-highlight-color: transparent; }
       </div>
     </section>
 
+    <!-- 🏫 إنشغالات المؤسسات التكوينية (للمدير الولائي) -->
+    <section class="page hidden" id="page-center-issues">
+      <div class="page-header">
+        <h2><i class="fa-solid fa-school"></i> إنشغالات المؤسسات التكوينية</h2>
+        <span class="sync-badge"><i class="fa-solid fa-rotate"></i> تحديث تلقائي</span>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="center-issues-search" placeholder="بحث بالرمز أو المؤسسة أو التصنيف..." onkeyup="renderCenterIssuesForWilayaManager()">
+        <select id="center-issues-priority" onchange="renderCenterIssuesForWilayaManager()"><option value="">كل الأولويات</option><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select>
+        <select id="center-issues-status" onchange="renderCenterIssuesForWilayaManager()"><option value="">كل الحالات</option><option value="pending">قيد المعالجة</option><option value="resolved">تم الحل</option></select>
+        <select id="center-issues-type" onchange="renderCenterIssuesForWilayaManager()"><option value="">كل التصنيفات</option></select>
+        <select id="center-issues-inst" onchange="renderCenterIssuesForWilayaManager()"><option value="">كل المؤسسات</option></select>
+      </div>
+      <div id="centerIssuesKPI" style="margin-bottom:18px;"></div>
+      <div class="table-wrap">
+        <div class="list-header-scroll" id="centerIssuesWMHeaderScroll">
+          <table class="list-fixed-table">
+            <colgroup><col style="width:160px"><col style="width:170px"><col style="width:150px"><col style="width:140px"><col style="width:150px"><col style="width:100px"><col style="width:100px"><col style="width:170px"><col style="width:90px"></colgroup>
+            <thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>المصلحة</th><th>الأولوية</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+          </table>
+        </div>
+        <div class="list-rows-container" id="centerIssuesWMTableBody"></div>
+      </div>
+    </section>
+
     <!-- DEPT DASHBOARD -->
     <section class="page hidden" id="page-dept-dashboard">
       <div class="page-header">
@@ -2891,6 +3036,24 @@ body { -webkit-tap-highlight-color: transparent; }
         <span class="sync-badge"><i class="fa-solid fa-rotate"></i> تحديث تلقائي</span>
       </div>
       <div id="deptStatsContainer"></div>
+      <!-- 💾 بطاقة مراقبة تخزين Firebase — للمصالح -->
+      <div class="storage-monitor-card" id="deptStorageCard" style="display:none;">
+        <div class="storage-head">
+          <h3><i class="fa-solid fa-database"></i> تخزين قاعدة بيانات Firebase <span class="pill pill-normal" style="font-size:13px;">قياس حقيقي من الخادم</span></h3>
+          <button class="btn-mini" type="button" onclick="refreshFirebaseStorageUsage(true)"><i class="fa-solid fa-rotate"></i> تحديث القياس</button>
+        </div>
+        <div class="storage-grid">
+          <div class="storage-item"><span class="s-label">المساحة المستعملة الآن</span><span class="s-value s-used" id="deptStorageUsed">—</span></div>
+          <div class="storage-item"><span class="s-label">المساحة المتبقية</span><span class="s-value s-free" id="deptStorageFree">—</span></div>
+          <div class="storage-item"><span class="s-label">السعة الإجمالية (خطة Spark)</span><span class="s-value">1.00 GB</span></div>
+          <div class="storage-item"><span class="s-label">نسبة الاستعمال</span><span class="s-value s-pct" id="deptStoragePct">—</span></div>
+        </div>
+        <div class="storage-bar-wrap">
+          <div class="storage-bar-track"><div class="storage-bar-fill ok" id="deptStorageBarFill"></div></div>
+          <span class="storage-bar-pct" id="deptStorageBarPct">—</span>
+        </div>
+        <p class="storage-note" id="deptStorageNote"><i class="fa-solid fa-circle-info"></i> سيتم قياس الحجم الحقيقي لقاعدة البيانات تلقائياً.</p>
+      </div>
       <div class="chart-card" style="height:300px; margin-top:20px;"><canvas id="deptChart"></canvas></div>
     </section>
 
@@ -3043,11 +3206,29 @@ body { -webkit-tap-highlight-color: transparent; }
         </div>
         <button class="btn-gold" style="width:100%; justify-content:center;" id="sendBtn" onclick="sendFromCenter()"><i class="fa-solid fa-broadcast"></i> بث وإرسال الإنشغال / المراسلة</button>
       </div>
+      <!-- 💾 بطاقة مراقبة تخزين Firebase — للمؤسسات التكوينية -->
+      <div class="storage-monitor-card" id="centerStorageCard" style="display:none; margin-top:20px;">
+        <div class="storage-head">
+          <h3><i class="fa-solid fa-database"></i> تخزين قاعدة بيانات Firebase <span class="pill pill-normal" style="font-size:13px;">قياس حقيقي من الخادم</span></h3>
+          <button class="btn-mini" type="button" onclick="refreshFirebaseStorageUsage(true)"><i class="fa-solid fa-rotate"></i> تحديث القياس</button>
+        </div>
+        <div class="storage-grid">
+          <div class="storage-item"><span class="s-label">المساحة المستعملة الآن</span><span class="s-value s-used" id="centerStorageUsed">—</span></div>
+          <div class="storage-item"><span class="s-label">المساحة المتبقية</span><span class="s-value s-free" id="centerStorageFree">—</span></div>
+          <div class="storage-item"><span class="s-label">السعة الإجمالية (خطة Spark)</span><span class="s-value">1.00 GB</span></div>
+          <div class="storage-item"><span class="s-label">نسبة الاستعمال</span><span class="s-value s-pct" id="centerStoragePct">—</span></div>
+        </div>
+        <div class="storage-bar-wrap">
+          <div class="storage-bar-track"><div class="storage-bar-fill ok" id="centerStorageBarFill"></div></div>
+          <span class="storage-bar-pct" id="centerStorageBarPct">—</span>
+        </div>
+        <p class="storage-note" id="centerStorageNote"><i class="fa-solid fa-circle-info"></i> سيتم قياس الحجم الحقيقي لقاعدة البيانات تلقائياً.</p>
+      </div>
     </section>
 
     <!-- CHAT HUB -->
     <section class="page hidden" id="page-chat-hub">
-      <div class="page-header"><h2><i class="fa-solid fa-comments"></i> متابعة الردود</h2><button class="btn-gold btn-sm" onclick="openInterChat()"><i class="fa-solid fa-users"></i> مراسلة المؤسسات</button></div>
+      <div class="page-header"><h2><i class="fa-solid fa-comments"></i> متابعة الردود</h2></div>
       <div id="chatHubContainer"></div>
     </section>
 
@@ -3179,12 +3360,18 @@ body { -webkit-tap-highlight-color: transparent; }
       </div>
     </section>
 
+    <!-- MANAGER MESSAGES INBOX -->
+    <section class="page hidden" id="page-manager-messages">
+      <div class="page-header"><h2><i class="fa-solid fa-envelope"></i> رسائل المدير الولائي</h2></div>
+      <div id="managerMessagesInbox"></div>
+    </section>
+
 <!-- MODALS -->
 <div class="modal-overlay" id="changePassModal" onclick="if(event.target===this)closeChangePassword()">
   <div class="modal-box" style="max-width:480px;">
     <div class="modal-head"><div><h3>🔑 تغيير كلمة السر</h3></div><button class="btn-close-modal" onclick="closeChangePassword()"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="modal-body">
-      <div class="form-field"><label>كلمة السر الحالية</label><input type="password" id="currentPass" placeholder="أدخل كلمة السر الحالية"></div>
+      <div class="form-field" id="currentPassField"><label>كلمة السر الحالية</label><input type="password" id="currentPass" placeholder="أدخل كلمة السر الحالية"></div>
       <div class="form-field"><label>كلمة السر الجديدة</label><input type="password" id="newPass" placeholder="أدخل كلمة السر الجديدة"></div>
       <div class="form-field"><label>تأكيد كلمة السر الجديدة</label><input type="password" id="confirmPass" placeholder="أعد كتابة كلمة السر الجديدة"></div>
       <button class="btn-primary" style="width:100%; justify-content:center;" onclick="changePassword()"><i class="fa-solid fa-save"></i> تغيير كلمة السر</button>
@@ -3236,21 +3423,6 @@ body { -webkit-tap-highlight-color: transparent; }
         <button type="button" class="chat-icon-btn voice-record-btn" id="chatVoiceBtn" onclick="toggleVoiceRecording()" title="تسجيل رد صوتي" style="display:none;"><i class="fa-solid fa-microphone"></i></button>
         <input type="text" id="chatInput" placeholder="اكتب رسالتك..." onkeyup="if(event.key==='Enter')sendChatMessage()">
         <button class="chat-icon-btn send" id="chatSendBtn" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="interChatModal" onclick="if(event.target===this)closeInterChat()">
-  <div class="modal-box" style="max-width:600px; height:600px;">
-    <div class="modal-head"><div><h3>💬 غرفة المؤسسات</h3><div class="sub">شات خاص بين المؤسسات</div></div><button class="btn-close-modal" onclick="closeInterChat()"><i class="fa-solid fa-xmark"></i></button></div>
-    <div class="chat-messages" id="interChatMessages"></div>
-    <div class="chat-input-area">
-      <div class="inter-chat-recipient"><label><i class="fa-solid fa-user"></i> إرسال إلى:</label><select id="interChatRecipient"><option value="all">الجميع</option></select><span class="recipient-badge" id="recipientBadge">الجميع</span></div>
-      <div class="chat-row">
-        <label class="chat-icon-btn" title="إرفاق ملف"><i class="fa-solid fa-paperclip"></i><input type="file" id="interChatFileInput" style="display:none" onchange="handleInterChatFileAttach(event)"></label>
-        <input type="text" id="interChatInput" placeholder="اكتب رسالتك..." onkeyup="if(event.key==='Enter')sendInterChatMessage()">
-        <button class="chat-icon-btn send-accent" onclick="sendInterChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
       </div>
     </div>
   </div>
@@ -3363,6 +3535,7 @@ const DEPARTMENTS_BASE = [
 // 💾 البيانات الأساسية
 // ============================================================
 let MASTER_PASSWORD = "1996";
+let WILAYA_MANAGER_PASSWORD = null; // null = نستخدم الافتراضية (Mgr@XX_2026)
 let currentRole = null;
 let currentDepartment = null;
 let activeIssues = [];
@@ -3380,8 +3553,6 @@ let deptChartInstance = null;
 let currentChatCode = null;
 let pendingAttachment = null;
 let pendingCenterFile = null;
-let interChatMessages = [];
-let interChatPendingAttachment = null;
 let notifiedMessages = new Set();
 let broadcastTarget = 'all';
 let isSyncing = false;
@@ -3545,9 +3716,12 @@ const LS_KEYS = {
   remember: "hassan_remember",
   theme: "hassan_theme",
   masterPass: "hassan_master_pass",
+  managerPass: "hassan_manager_pass",
   lastSync: "hassan_last_sync",
   session: "hassan_session",
-  mute: "hassan_mute_notifications"
+  mute: "hassan_mute_notifications",
+  managerNotesSeen: "hassan_mgr_notes_seen",
+  managerNotesDismissed: "hassan_mgr_notes_dismissed"
 };
 
 const DEFAULT_FILE_TYPES = ["المكلف بالرقمنة","مصلحة التوجيه ( المستشارين )","مصلحة التكوين الحضوري","مصلحة التمهين","مصلحة الإدارة والمالية والوسائل","إنشغالات المداراء"];
@@ -3638,7 +3812,6 @@ function loadDB() {
   fileTypes = DEFAULT_FILE_TYPES.slice();
   centerIssues = [];
   centerArchived = [];
-  interChatMessages = [];
   auditLog = [];
   departments = DEPARTMENTS_BASE.slice();
 
@@ -3658,6 +3831,8 @@ function loadDB() {
 
   const savedPass = localStorage.getItem(LS_KEYS.masterPass);
   if (savedPass) MASTER_PASSWORD = savedPass;
+  const savedManagerPass = localStorage.getItem(LS_KEYS.managerPass);
+  if (savedManagerPass) WILAYA_MANAGER_PASSWORD = savedManagerPass;
   lastSyncTimestamp = parseInt(localStorage.getItem(LS_KEYS.lastSync) || "0");
   isMuted = localStorage.getItem(LS_KEYS.mute) === "1";
 }
@@ -3670,9 +3845,6 @@ function loadDB() {
 let _lastPushedJSON = {};
 
 function _pushToFirebaseNow() {
-  // 🔥 ملاحظة: interChatMessages لم يعد ضمن هذه الدفعة المُجمّعة؛ محادثة
-  // المؤسسات تُرسَل الآن فوراً رسالة برسالة عبر appendInterChatMessage()
-  // (push مستقل)، بنفس منطق الشات الفردي — راجع تعليق التوضيح أعلى الدالة.
   const candidates = {
     activeIssues: activeIssues,
     archivedIssues: archivedIssues,
@@ -3781,7 +3953,25 @@ function listenToFirebase() {
     }
   });
 
+  // مستمع التغيرات في كلمة مرور المدير الولائي لمزامنتها بين الأجهزة
+  database.ref('data/wilayaManagerPassword').on('value', (snapshot) => {
+    const val = snapshot.val();
+    if (val) {
+      WILAYA_MANAGER_PASSWORD = val;
+      localStorage.setItem(LS_KEYS.managerPass, val);
+    }
+  });
+
 let _lastIssueNotifiedCode = ''; // لمنع تكرار الإشعار عند إضافة الإنشغال لمصفوفتين
+let _notifiedIssueCodes = new Set(); // مجموعة أكثر متانة لمنع تكرار الإشعارات عن نفس الإنشغال
+
+// تنظيف مجموعة الأكواد المُشعَر عنها دورياً (الاحتفاظ بآخر 200 فقط)
+setInterval(() => {
+  if (_notifiedIssueCodes.size > 200) {
+    const arr = [..._notifiedIssueCodes];
+    _notifiedIssueCodes = new Set(arr.slice(-100));
+  }
+}, 60000);
 
   database.ref('data/activeIssues').on('value', (snapshot) => {
     const val = snapshot.val();
@@ -3794,28 +3984,43 @@ let _lastIssueNotifiedCode = ''; // لمنع تكرار الإشعار عند إ
     if (activeIssues.length > oldCount) {
       if (currentRole === 'directorate') {
         // المديرية العامة تستقبل فقط الإنشغالات غير الموجهة مباشرة إلى مصلحة.
-        const newIssue = val.find(i => i.code && i.code !== _lastIssueNotifiedCode && i.source === 'center' && !isCenterIssueRoutedToDepartment(i));
+        const newIssue = val.find(i => i.code && !_notifiedIssueCodes.has(i.code) && i.source === 'center');
         if (newIssue) {
           _lastIssueNotifiedCode = newIssue.code;
+          _notifiedIssueCodes.add(newIssue.code);
           if (!isMuted) playNotificationSound();
           const issueCode = newIssue.code;
           const issueCenter = newIssue.center || 'مؤسسة';
           const issueTitle = newIssue.title || newIssue.type || 'إنشغال جديد';
-          showIssueRedToast(
-            '🔴 انشغال جديد وارد من ' + issueCenter,
-            issueTitle + (issueCode ? ' — ' + issueCode : ''),
-            issueCode
-          );
-          notifyBrowser('🔴 انشغال جديد وارد', issueCenter + ': ' + issueTitle, () => {
-            switchTab('list');
-            if (issueCode) setTimeout(() => openDetails(issueCode), 300);
-          });
+          if (isWilayaManager) {
+            // المدير الولائي: إشعار بسيط فقط + تحديث الشارة (بدون نافذة منبثقة)
+            showToast('📩 إنشغال جديد من ' + issueCenter, issueTitle + (issueCode ? ' — ' + issueCode : ''));
+            updateCenterIssuesBadge();
+            // تحديث القائمة إن كانت مفتوحة
+            if (!document.getElementById('page-center-issues')?.classList.contains('hidden')) {
+              renderCenterIssuesForWilayaManager();
+            }
+            notifyBrowser('📩 إنشغال جديد من ' + issueCenter, issueTitle, () => {
+              switchTab('center-issues');
+            });
+          } else {
+            showIssueRedToast(
+              '🔴 انشغال جديد وارد من ' + issueCenter,
+              issueTitle + (issueCode ? ' — ' + issueCode : ''),
+              issueCode
+            );
+            notifyBrowser('🔴 انشغال جديد وارد', issueCenter + ': ' + issueTitle, () => {
+              switchTab('list');
+              if (issueCode) setTimeout(() => openDetails(issueCode), 300);
+            });
+          }
         }
       } else if (currentRole === 'department') {
         // لا تتلقى أي مصلحة إشعاراً إلا عن الإنشغال الموجه إليها تحديداً.
-        const newIssue = val.find(i => i.code && i.code !== _lastIssueNotifiedCode && i.department === currentDepartment);
+        const newIssue = val.find(i => i.code && !_notifiedIssueCodes.has(i.code) && i.department === currentDepartment);
         if (newIssue) {
           _lastIssueNotifiedCode = newIssue.code;
+          _notifiedIssueCodes.add(newIssue.code);
           if (!isMuted) playNotificationSound();
           showToast('📩 إنشغال جديد للمصلحة', `${newIssue.center || 'مؤسسة'} — ${newIssue.type || newIssue.code}`);
           notifyBrowser('📩 إنشغال جديد للمصلحة', `${newIssue.center || 'مؤسسة'} — ${newIssue.type || newIssue.code}`, () => switchTab('dept-issues'));
@@ -3851,24 +4056,36 @@ let _lastIssueNotifiedCode = ''; // لمنع تكرار الإشعار عند إ
     pulseSyncBadge();
     if (centerIssues.length > oldCount) {
       // مستمع احتياطي في حال وصلت نسخة centerIssues قبل activeIssues.
+      // نستخدم _notifiedIssueCodes (Set) لمنع تكرار الإشعار عن نفس الإنشغال
+      // الذي سبق لمستمع activeIssues بإشعاره.
       if (currentRole === 'directorate') {
-        const newIssue = val.find(i => i.code && i.code !== _lastIssueNotifiedCode && !isCenterIssueRoutedToDepartment(i));
+        const newIssue = val.find(i => i.code && !_notifiedIssueCodes.has(i.code) && i.source === 'center');
         if (newIssue) {
           _lastIssueNotifiedCode = newIssue.code;
+          _notifiedIssueCodes.add(newIssue.code);
           if (!isMuted) playNotificationSound();
           const issueCode = newIssue.code;
           const issueCenter = newIssue.center || 'مؤسسة';
           const issueTitle = newIssue.title || newIssue.type || 'إنشغال جديد';
-          showIssueRedToast(
-            '🔴 انشغال جديد وارد من ' + issueCenter,
-            issueTitle + (issueCode ? ' — ' + issueCode : ''),
-            issueCode
-          );
+          if (isWilayaManager) {
+            showToast('📩 إنشغال جديد من ' + issueCenter, issueTitle + (issueCode ? ' — ' + issueCode : ''));
+            updateCenterIssuesBadge();
+            if (!document.getElementById('page-center-issues')?.classList.contains('hidden')) {
+              renderCenterIssuesForWilayaManager();
+            }
+          } else {
+            showIssueRedToast(
+              '🔴 انشغال جديد وارد من ' + issueCenter,
+              issueTitle + (issueCode ? ' — ' + issueCode : ''),
+              issueCode
+            );
+          }
         }
       } else if (currentRole === 'department') {
-        const newIssue = val.find(i => i.code && i.code !== _lastIssueNotifiedCode && i.department === currentDepartment);
+        const newIssue = val.find(i => i.code && !_notifiedIssueCodes.has(i.code) && i.department === currentDepartment);
         if (newIssue) {
           _lastIssueNotifiedCode = newIssue.code;
+          _notifiedIssueCodes.add(newIssue.code);
           if (!isMuted) playNotificationSound();
           showToast('📩 إنشغال جديد للمصلحة', `${newIssue.center || 'مؤسسة'} — ${newIssue.type || newIssue.code}`);
         }
@@ -3885,10 +4102,6 @@ let _lastIssueNotifiedCode = ''; // لمنع تكرار الإشعار عند إ
     pulseSyncBadge();
     updateUI();
   });
-
-  // 🔥 ملاحظة: محادثة المؤسسات (interChat) لم تعد تُقرأ من data/interChat هنا؛
-  // أصبحت تُدار بشكل مستقل عبر listenToInterChat() (انظر أسفل) بنمط push()
-  // لكل رسالة بدل الكتابة فوق مصفوفة كاملة — انظر تعليق appendInterChatMessage.
 
   database.ref('data/fileTypes').on('value', (snapshot) => {
     const val = snapshot.val();
@@ -3967,6 +4180,7 @@ function forceSync() {
 
 function updateUI() {
   updateNavBadges();
+  updateCenterIssuesBadge();
   const activeBtn = document.querySelector('.nav-btn.active');
   const activeTab = activeBtn ? activeBtn.getAttribute('data-tab') : null;
 
@@ -3985,6 +4199,7 @@ function updateUI() {
     populateDropdowns();
     if (activeTab === 'broadcast') renderBroadcastPage();
     if (activeTab === 'user-guides') renderUserGuidesPage();
+    if (isWilayaManager && activeTab === 'center-issues') renderCenterIssuesForWilayaManager();
   } else if (currentRole === 'department') {
     renderDepartmentIssues();
     renderDeptKPIs();
@@ -4045,6 +4260,38 @@ function updateNavBadges() {
 // 🔐 تسجيل الدخول
 // ============================================================
 let selectedLoginRole = 'directorate';
+let isWilayaManager = false;
+
+function selectDirectorateAccess(type) {
+  selectLoginRole('directorate');
+  const selector = document.getElementById('loginRoleDirectorate');
+  if (selector) selector.value = type;
+  toggleDirectorateAccessFields();
+}
+
+function toggleDirectorateAccessFields() {
+  const type = document.getElementById('loginRoleDirectorate')?.value || 'digitization';
+  const digi = document.getElementById('digitizationAccessFields');
+  const manager = document.getElementById('wilayaManagerAccessFields');
+  if (digi) digi.style.display = type === 'digitization' ? 'flex' : 'none';
+  if (manager) manager.style.display = type === 'wilayaManager' ? 'flex' : 'none';
+}
+
+// كلمة سر المدير الولائي الافتراضية (محسوبة من رقم الولاية)
+function getDefaultWilayaManagerPassword(code) {
+  return 'Mgr@' + code + '2026';
+}
+
+function getWilayaManagerCredentials() {
+  const code = selectedWilaya || '34';
+  const name = (typeof getWilayaName === 'function' ? getWilayaName(code) : code);
+  const password = WILAYA_MANAGER_PASSWORD || getDefaultWilayaManagerPassword(code);
+  return { username: 'manager_' + code, password: password, name };
+}
+function verifyWilayaManagerLogin(password) {
+  const c = getWilayaManagerCredentials();
+  return password === c.password;
+}
 
 function selectLoginRole(role) {
   selectedLoginRole = role;
@@ -4058,6 +4305,7 @@ function selectLoginRole(role) {
   
   if (role === 'directorate') {
     document.getElementById('directorateFields').style.display = 'block';
+    toggleDirectorateAccessFields();
   } else if (role === 'department') {
     document.getElementById('departmentFields').style.display = 'block';
     populateLoginDeptSelect();
@@ -4096,7 +4344,7 @@ function filterCenterSelect() {
 // ============================================================
 function saveSession() {
   try {
-    sessionStorage.setItem(LS_KEYS.session, JSON.stringify({ role: currentRole, department: currentDepartment, wilaya: selectedWilaya }));
+    sessionStorage.setItem(LS_KEYS.session, JSON.stringify({ role: currentRole, department: currentDepartment, wilaya: selectedWilaya, isWilayaManager: !!isWilayaManager }));
   } catch(e) {}
 }
 
@@ -4112,6 +4360,7 @@ function restoreSession() {
     const parsed = JSON.parse(data);
     if (!parsed || !parsed.role) return false;
     currentRole = parsed.role;
+    isWilayaManager = !!parsed.isWilayaManager;
     currentDepartment = parsed.department || null;
     selectedWilaya = parsed.wilaya || "34";
     const select = document.getElementById('loginWilayaSelect');
@@ -4131,10 +4380,13 @@ function handleLogin() {
   err.style.display = 'none';
   
   if (selectedLoginRole === 'directorate') {
+    const accessType = document.getElementById('loginRoleDirectorate')?.value || 'digitization';
     const user = document.getElementById('loginUser').value.trim();
-    const pass = document.getElementById('loginPass').value.trim();
-    if (verifyDirectorateLogin(user, pass)) {
+    const pass = accessType === 'wilayaManager' ? document.getElementById('loginManagerPass').value.trim() : document.getElementById('loginPass').value.trim();
+    const valid = accessType === 'wilayaManager' ? verifyWilayaManagerLogin(pass) : verifyDirectorateLogin(user, pass);
+    if (valid) {
       currentRole = 'directorate';
+      isWilayaManager = accessType === 'wilayaManager';
       saveSession();
       initApp();
     } else {
@@ -4238,6 +4490,11 @@ function openChangePassword() {
   document.getElementById('currentPass').value = '';
   document.getElementById('newPass').value = '';
   document.getElementById('confirmPass').value = '';
+  // المدير الولائي: إخفاء حقل كلمة السر الحالية (لا يحتاجها)
+  var currentPassField = document.getElementById('currentPassField');
+  if (currentPassField) {
+    currentPassField.style.display = isWilayaManager ? 'none' : 'block';
+  }
   document.getElementById('changePassModal').classList.add('open');
 }
 
@@ -4249,12 +4506,21 @@ function changePassword() {
   const current = document.getElementById('currentPass').value.trim();
   const newPass = document.getElementById('newPass').value.trim();
   const confirm = document.getElementById('confirmPass').value.trim();
-  if (current !== MASTER_PASSWORD) { alert("⚠️ كلمة السر الحالية غير صحيحة!"); return; }
+  // المدير الولائي: لا يحتاج لإدخال كلمة السر الحالية، ويغيّر كلمة سره الخاصة
+  if (!isWilayaManager && current !== MASTER_PASSWORD) { alert("⚠️ كلمة السر الحالية غير صحيحة!"); return; }
   if (newPass.length < 4) { alert("⚠️ كلمة السر الجديدة يجب أن تكون 4 أحرف على الأقل."); return; }
   if (newPass !== confirm) { alert("⚠️ كلمة السر الجديدة وتأكيدها غير متطابقين."); return; }
-  MASTER_PASSWORD = newPass;
-  localStorage.setItem(LS_KEYS.masterPass, newPass);
-  database.ref('data/masterPassword').set(newPass);
+  if (isWilayaManager) {
+    // المدير الولائي: حفظ كلمة السر الجديدة في Firebase و localStorage
+    WILAYA_MANAGER_PASSWORD = newPass;
+    localStorage.setItem(LS_KEYS.managerPass, newPass);
+    database.ref('data/wilayaManagerPassword').set(newPass);
+  } else {
+    // المديرية العادية: تغيير MASTER_PASSWORD
+    MASTER_PASSWORD = newPass;
+    localStorage.setItem(LS_KEYS.masterPass, newPass);
+    database.ref('data/masterPassword').set(newPass);
+  }
   closeChangePassword();
   showToast("✅ تم التغيير", "تم تغيير كلمة السر بنجاح!");
 }
@@ -4517,8 +4783,9 @@ function initApp() {
   
   listenToFirebase();
   if (currentRole === 'directorate') listenToPasswordRequestsForDirectorate();
-  // 💬 محادثة المؤسسات: نظام مستقل بالكامل الآن (push لكل رسالة) — راجع appendInterChatMessage
-  listenToInterChat();
+  // 💬 محادثة المؤسسات: تم حذفها نهائياً
+  // حذف بيانات دردشة المؤسسات من Firebase
+  database.ref('interChatRoom').remove().catch(function(){});
   // الشبكة الوطنية مستقلة عن بيانات الولاية المحلية
   if (currentRole === 'directorate') initInterDirectorates();
   
@@ -4568,6 +4835,11 @@ function initApp() {
       MASTER_PASSWORD = "1996";
       database.ref('data/masterPassword').set(MASTER_PASSWORD);
     }
+
+    // تحميل ومزامنة كلمة مرور المدير الولائي
+    if (data.wilayaManagerPassword) {
+      WILAYA_MANAGER_PASSWORD = data.wilayaManagerPassword;
+    }
     
     // 🔥 تسجيل كل الحقول كـ "متزامنة" حتى لا تُعاد كتابتها لاحقاً بلا داعٍ
     _markSynced('activeIssues', activeIssues);
@@ -4586,7 +4858,11 @@ function setupInterface() {
   // عرض مقولة دينية عشوائية
   displayRandomQuote();
   
+  document.body.classList.toggle('wilaya-manager-mode', currentRole === 'directorate' && isWilayaManager);
   setupSidebar();
+  if (currentRole === 'directorate' && isWilayaManager) setupWilayaManagerNotes();
+  // تفعيل مستمع رسائل المدير الولائي للجميع
+  startManagerNotesListener();
   populateDropdowns();
   renderInstitutionsList();
   renderFileTypesManageList();
@@ -4598,8 +4874,8 @@ function setupInterface() {
   document.getElementById('strategicNotes').value = localStorage.getItem(LS_KEYS.notes) || "";
   
   if (currentRole === 'directorate') {
-    document.getElementById('institutionsPanel').style.display = 'block';
-    document.getElementById('fileTypesPanel').style.display = 'block';
+    document.getElementById('institutionsPanel').style.display = isWilayaManager ? 'none' : 'block';
+    document.getElementById('fileTypesPanel').style.display = isWilayaManager ? 'none' : 'block';
     document.getElementById('centerInfoPanel').style.display = 'none';
     document.getElementById('fileTypeManageRow').style.display = 'flex';
     renderKPIs();
@@ -4609,12 +4885,23 @@ function setupInterface() {
     renderArchive();
     renderDepartmentsList();
     renderDeptDashboard();
+    if (isWilayaManager) renderWilayaManagerInstitutionStats();
     renderAuditLog();
     populateDeptFilters();
     document.getElementById('page-dashboard').classList.remove('hidden');
     switchTab('dashboard');
     // 💾 تشغيل مراقبة تخزين Firebase الحقيقية (للمديرية فقط)
     initFirebaseStorageMonitor();
+    // تحديث حي لإحصائيات المدير الولائي بعد كل مزامنة للبيانات
+    if (isWilayaManager) {
+      clearInterval(window._wilayaManagerStatsTimer);
+      window._wilayaManagerStatsTimer = setInterval(() => {
+        if (currentRole === 'directorate' && isWilayaManager) {
+          renderKPIs();
+          if (analyticsChartInstance) updateChart();
+        }
+      }, 1500);
+    }
 
   } else if (currentRole === 'department') {
     document.getElementById('institutionsPanel').style.display = 'none';
@@ -4623,7 +4910,10 @@ function setupInterface() {
     document.getElementById('page-dept-dashboard').classList.remove('hidden');
     renderDeptIssuesForDepartment();
     switchTab('dept-dashboard');
-    stopFirebaseStorageMonitor();
+    // 💾 إظهار بطاقة التخزين للمصالح
+    const deptStorageCard = document.getElementById('deptStorageCard');
+    if (deptStorageCard) deptStorageCard.style.display = 'block';
+    initFirebaseStorageMonitor();
   } else {
     document.getElementById('institutionsPanel').style.display = 'none';
     document.getElementById('fileTypesPanel').style.display = 'block';
@@ -4634,7 +4924,10 @@ function setupInterface() {
     document.getElementById('page-send-panel').classList.remove('hidden');
     switchTab('send-panel');
     setupPasteFeature();
-    stopFirebaseStorageMonitor();
+    // 💾 إظهار بطاقة التخزين للمؤسسات التكوينية
+    const centerStorageCard = document.getElementById('centerStorageCard');
+    if (centerStorageCard) centerStorageCard.style.display = 'block';
+    initFirebaseStorageMonitor();
   }
   
   setInterval(checkForNewMessages, 3000);
@@ -4650,10 +4943,25 @@ function setupSidebar() {
   const title = document.getElementById('profileTitle');
   const badge = document.getElementById('profileRoleBadge');
 
+  if (currentRole === 'directorate' && isWilayaManager) {
+    avatar.innerHTML = '<i class="fa-solid fa-user-tie"></i>';
+    name.textContent = 'المدير الولائي — ولاية ' + getWilayaName(selectedWilaya);
+    title.textContent = 'صلاحية الاطلاع على الإحصائيات وإرسال الرسائل الرسمية';
+    badge.textContent = 'مدير ولائي';
+    badge.className = 'role-badge directorate';
+    navList.innerHTML = `
+      <li><button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> الإحصائيات العامة</button></li>
+      <li><button class="nav-btn" data-tab="center-issues" onclick="switchTab('center-issues')"><i class="fa-solid fa-school"></i> إنشغالات المؤسسات التكوينية <span class="nav-badge" id="navBadgeCenterIssues" style="display:none;"></span></button></li>
+      <li><button class="nav-btn" data-tab="dept-dashboard" onclick="switchTab('dept-dashboard')"><i class="fa-solid fa-chart-simple"></i> إحصائيات المصالح والمؤسسات</button></li>
+      <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-bullhorn"></i> إرسال رسالة رسمية</button></li>
+      <li><button class="nav-btn" data-tab="manager-messages" onclick="switchTab('manager-messages')"><i class="fa-solid fa-envelope"></i> الرسائل المرسلة <span class="nav-badge" id="navBadgeManagerMsgs" style="display:none;"></span></button></li>`;
+    return;
+  }
+
   if (currentRole === 'directorate') {
     avatar.innerHTML = '<i class="fa-solid fa-user-tie"></i>';
     name.textContent = 'المديرية - ولاية ' + getWilayaName(selectedWilaya);
-    title.textContent = 'المسؤول عن الرقمنة: بلحاج';
+    title.textContent = 'مرحبا بالسادة بوفليح و بلحاج☺';
     // تحديث شريط اسم المديرية أعلى الصفحة
     const bannerName = document.getElementById('directorateBannerName');
     const bannerSub = document.getElementById('directorateBannerSub');
@@ -4675,6 +4983,7 @@ function setupSidebar() {
       <li><button class="nav-btn" data-tab="inter-directorates" onclick="switchTab('inter-directorates')"><i class="fa-solid fa-network-wired"></i> شبكة المديريات <span class="nav-badge" id="navBadgeIdn" style="display:none"></span></button></li>
       <li><button class="nav-btn" data-tab="teachers" onclick="switchTab('teachers')"><i class="fa-solid fa-chalkboard-user"></i> الأساتذة المتدخلين <span class="nav-badge" id="navBadgeTeachers" style="display:none"></span></button></li>
             <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
+      <li><button class="nav-btn" data-tab="manager-messages" onclick="switchTab('manager-messages')"><i class="fa-solid fa-envelope"></i> رسائل المدير الولائي <span class="nav-badge" id="navBadgeManagerMsgs" style="display:none;"></span></button></li>
     `;
   } else if (currentRole === 'department') {
     const dept = departments.find(d => d.id === currentDepartment);
@@ -4691,6 +5000,7 @@ function setupSidebar() {
     navList.innerHTML = `
       <li><button class="nav-btn active" data-tab="dept-dashboard" onclick="switchTab('dept-dashboard')"><i class="fa-solid fa-gauge-high"></i> لوحة المصلحة</button></li>
       <li><button class="nav-btn" data-tab="dept-issues" onclick="switchTab('dept-issues')"><i class="fa-solid fa-list-check"></i> الإنشغالات <span class="nav-badge" id="navBadgeDeptIssues" style="display:none;"></span></button></li>
+      <li><button class="nav-btn" data-tab="manager-messages" onclick="switchTab('manager-messages')"><i class="fa-solid fa-envelope"></i> رسائل المدير الولائي <span class="nav-badge" id="navBadgeManagerMsgs" style="display:none;"></span></button></li>
             <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
     `;
   } else {
@@ -4711,12 +5021,14 @@ function setupSidebar() {
       <li><button class="nav-btn" data-tab="broadcast" onclick="switchTab('broadcast')"><i class="fa-solid fa-envelope-open-text"></i> المراسلات والمهام <span class="nav-badge" id="navBadgeBroadcastCenter" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="user-guides" onclick="switchTab('user-guides')"><i class="fa-solid fa-book-bookmark"></i> دليل الاستعمال <span class="nav-badge" id="navBadgeUserGuidesCenter" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="teachers" onclick="switchTab('teachers')"><i class="fa-solid fa-chalkboard-user"></i> الأساتذة المتدخلين</button></li>
+      <li><button class="nav-btn" data-tab="manager-messages" onclick="switchTab('manager-messages')"><i class="fa-solid fa-envelope"></i> رسائل المدير الولائي <span class="nav-badge" id="navBadgeManagerMsgs" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
     `;
   }
 }
 
 function switchTab(tab) {
+  if (currentRole === 'directorate' && isWilayaManager && !['dashboard','center-issues','dept-dashboard','notes','manager-messages'].includes(tab)) tab = 'dashboard';
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   const target = document.getElementById('page-' + tab);
   if (target) target.classList.remove('hidden');
@@ -4734,6 +5046,10 @@ function switchTab(tab) {
   if (tab === 'inter-directorates' && currentRole === 'directorate') initInterDirectorates();
   if (tab === 'teachers') initTeachersPage();
   if (tab === 'dashboard' && currentRole === 'directorate') refreshFirebaseStorageUsage('silent');
+  if (tab === 'dept-dashboard' && currentRole === 'department') refreshFirebaseStorageUsage('silent');
+  if (tab === 'send-panel' && currentRole === 'center') refreshFirebaseStorageUsage('silent');
+  if (tab === 'manager-messages') renderManagerMessagesInbox();
+  if (tab === 'center-issues' && currentRole === 'directorate' && isWilayaManager) { renderCenterIssuesForWilayaManager(); _centerIssuesFiltersPopulated = false; }
 }
 
 // ============================================================
@@ -4849,8 +5165,8 @@ function updateTeacherRequest(key, status) {
 // ============================================================
 function renderKPIs() {
   // 🏷️ تصفية حسب الولاية: فقط إنشغالات الولاية الحالية
-  const actualActive = activeIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i) && !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم');
-  const actualArchived = archivedIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i) && !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم');
+  const actualActive = activeIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم');
+  const actualArchived = archivedIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !i.isBroadcast && i.type !== 'مراسلة / مهمة' && i.type !== 'تعميم');
   const total = actualActive.length + actualArchived.length;
   const pending = actualActive.filter(i => !(i.status && i.status.indexOf('تم الحل') !== -1)).length;
   const done = total - pending;
@@ -4863,8 +5179,8 @@ function renderKPIs() {
 
 function initChart() {
   const ctx = document.getElementById('analyticsChart').getContext('2d');
-  const visibleActive = activeIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i));
-  const visibleArchived = archivedIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i));
+  const visibleActive = activeIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya));
+  const visibleArchived = archivedIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya));
   analyticsChartInstance = new Chart(ctx, {
     type: 'bar',
     data: { labels: ['الإجمالي', 'قيد المعالجة', 'المسواة'], datasets: [{ label: 'عدد الإنشغالات', data: [visibleActive.length + visibleArchived.length, visibleActive.length, visibleArchived.length], backgroundColor: ['#006633', '#ffc107', '#28a745'], borderRadius: 8, maxBarThickness: 50 }] },
@@ -4874,8 +5190,8 @@ function initChart() {
 
 function updateChart() {
   if (!analyticsChartInstance) return;
-  const visibleActive = activeIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i));
-  const visibleArchived = archivedIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i));
+  const visibleActive = activeIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya));
+  const visibleArchived = archivedIssues.filter(i => (!i.wilaya || i.wilaya === selectedWilaya));
   const total = visibleActive.length + visibleArchived.length;
   analyticsChartInstance.data.datasets[0].data = [total, visibleActive.length, visibleArchived.length];
   analyticsChartInstance.update();
@@ -4886,7 +5202,7 @@ function getTrendData() {
   const days = 14;
   const labels = [];
   const counts = [];
-  const all = [...activeIssues, ...archivedIssues].filter(i => (!i.wilaya || i.wilaya === selectedWilaya) && !isCenterIssueRoutedToDepartment(i));
+  const all = [...activeIssues, ...archivedIssues].filter(i => (!i.wilaya || i.wilaya === selectedWilaya));
   const dayKeys = [];
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date();
@@ -5015,24 +5331,6 @@ function refreshAllDropdowns() {
     transferSelect.innerHTML = departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
     if (currentVal && departments.some(d => d.id === currentVal)) {
       transferSelect.value = currentVal;
-    }
-  }
-  
-  // 5. تحديث قائمة المصالح في شات المؤسسات
-  const interChatSelect = document.getElementById('interChatRecipient');
-  if (interChatSelect) {
-    const currentVal = interChatSelect.value;
-    const deptOptions = departments.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
-    interChatSelect.innerHTML = `<option value="all">الجميع</option><option value="directorate">المديرية</option>${deptOptions}`;
-    if (currentVal && (currentVal === 'all' || currentVal === 'directorate' || departments.some(d => d.name === currentVal))) {
-      interChatSelect.value = currentVal;
-    }
-    // تحديث الـ badge
-    if (interChatSelect.value) {
-      const badge = document.getElementById('recipientBadge');
-      if (interChatSelect.value === 'all') { badge.textContent = 'الجميع'; badge.style.background = 'var(--algeria-green)'; }
-      else if (interChatSelect.value === 'directorate') { badge.textContent = 'المديرية'; badge.style.background = 'var(--algeria-red)'; }
-      else { badge.textContent = interChatSelect.value.length > 20 ? interChatSelect.value.substring(0, 20) + '...' : interChatSelect.value; badge.style.background = 'var(--algeria-green)'; }
     }
   }
   
@@ -5186,12 +5484,20 @@ function deleteDepartment(id) {
   const dept = departments.find(d => d.id === id);
   if (!dept) return;
   
-  if (confirm(`هل أنت متأكد من حذف المصلحة "${dept.name}"؟\nسيؤدي هذا لحذفها نهائياً من المصالح المعتمدة في الولاية.`)) {
+  if (confirm(`هل أنت متأكد من حذف المصلحة "${dept.name}"؟\nسيؤدي هذا لحذفها نهائياً من المصالح المعتمدة في الولاية وحذف محادثاتها.`)) {
     const idx = departments.findIndex(d => d.id === id);
     if (idx !== -1) {
       departments.splice(idx, 1);
+      // حذف محادثات المصلحة من Firebase
+      database.ref('chats').orderByChild('department').equalTo(id).once('value').then(function(snap) {
+        if (snap.val()) {
+          Object.keys(snap.val()).forEach(function(chatKey) {
+            database.ref('chats/' + chatKey).remove();
+          });
+        }
+      }).catch(function(){});
       database.ref('data/departments').set(departments).then(() => {
-        showToast("✅ تم الحذف", "تم حذف المصلحة بنجاح");
+        showToast("✅ تم الحذف", "تم حذف المصلحة ومحادثاتها نهائياً");
         
         // تحديث فوري شامل
         renderDepartmentsList();
@@ -5201,6 +5507,221 @@ function deleteDepartment(id) {
       });
     }
   }
+}
+
+// 🏫 عرض إنشغالات المؤسسات التكوينية للمدير الولائي (خانة جانبية بدل النافذة المنبثقة)
+function renderCenterIssuesForWilayaManager() {
+  const container = document.getElementById('centerIssuesWMTableBody');
+  if (!container) return;
+  
+  const search = (document.getElementById('center-issues-search')?.value || '').trim().toLowerCase();
+  const priorityFilter = document.getElementById('center-issues-priority')?.value || '';
+  const statusFilter = document.getElementById('center-issues-status')?.value || '';
+  const typeFilter = document.getElementById('center-issues-type')?.value || '';
+  const instFilter = document.getElementById('center-issues-inst')?.value || '';
+  
+  // كل الإنشاءات من المؤسسات (activeIssues + centerIssues)
+  let allCenterIssues = [...activeIssues, ...centerIssues].filter(i => i.source === 'center' && (!i.wilaya || i.wilaya === selectedWilaya));
+  
+  // إزالة التكرارات (نفس الكود موجود في activeIssues و centerIssues)
+  const seenCodes = new Set();
+  allCenterIssues = allCenterIssues.filter(i => {
+    if (seenCodes.has(i.code)) return false;
+    seenCodes.add(i.code);
+    return true;
+  });
+  
+  if (search) {
+    allCenterIssues = allCenterIssues.filter(i => 
+      i.code.toLowerCase().includes(search) || 
+      (i.center || '').toLowerCase().includes(search) || 
+      (i.type || '').toLowerCase().includes(search) ||
+      (i.details || '').toLowerCase().includes(search)
+    );
+  }
+  if (priorityFilter) {
+    allCenterIssues = allCenterIssues.filter(i => i.priority === priorityFilter);
+  }
+  if (statusFilter) {
+    if (statusFilter === 'pending') allCenterIssues = allCenterIssues.filter(i => i.status && i.status.indexOf('تم الحل') === -1);
+    if (statusFilter === 'resolved') allCenterIssues = allCenterIssues.filter(i => i.status && i.status.indexOf('تم الحل') !== -1);
+  }
+  if (typeFilter) {
+    allCenterIssues = allCenterIssues.filter(i => i.type === typeFilter);
+  }
+  if (instFilter) {
+    allCenterIssues = allCenterIssues.filter(i => i.center === instFilter);
+  }
+  
+  allCenterIssues.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  
+  // KPIs
+  const kpiContainer = document.getElementById('centerIssuesKPI');
+  if (kpiContainer) {
+    const totalAll = [...activeIssues, ...centerIssues].filter(i => i.source === 'center' && (!i.wilaya || i.wilaya === selectedWilaya));
+    const uniqueCodes = new Set();
+    const unique = totalAll.filter(i => { if (uniqueCodes.has(i.code)) return false; uniqueCodes.add(i.code); return true; });
+    const total = unique.length;
+    const pending = unique.filter(i => !(i.status && i.status.includes('تم الحل'))).length;
+    const resolved = total - pending;
+    const efficiency = total > 0 ? Math.round((resolved / total) * 100) : 0;
+    kpiContainer.innerHTML = `<div class="kpi-grid">
+      <div class="kpi-card kpi-total"><div class="kpi-icon"><i class="fa-solid fa-layer-group"></i></div><div class="kpi-label">إجمالي إنشغالات المؤسسات</div><div class="kpi-value">${total}</div></div>
+      <div class="kpi-card kpi-pending"><div class="kpi-icon"><i class="fa-solid fa-hourglass-half"></i></div><div class="kpi-label">قيد المعالجة</div><div class="kpi-value">${pending}</div></div>
+      <div class="kpi-card kpi-done"><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div><div class="kpi-label">تم الحل</div><div class="kpi-value">${resolved}</div></div>
+      <div class="kpi-card kpi-efficiency"><div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div><div class="kpi-label">معدل الكفاءة</div><div class="kpi-value">${efficiency}%</div></div>
+    </div>`;
+  }
+  
+  // تحديث فلاتر التصنيفات والمؤسسات
+  _populateCenterIssuesFilters();
+  
+  if (allCenterIssues.length === 0) {
+    container.innerHTML = '<div class="empty-msg">لا توجد إنشغالات مرسلة من المؤسسات التكوينية</div>';
+    const emptyHeader = document.getElementById('centerIssuesWMHeaderScroll');
+    if (emptyHeader) emptyHeader.scrollLeft = 0;
+    return;
+  }
+  
+  const COLGROUP = '<colgroup><col style="width:160px"><col style="width:170px"><col style="width:150px"><col style="width:140px"><col style="width:150px"><col style="width:100px"><col style="width:100px"><col style="width:170px"><col style="width:90px"></colgroup>';
+  
+  container.innerHTML = allCenterIssues.map(issue => {
+    const hasAttach = hasAttachment(issue);
+    const timeAgo = getTimeAgo(issue.createdAt);
+    const isResolved = issue.status && issue.status.indexOf('تم الحل') !== -1;
+    const deptName = getDepartmentName(issue.department);
+    return `<div class="list-row-scroll"><table class="list-fixed-table">${COLGROUP}<tbody><tr>
+      <td class="wrap-cell"><strong style="font-size:15px;">${escapeHtml(issue.code)}</strong><br><span style="font-size:12px; color:var(--text-dim);">${timeAgo}</span></td>
+      <td class="wrap-cell" style="font-size:15px;">${escapeHtml(issue.center || '—')}</td>
+      <td class="wrap-cell" style="font-size:15px;"><span style="background:rgba(0,122,61,0.08);padding:3px 10px;border-radius:8px;font-weight:700;color:var(--algeria-green);">${escapeHtml(issue.type || '—')}</span></td>
+      <td class="wrap-cell" style="font-size:14px;">${escapeHtml(deptName)}</td>
+      <td>${priorityPillHtml(issue.priority)}</td>
+      <td><button class="btn-mini view-btn" onclick="openDetails('${issue.code}', false)"><i class="fa-solid fa-eye"></i></button></td>
+      <td>${hasAttach ? '<span style="color:var(--algeria-green);"><i class="fa-solid fa-paperclip"></i></span>' : '<span style="color:var(--text-dim);">-</span>'}</td>
+      <td>${isResolved ? '<span class="status-resolved">تم الحل ✅</span>' : '<span class="status-pending">قيد المعالجة 🔄</span>'}</td>
+      <td style="font-size:13px; color:var(--text-dim);">${new Date(issue.createdAt).toLocaleDateString('ar-DZ', {day:'2-digit',month:'short'})}</td>
+    </tr></tbody></table></div>`;
+  }).join('');
+  
+  const header = document.getElementById('centerIssuesWMHeaderScroll');
+  if (header) header.scrollLeft = 0;
+}
+
+// تعبئة فلاتر صفحة إنشغالات المؤسسات
+let _centerIssuesFiltersPopulated = false;
+function _populateCenterIssuesFilters() {
+  if (_centerIssuesFiltersPopulated) return;
+  const typeSelect = document.getElementById('center-issues-type');
+  const instSelect = document.getElementById('center-issues-inst');
+  if (!typeSelect || !instSelect) return;
+  
+  const allCenter = [...activeIssues, ...centerIssues].filter(i => i.source === 'center' && (!i.wilaya || i.wilaya === selectedWilaya));
+  const types = [...new Set(allCenter.map(i => i.type).filter(Boolean))].sort();
+  const insts = [...new Set(allCenter.map(i => i.center).filter(Boolean))].sort();
+  
+  const currentType = typeSelect.value;
+  typeSelect.innerHTML = '<option value="">كل التصنيفات</option>' + types.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+  if (currentType && types.includes(currentType)) typeSelect.value = currentType;
+  
+  const currentInst = instSelect.value;
+  instSelect.innerHTML = '<option value="">كل المؤسسات</option>' + insts.map(i => `<option value="${escapeHtml(i)}">${escapeHtml(i)}</option>`).join('');
+  if (currentInst && insts.includes(currentInst)) instSelect.value = currentInst;
+  
+  _centerIssuesFiltersPopulated = true;
+}
+
+// تحديث شارة إنشغالات المؤسسات في الشريط الجانبي
+function updateCenterIssuesBadge() {
+  const badge = document.getElementById('navBadgeCenterIssues');
+  if (!badge) return;
+  const allCenter = [...activeIssues, ...centerIssues].filter(i => i.source === 'center' && (!i.wilaya || i.wilaya === selectedWilaya));
+  const uniqueCodes = new Set();
+  const unique = allCenter.filter(i => { if (uniqueCodes.has(i.code)) return false; uniqueCodes.add(i.code); return true; });
+  const pending = unique.filter(i => !(i.status && i.status.includes('تم الحل'))).length;
+  if (pending > 0) {
+    badge.style.display = 'inline-block';
+    badge.textContent = pending;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function renderWilayaManagerInstitutionStats() {
+  const container = document.getElementById('deptStatsContainer');
+  if (!container) return;
+  const all = [...activeIssues, ...archivedIssues].filter(i => !i.wilaya || i.wilaya === selectedWilaya);
+  
+  // 🏷️ الإنشغالات المرسلة من المؤسسات التكوينية إلى المصالح فقط
+  const centerToDeptIssues = all.filter(i => i.source === 'center');
+  
+  // 📊 تجميع حسب نوع الإنشغال
+  const typeMap = {};
+  centerToDeptIssues.forEach(issue => {
+    const t = issue.type || 'غير مصنف';
+    if (!typeMap[t]) typeMap[t] = { total: 0, pending: 0, resolved: 0 };
+    typeMap[t].total++;
+    if (issue.status && issue.status.includes('تم الحل')) typeMap[t].resolved++;
+    else typeMap[t].pending++;
+  });
+  
+  // 📊 تجميع حسب المؤسسة + نوع الإنشغال
+  const instTypeMap = {};
+  centerToDeptIssues.forEach(issue => {
+    const inst = issue.center || 'غير محدد';
+    const t = issue.type || 'غير مصنف';
+    if (!instTypeMap[inst]) instTypeMap[inst] = {};
+    if (!instTypeMap[inst][t]) instTypeMap[inst][t] = { total: 0, pending: 0, resolved: 0 };
+    instTypeMap[inst][t].total++;
+    if (issue.status && issue.status.includes('تم الحل')) instTypeMap[inst][t].resolved++;
+    else instTypeMap[inst][t].pending++;
+  });
+
+  const cards = INSTITUTIONS_DATA.map(inst => {
+    const rows = all.filter(i => i.center === inst.name || i.institution === inst.name);
+    const pending = rows.filter(i => !(i.status && i.status.includes('تم الحل'))).length;
+    const done = rows.length - pending;
+    const pct = rows.length ? Math.round(done / rows.length * 100) : 0;
+    
+    // 📂 تفصيل أنواع الإنشغالات لكل مؤسسة
+    const instTypes = instTypeMap[inst.name] || {};
+    const typeDetails = Object.keys(instTypes).length > 0 
+      ? `<div style="margin-top:10px; border-top:1px solid var(--border); padding-top:8px;">
+          ${Object.entries(instTypes).map(([typeName, data]) => 
+            `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:13px;">
+              <span style="color:var(--text);font-weight:700;"><i class="fa-solid fa-tag" style="color:var(--algeria-green);margin-left:4px;"></i>${escapeHtml(typeName)}</span>
+              <span><span style="color:var(--algeria-red);font-weight:800;">${data.pending}</span> قيد المعالجة / <span style="color:var(--algeria-green);font-weight:800;">${data.resolved}</span> محلول / <strong>${data.total}</strong> الكل</span>
+            </div>`
+          ).join('')}
+        </div>` 
+      : '';
+    
+    return `<div class="dept-stat-card"><div class="dept-name">${escapeHtml(inst.name)}</div><div class="dept-stats"><div class="stat-item"><div class="num">${rows.length}</div><div class="label">إجمالي الانشغالات</div></div><div class="stat-item"><div class="num">${pending}</div><div class="label">قيد المعالجة</div></div><div class="stat-item"><div class="num">${done}</div><div class="label">تم الحل</div></div><div class="stat-item"><div class="num">${pct}%</div><div class="label">نسبة الحل</div></div></div>${typeDetails}</div>`;
+  }).join('');
+  
+  // 📊 ملخص أنواع الإنشغالات المرسلة من المؤسسات
+  const typeSummaryHtml = Object.keys(typeMap).length > 0 
+    ? `<h3 style="margin:24px 0 12px;color:var(--algeria-red)"><i class="fa-solid fa-tags"></i> أنواع الإنشغالات المرسلة من المؤسسات التكوينية إلى المصالح</h3>
+       <div class="dept-stats-grid">
+         ${Object.entries(typeMap).sort((a,b) => b[1].total - a[1].total).map(([typeName, data]) => {
+           const pct = data.total > 0 ? Math.round(data.resolved / data.total * 100) : 0;
+           return `<div class="dept-stat-card" style="border-right:4px solid var(--algeria-red);">
+             <div class="dept-name" style="color:var(--algeria-red);"><i class="fa-solid fa-tag"></i> ${escapeHtml(typeName)}</div>
+             <div class="dept-stats">
+               <div class="stat-item"><div class="num" style="color:var(--algeria-red);">${data.total}</div><div class="label">الإجمالي</div></div>
+               <div class="stat-item"><div class="num">${data.pending}</div><div class="label">قيد المعالجة</div></div>
+               <div class="stat-item"><div class="num">${data.resolved}</div><div class="label">تم الحل</div></div>
+               <div class="stat-item"><div class="num">${pct}%</div><div class="label">نسبة الحل</div></div>
+             </div>
+           </div>`;
+         }).join('')}
+       </div>`
+    : '';
+  
+  container.insertAdjacentHTML('beforeend', `
+    <h3 style="margin:24px 0 12px;color:var(--algeria-green)"><i class="fa-solid fa-school"></i> إحصائيات جميع المؤسسات التكوينية</h3>
+    <div class="dept-stats-grid">${cards || '<div class="empty-msg">لا توجد مؤسسات مسجلة.</div>'}</div>
+    ${typeSummaryHtml}
+  `);
 }
 
 function renderDeptDashboard() {
@@ -5531,10 +6052,19 @@ function toggleStatus(code, value) {
 
 function deleteIssue(code) {
   if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
+  const issue = activeIssues.find(i => i.code === code);
   addAuditLog('حذف إنشغال', code, '');
+  // حذف المرفق من Firebase إذا وجد
+  if (issue && issue.attachments && issue.attachments.length > 0) {
+    issue.attachments.forEach(function(att) {
+      if (att.refKey) database.ref('issueAttachments/' + att.refKey).remove().catch(function(){});
+      if (att.data) database.ref('issueAttachments/' + code).remove().catch(function(){});
+    });
+  }
   activeIssues = activeIssues.filter(i => i.code !== code);
   saveToFirebase();
   renderKPIs(); updateChart(); renderList();
+  showToast("🗑️ تم الحذف", "تم حذف الإنشغال والمرفقات المرتبطة نهائياً.");
 }
 
 // ============================================================
@@ -5605,10 +6135,50 @@ function restoreFromArchive(code) {
 
 function deleteFromArchive(code) {
   if (!confirm("هل أنت متأكد من الحذف النهائي من الأرشيف؟")) return;
+  const issue = archivedIssues.find(i => i.code === code);
   addAuditLog('حذف من الأرشيف', code, '');
+  // حذف المرفق من Firebase إذا وجد
+  if (issue && issue.attachments && issue.attachments.length > 0) {
+    issue.attachments.forEach(function(att) {
+      if (att.refKey) database.ref('issueAttachments/' + att.refKey).remove().catch(function(){});
+      if (att.data) database.ref('issueAttachments/' + code).remove().catch(function(){});
+    });
+  }
   archivedIssues = archivedIssues.filter(i => i.code !== code);
   saveToFirebase();
   renderKPIs(); updateChart(); renderArchive();
+  showToast("🗑️ تم الحذف", "تم حذف الإنشغال والمرفقات نهائياً من الأرشيف.");
+}
+
+// حذف إنشغال من أرشيف المؤسسات
+function deleteFromCenterArchive(code) {
+  if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
+  const issue = centerArchived.find(i => i.code === code);
+  addAuditLog('حذف من أرشيف المؤسسات', code, '');
+  if (issue && issue.attachments && issue.attachments.length > 0) {
+    issue.attachments.forEach(function(att) {
+      if (att.refKey) database.ref('issueAttachments/' + att.refKey).remove().catch(function(){});
+      if (att.data) database.ref('issueAttachments/' + code).remove().catch(function(){});
+    });
+  }
+  centerArchived = centerArchived.filter(i => i.code !== code);
+  saveToFirebase();
+  renderChatHub();
+  showToast("🗑️ تم الحذف", "تم حذف الإنشغال والمرفقات نهائياً.");
+}
+
+// استعادة إنشغال من أرشيف المؤسسات
+function restoreFromCenterArchive(code) {
+  if (!confirm("هل تريد إعادة هذا الإنشغال إلى القائمة النشطة؟")) return;
+  const idx = centerArchived.findIndex(i => i.code === code);
+  if (idx === -1) return;
+  const issue = centerArchived[idx];
+  issue.status = "قيد المعالجة 🔄";
+  centerArchived.splice(idx, 1);
+  activeIssues.unshift(issue);
+  addAuditLog('استعادة من أرشيف المؤسسات', code, issue.center || '');
+  saveToFirebase();
+  renderChatHub(); renderKPIs(); updateChart(); renderList();
 }
 
 // فتح نافذة التحويل من الأرشيف إلى مصلحة
@@ -5689,8 +6259,8 @@ function renderDeptIssuesForDepartment() {
       <div class="table-wrap">
         <div class="list-header-scroll" id="deptIssuesHeaderScroll">
           <table class="list-fixed-table">
-            <colgroup><col style="width:180px"><col style="width:190px"><col style="width:160px"><col style="width:140px"><col style="width:110px"><col style="width:100px"><col style="width:100px"><col style="width:170px"><col style="width:110px"><col style="width:110px"></colgroup>
-            <thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>الأولوية</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>إجراء الحالة</th><th>الشات</th></tr></thead>
+            <colgroup><col style="width:180px"><col style="width:190px"><col style="width:160px"><col style="width:140px"><col style="width:110px"><col style="width:100px"><col style="width:100px"><col style="width:170px"><col style="width:110px"><col style="width:110px"><col style="width:90px"></colgroup>
+            <thead><tr><th>الرمز</th><th>المؤسسة</th><th>التصنيف</th><th>الأولوية</th><th>المصدر</th><th>التفاصيل</th><th>المرفقات</th><th>الحالة</th><th>إجراء الحالة</th><th>الشات</th><th>حذف</th></tr></thead>
           </table>
         </div>
         <div class="list-rows-container dept-issues-rows-container" id="deptIssuesTableBody"></div>
@@ -5731,7 +6301,7 @@ function renderDeptIssuesTable() {
     return;
   }
 
-  const DEPT_ISSUES_COLGROUP = '<colgroup><col style="width:180px"><col style="width:190px"><col style="width:160px"><col style="width:140px"><col style="width:110px"><col style="width:100px"><col style="width:100px"><col style="width:170px"><col style="width:110px"><col style="width:110px"></colgroup>';
+  const DEPT_ISSUES_COLGROUP = '<colgroup><col style="width:180px"><col style="width:190px"><col style="width:160px"><col style="width:140px"><col style="width:110px"><col style="width:100px"><col style="width:100px"><col style="width:170px"><col style="width:110px"><col style="width:110px"><col style="width:90px"></colgroup>';
   
   container.innerHTML = deptIssues.map(issue => {
     const unread = hasUnreadMessages(issue.code);
@@ -5749,6 +6319,7 @@ function renderDeptIssuesTable() {
       <td>${isResolved ? '<span class="status-resolved">تم الحل ✅</span>' : '<span class="status-pending">قيد المعالجة 🔄</span>'}</td>
       <td><button class="btn-mini ${isResolved ? 'success' : 'primary'}" onclick="toggleDeptIssueStatus('${issue.code}')" title="${isResolved ? 'إعادة فتح' : 'تحديد كمحل'}"><i class="fa-solid fa-${isResolved ? 'rotate-left' : 'check'}"></i></button></td>
       <td><button class="btn-chat ${unread ? 'new-msg' : ''}" onclick="openChat('${issue.code}', 'department')">${unread ? '<i class="fa-solid fa-bell"></i>' : '<i class="fa-solid fa-comments"></i>'}</button></td>
+      <td><button class="btn-mini danger" onclick="deleteDeptIssue('${issue.code}')" title="حذف نهائي"><i class="fa-solid fa-trash"></i></button></td>
     </tr></tbody></table></div>`;
   }).join('');
 
@@ -5778,6 +6349,33 @@ function toggleDeptIssueStatus(code) {
   saveToFirebase();
   renderDeptIssuesForDepartment();
   renderDeptKPIs();
+}
+
+// 🗑️ حذف إنشغال من طرف المصلحة (حذف نهائي من Firebase)
+function deleteDeptIssue(code) {
+  if (!confirm('هل أنت متأكد من الحذف النهائي لهذا الإنشغال؟')) return;
+  const issue = activeIssues.find(i => i.code === code);
+  if (!issue) { showToast('⚠️ خطأ', 'لم يتم العثور على الإنشغال'); return; }
+  addAuditLog('حذف إنشغال (من المصلحة)', code, issue.center || '');
+  // حذف المرفقات من Firebase
+  if (issue.attachments && issue.attachments.length > 0) {
+    issue.attachments.forEach(function(att) {
+      if (att.refKey) database.ref('issueAttachments/' + att.refKey).remove().catch(function(){});
+      if (att.data) database.ref('issueAttachments/' + code).remove().catch(function(){});
+    });
+  }
+  // حذف محادثات الإنشغال من Firebase
+  database.ref('chats/' + code).remove().catch(function(){});
+  // حذف من centerIssues أيضاً إن وُجد
+  const centerIdx = centerIssues.findIndex(i => i.code === code);
+  if (centerIdx !== -1) {
+    centerIssues.splice(centerIdx, 1);
+  }
+  activeIssues = activeIssues.filter(i => i.code !== code);
+  saveToFirebase();
+  renderDeptIssuesForDepartment();
+  renderDeptKPIs();
+  showToast('🗑️ تم الحذف', 'تم حذف الإنشغال والمرفقات والمحادثات نهائياً.');
 }
 
 function renderDeptKPIs() {
@@ -5877,10 +6475,9 @@ function setupPasteFeature() {
 function handleCenterFileSelection(e) {
   const file = e.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev) {
+  optimizeUploadFile(file).then(opt => {
     const fileType = file.type.startsWith('video/') ? 'video' : (file.type === 'application/pdf' ? 'pdf' : 'image');
-    pendingCenterFile = { data: ev.target.result, type: fileType, mimeType: file.type, name: file.name };
+    pendingCenterFile = { data: opt.data, type: fileType, mimeType: opt.file.type, name: opt.file.name, size: opt.size };
     const zone = document.getElementById('pasteZone');
     if (zone) {
       const selectionMessage = fileType === 'video'
@@ -5889,8 +6486,8 @@ function handleCenterFileSelection(e) {
       zone.classList.add('captured');
       zone.textContent = selectionMessage;
     }
-  };
-  reader.readAsDataURL(file);
+  });
+  e.target.value = '';
 }
 
 function sendFromCenter() {
@@ -6226,127 +6823,11 @@ function sendChatMessage() {
 }
 
 // ============================================================
-// 💬 INTER-INSTITUTION CHAT
+// 💬 INTER-INSTITUTION CHAT — تم الحذف نهائياً
 // ============================================================
-function populateInterChatRecipients() {
-  const select = document.getElementById('interChatRecipient');
-  if (!select) return;
-  const currentValue = select.value;
-  select.innerHTML = '<option value="all">الجميع</option>';
-  INSTITUTIONS_DATA.forEach(inst => { select.innerHTML += `<option value="${inst.name}">${inst.name}</option>`; });
-  select.innerHTML += `<option value="directorate">المديرية</option>`;
-  departments.forEach(dept => { select.innerHTML += `<option value="${dept.name}">${dept.name}</option>`; });
-  if (currentValue && (currentValue === 'all' || currentValue === 'directorate' || 
-      INSTITUTIONS_DATA.some(i => i.name === currentValue) || departments.some(d => d.name === currentValue))) {
-    select.value = currentValue;
-  }
-  select.onchange = function() {
-    const badge = document.getElementById('recipientBadge');
-    if (this.value === 'all') { badge.textContent = 'الجميع'; badge.style.background = 'var(--algeria-green)'; }
-    else if (this.value === 'directorate') { badge.textContent = 'المديرية'; badge.style.background = 'var(--algeria-red)'; }
-    else { badge.textContent = this.value.length > 20 ? this.value.substring(0, 20) + '...' : this.value; badge.style.background = 'var(--algeria-green)'; }
-  };
-  // تحديث الـ badge فوراً
-  if (select.value) {
-    const badge = document.getElementById('recipientBadge');
-    if (select.value === 'all') { badge.textContent = 'الجميع'; badge.style.background = 'var(--algeria-green)'; }
-    else if (select.value === 'directorate') { badge.textContent = 'المديرية'; badge.style.background = 'var(--algeria-red)'; }
-    else { badge.textContent = select.value.length > 20 ? select.value.substring(0, 20) + '...' : select.value; badge.style.background = 'var(--algeria-green)'; }
-  }
-}
+// دردشة المؤسسات التكوينية (interChat) تم حذفها نهائياً من المنصة.
+// تم أيضاً حذف بيانات interChatRoom من Firebase تلقائياً عند تسجيل الدخول.
 
-function openInterChat() {
-  populateInterChatRecipients();
-  renderInterChatMessages();
-  document.getElementById('interChatModal').classList.add('open');
-}
-
-function closeInterChat() { document.getElementById('interChatModal').classList.remove('open'); }
-
-// 🔥 تحسين الديناميكية #2: نُخزّن رسائل محادثة المؤسسات كعناصر push() مستقلة
-// تحت عقدة 'interChatRoom' بدل مصفوفة واحدة كانت تُعاد كتابتها بالكامل مع كل
-// رسالة (data/interChat سابقاً)، لنفس أسباب نظام الشات الفردي أعلاه: تفادي
-// فقدان رسائل عند التزامن المتزامن، وتقليل حجم البيانات المرسلة مع كل رسالة.
-// (يبقى المتغيّر العام interChatMessages للتوافق مع أي كود عرض قديم فقط).
-function getInterChatMessages() {
-  return interChatMessages;
-}
-
-function appendInterChatMessage(msg) {
-  const ref = database.ref('interChatRoom').push();
-  interChatMessages.push({ ...msg, _key: ref.key });
-  ref.set(msg).catch(err => {
-    console.error('[interChat] فشل إرسال الرسالة:', err);
-    showToast('⚠️ تحذير', 'تعذّر إرسال الرسالة، تحقق من الاتصال وحاول مجدداً');
-  });
-}
-
-function listenToInterChat() {
-  database.ref('interChatRoom').on('value', (snapshot) => {
-    const data = snapshot.val();
-    if (!data) return;
-    const msgs = Object.keys(data).map(key => ({ ...data[key], _key: key }));
-    msgs.sort((a, b) => (a.time || 0) - (b.time || 0));
-    interChatMessages = msgs;
-    renderInterChatMessages();
-  });
-}
-
-function renderInterChatMessages() {
-  const container = document.getElementById('interChatMessages');
-  const msgs = getInterChatMessages();
-  const htmlContent = msgs.map(m => {
-    const timeStr = new Date(m.time).toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
-    const isMe = m.sender === getCenterName() || m.sender === 'المديرية' || departments.some(d => d.name === m.sender);
-    const bubbleClass = isMe ? 'center-msg' : 'directorate-msg';
-    const senderLabel = m.sender || 'غير معروف';
-    const recipientLabel = m.recipient ? ` → ${m.recipient}` : '';
-    let attachHtml = '';
-    if (m.attachment) {
-      if (m.attachment.type && m.attachment.type.startsWith('image/')) {
-        attachHtml = `<img class="chat-attach-img" src="${m.attachment.data}" onclick="openLightbox('${m.attachment.data}')">`;
-      } else {
-        attachHtml = `<a class="chat-attach-file" href="${m.attachment.data}" download="${escapeHtml(m.attachment.name)}"><i class="fa-solid fa-file"></i> ${escapeHtml(m.attachment.name)}</a>`;
-      }
-    }
-    return `<div class="chat-bubble ${bubbleClass}"><span class="chat-sender-label">${escapeHtml(senderLabel)}${recipientLabel}</span>${m.text ? escapeHtml(m.text) : ''}${attachHtml}<span class="chat-time">${timeStr}</span></div>`;
-  }).join('');
-  container.innerHTML = htmlContent || '<div style="color:var(--text-dim); text-align:center; padding:40px; font-size:18px;">لا توجد رسائل في غرفة المؤسسات</div>';
-  container.scrollTop = container.scrollHeight;
-}
-
-function handleInterChatFileAttach(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  if (file.size > 4 * 1024 * 1024) { alert("⚠️ حجم الملف يتجاوز الحد الأقصى المسموح به (4 ميغابايت)."); e.target.value = ''; return; }
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    interChatPendingAttachment = { name: file.name, type: file.type, data: ev.target.result };
-    showToast("📎 مرفق", `تم إرفاق ${file.name}`);
-  };
-  reader.readAsDataURL(file);
-}
-
-function sendInterChatMessage() {
-  const input = document.getElementById('interChatInput');
-  const text = input.value.trim();
-  const recipient = document.getElementById('interChatRecipient').value;
-  const recipientLabel = recipient === 'all' ? 'الجميع' : 
-                         recipient === 'directorate' ? 'المديرية' : 
-                         INSTITUTIONS_DATA.find(i => i.name === recipient)?.name || 
-                         departments.find(d => d.name === recipient)?.name || recipient;
-  if (!text && !interChatPendingAttachment) return;
-  const senderName = currentRole === 'directorate' ? 'المديرية' : 
-                     currentRole === 'department' ? departments.find(d => d.id === currentDepartment)?.name || 'مصلحة' :
-                     getCenterName();
-  appendInterChatMessage({ sender: senderName, recipient: recipientLabel, text, attachment: interChatPendingAttachment, time: Date.now() });
-  interChatPendingAttachment = null;
-  input.value = '';
-  renderInterChatMessages();
-  document.getElementById('interChatFileInput').value = '';
-}
-
-// ============================================================
 // 📋 CENTER CHAT HUB
 // ============================================================
 function renderChatHub() {
@@ -6638,6 +7119,10 @@ function onWilayaChange() {
     } else {
       MASTER_PASSWORD = "1996";
     }
+    // تحميل كلمة سر المدير الولائي
+    if (data.wilayaManagerPassword) {
+      WILAYA_MANAGER_PASSWORD = data.wilayaManagerPassword;
+    }
   });
 }
 
@@ -6729,12 +7214,18 @@ function deleteInstitution(idx) {
   const inst = INSTITUTIONS_DATA[idx];
   if (!inst) return;
   
-  if (confirm(`هل أنت متأكد من حذف المؤسسة "${inst.name}"؟\nسيؤدي هذا لحذفها نهائياً من قائمة المؤسسات المسموح لها بالدخول.`)) {
+  if (confirm(`هل أنت متأكد من حذف المؤسسة "${inst.name}"؟\nسيؤدي هذا لحذفها نهائياً من قائمة المؤسسات المسموح لها بالدخول وحذف إشغالاتها ومحادثاتها.`)) {
+    const instName = inst.name;
+    // حذف إشغالات المؤسسة النشطة والمؤرشفة
+    activeIssues = activeIssues.filter(i => { if (i.center === instName) { if (i.attachments) i.attachments.forEach(a => { if (a.refKey) database.ref('issueAttachments/' + a.refKey).remove().catch(function(){}); }); return false; } return true; });
+    archivedIssues = archivedIssues.filter(i => { if (i.center === instName) { if (i.attachments) i.attachments.forEach(a => { if (a.refKey) database.ref('issueAttachments/' + a.refKey).remove().catch(function(){}); }); return false; } return true; });
+    centerIssues = centerIssues.filter(i => { if (i.center === instName) { if (i.attachments) i.attachments.forEach(a => { if (a.refKey) database.ref('issueAttachments/' + a.refKey).remove().catch(function(){}); }); return false; } return true; });
+    centerArchived = centerArchived.filter(i => { if (i.center === instName) { if (i.attachments) i.attachments.forEach(a => { if (a.refKey) database.ref('issueAttachments/' + a.refKey).remove().catch(function(){}); }); return false; } return true; });
     INSTITUTIONS_DATA.splice(idx, 1);
-    database.ref('data/institutions').set(INSTITUTIONS_DATA).then(() => {
-      showToast("✅ تم الحذف", "تم حذف المؤسسة بنجاح");
-      updateUI();
-    });
+    database.ref('data/institutions').set(INSTITUTIONS_DATA);
+    saveToFirebase();
+    showToast("✅ تم الحذف", "تم حذف المؤسسة وإشغالاتها ومرفقاتها نهائياً");
+    updateUI();
   }
 }
 
@@ -6831,9 +7322,503 @@ function deleteFileType(idx) {
   }
 }
 
-function saveNotes() { 
+function setupWilayaManagerNotes() {
+  const page = document.getElementById('page-notes');
+  if (!page) return;
+  page.querySelector('.page-header h2').innerHTML = '<i class="fa-solid fa-bullhorn"></i> إرسال رسالة من المدير الولائي';
+
+  // بناء قائمة المصالح
+  let deptOptions = '<option value="">-- اختر مصلحة محددة --</option>';
+  departments.forEach(d => {
+    deptOptions += '<option value="dept:' + d.id + '">' + escapeHtml(d.name) + '</option>';
+  });
+
+  // بناء قائمة المؤسسات
+  let instOptions = '<option value="">-- اختر مؤسسة محددة --</option>';
+  INSTITUTIONS_DATA.forEach(inst => {
+    const typeIcon = inst.type === 'private' ? '🏫' : '🏛️';
+    instOptions += '<option value="inst:' + escapeHtml(inst.name) + '">' + typeIcon + ' ' + escapeHtml(inst.name) + '</option>';
+  });
+
+  // استبدال محتوى صفحة الملاحظات بالكامل (notes-grid)
+  const notesGrid = page.querySelector('.notes-grid');
+  if (notesGrid) notesGrid.innerHTML = `
+    <div class="panel full" style="border-top:4px solid var(--algeria-red);">
+      <h3 style="font-size:22px; color:var(--algeria-red); margin-bottom:18px;"><i class="fa-solid fa-bullhorn"></i> رسالة رسمية من المدير الولائي</h3>
+
+      <div style="background:linear-gradient(135deg,rgba(224,27,63,0.08),rgba(224,27,63,0.03)); border:2px solid rgba(224,27,63,0.2); border-radius:16px; padding:18px; margin-bottom:18px;">
+        <p style="font-size:16px; font-weight:800; color:var(--algeria-red); margin-bottom:8px;"><i class="fa-solid fa-circle-exclamation"></i> تنبيه: الرسالة ستظهر كتنبيه أحمر كبير في منتصف شاشة المستقبل لمدة 15 ثانية</p>
+        <p style="font-size:14px; color:var(--text-dim); margin:0;">تُستخدم للتعميمات العاجلة والتعليمات الرسمية فقط</p>
+      </div>
+
+      <div class="form-field" style="margin-bottom:14px;">
+        <label><i class="fa-solid fa-crosshairs"></i> جهة الاستقبال</label>
+        <select id="managerMsgRecipientType" style="width:100%; padding:14px 18px; border:2px solid var(--border); border-radius:12px; font-family:inherit; font-size:17px; background:var(--input-bg); color:var(--text); margin-bottom:10px;" onchange="onManagerRecipientTypeChange()">
+          <option value="all">🌐 جميع المصالح والمؤسسات</option>
+          <option value="departments">🏢 جميع مصالح المديرية</option>
+          <option value="institutions">🏛️ جميع المؤسسات التكوينية</option>
+          <option value="specific_dept">📌 مصلحة محددة</option>
+          <option value="specific_inst">📌 مؤسسة محددة</option>
+        </select>
+      </div>
+
+      <div id="managerSpecificDeptRow" class="form-field" style="display:none; margin-bottom:14px;">
+        <label><i class="fa-solid fa-building"></i> اختر المصلحة</label>
+        <select id="managerNoteDeptSelect" style="width:100%; padding:14px 18px; border:2px solid var(--border); border-radius:12px; font-family:inherit; font-size:17px; background:var(--input-bg); color:var(--text);">
+          ${deptOptions}
+        </select>
+      </div>
+
+      <div id="managerSpecificInstRow" class="form-field" style="display:none; margin-bottom:14px;">
+        <label><i class="fa-solid fa-building-columns"></i> اختر المؤسسة</label>
+        <select id="managerNoteInstSelect" style="width:100%; padding:14px 18px; border:2px solid var(--border); border-radius:12px; font-family:inherit; font-size:17px; background:var(--input-bg); color:var(--text);">
+          ${instOptions}
+        </select>
+      </div>
+
+      <div class="form-field" style="margin-bottom:14px;">
+        <label><i class="fa-solid fa-message"></i> نص الرسالة</label>
+        <textarea id="managerNoteText" placeholder="اكتب الرسالة الرسمية هنا... (ستظهر كتنبيه أحمر كبير عند المستقبل)" style="width:100%; min-height:160px; padding:18px; border:2px solid var(--border); border-radius:14px; font-family:inherit; font-size:19px; line-height:2; resize:vertical; background:var(--input-bg); color:var(--text);"></textarea>
+      </div>
+
+      <button class="btn-primary" style="width:100%; justify-content:center; font-size:22px; padding:20px; background:linear-gradient(135deg, var(--algeria-red), #8b001b) !important; box-shadow:0 10px 30px rgba(224,27,63,0.35);" onclick="sendWilayaManagerNote()">
+        <i class="fa-solid fa-paper-plane"></i> إرسال الرسالة الرسمية
+      </button>
+    </div>
+  `;
+}
+
+function onManagerRecipientTypeChange() {
+  const type = document.getElementById('managerMsgRecipientType')?.value;
+  const deptRow = document.getElementById('managerSpecificDeptRow');
+  const instRow = document.getElementById('managerSpecificInstRow');
+  if (deptRow) deptRow.style.display = type === 'specific_dept' ? 'block' : 'none';
+  if (instRow) instRow.style.display = type === 'specific_inst' ? 'block' : 'none';
+}
+
+function sendWilayaManagerNote() {
+  const text = (document.getElementById('managerNoteText')?.value || '').trim();
+  const recipientType = document.getElementById('managerMsgRecipientType')?.value;
+
+  if (!text) return showToast('⚠️ رسالة فارغة', 'يرجى كتابة نص الرسالة.');
+
+  let target = recipientType;
+  let targetLabel = '';
+
+  if (recipientType === 'specific_dept') {
+    const deptVal = document.getElementById('managerNoteDeptSelect')?.value;
+    if (!deptVal) return showToast('⚠️ اختر المصلحة', 'يرجى اختيار مصلحة محددة.');
+    target = deptVal; // e.g. "dept:dept1"
+    targetLabel = document.getElementById('managerNoteDeptSelect')?.selectedOptions[0]?.text || '';
+  } else if (recipientType === 'specific_inst') {
+    const instVal = document.getElementById('managerNoteInstSelect')?.value;
+    if (!instVal) return showToast('⚠️ اختر المؤسسة', 'يرجى اختيار مؤسسة محددة.');
+    target = instVal; // e.g. "inst:المعهد..."
+    targetLabel = document.getElementById('managerNoteInstSelect')?.selectedOptions[0]?.text || '';
+  } else if (recipientType === 'all') {
+    targetLabel = 'جميع المصالح والمؤسسات';
+  } else if (recipientType === 'departments') {
+    targetLabel = 'جميع مصالح المديرية';
+  } else if (recipientType === 'institutions') {
+    targetLabel = 'جميع المؤسسات التكوينية';
+  }
+
+  const payload = {
+    text,
+    target,
+    targetLabel,
+    recipientType,
+    wilaya: selectedWilaya,
+    sender: 'المدير الولائي',
+    senderName: 'المدير الولائي — ولاية ' + getWilayaName(selectedWilaya),
+    createdAt: firebase.database.ServerValue.TIMESTAMP,
+    type: 'wilaya_manager_alert'
+  };
+
+  database.ref('managerNotes').push(payload)
+    .then(() => {
+      document.getElementById('managerNoteText').value = '';
+      showToast('✅ تم الإرسال', 'تم إرسال الرسالة الرسمية إلى ' + targetLabel);
+    });
+}
+
+function saveNotes() {
   localStorage.setItem(LS_KEYS.notes, document.getElementById('strategicNotes').value);
   database.ref('notes').set(document.getElementById('strategicNotes').value);
+}
+
+// ============================================================
+// 🚨 مستمع رسائل المدير الولائي — استقبال + عرض + صندوق الرسائل + إيصالات القراءة
+// ============================================================
+let _managerNotesListener = null;
+let _managerNotesInitialized = false;
+let receivedManagerMessages = [];
+let _seenManagerNoteKeys = new Set();
+let _dismissedManagerNoteKeys = new Set();
+
+function _loadManagerNoteLocalKeys() {
+  try { _seenManagerNoteKeys = new Set(JSON.parse(localStorage.getItem(LS_KEYS.managerNotesSeen) || '[]')); } catch(e) { _seenManagerNoteKeys = new Set(); }
+  try { _dismissedManagerNoteKeys = new Set(JSON.parse(localStorage.getItem(LS_KEYS.managerNotesDismissed) || '[]')); } catch(e) { _dismissedManagerNoteKeys = new Set(); }
+}
+
+function _saveManagerNoteLocalKeys() {
+  try { localStorage.setItem(LS_KEYS.managerNotesSeen, JSON.stringify([..._seenManagerNoteKeys].slice(-300))); } catch(e) {}
+  try { localStorage.setItem(LS_KEYS.managerNotesDismissed, JSON.stringify([..._dismissedManagerNoteKeys].slice(-300))); } catch(e) {}
+}
+
+function getMyManagerNoteId() {
+  if (currentRole === 'department') return 'dept:' + currentDepartment;
+  if (currentRole === 'center') return 'inst:' + getCenterName();
+  if (currentRole === 'directorate') return 'directorate';
+  return '';
+}
+
+function markManagerNoteAsRead(noteKey) {
+  const myId = getMyManagerNoteId();
+  if (!myId || !noteKey) return;
+  database.ref('managerNotes/' + noteKey + '/readBy/' + encodeURIComponent(myId)).set(true);
+}
+
+function startManagerNotesListener() {
+  if (_managerNotesListener) return;
+  _loadManagerNoteLocalKeys();
+
+  _managerNotesListener = database.ref('managerNotes').orderByChild('createdAt').limitToLast(100);
+
+  _managerNotesListener.on('value', function(snapshot) {
+    const raw = snapshot.val() || {};
+    const allMessages = Object.keys(raw).map(k => ({...raw[k], _key: k}))
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    // تصفية الرسائل حسب الولاية والمستقبل
+    const myRole = currentRole;
+    const isWM = !!(currentRole === 'directorate' && isWilayaManager);
+
+    if (isWM) {
+      // المدير الولائي يرى رسائله المرسلة فقط
+      receivedManagerMessages = allMessages.filter(m => m.wilaya === selectedWilaya && m.type === 'wilaya_manager_alert');
+    } else {
+      receivedManagerMessages = allMessages.filter(m => isManagerNoteForMe(m));
+    }
+
+    // أول تحميل: تسجيل كل الرسائل الموجودة كمقروءة بدون تنبيه
+    if (!_managerNotesInitialized) {
+      _managerNotesInitialized = true;
+      receivedManagerMessages.forEach(m => _seenManagerNoteKeys.add(m._key));
+      _saveManagerNoteLocalKeys();
+    } else {
+      // التحديثات اللاحقة: تنبيه فقط للرسائل الجديدة غير المرئية والحديثة
+      const now = Date.now();
+      receivedManagerMessages.forEach(m => {
+        if (_seenManagerNoteKeys.has(m._key)) return;
+        _seenManagerNoteKeys.add(m._key);
+        const age = now - (m.createdAt || 0);
+        if (age > 120000) return; // أقدم من دقيقتين لا تنبيه
+        if (isWM) return; // المدير الولائي لا يرى تنبيه
+        showWilayaManagerAlert(m);
+        if (!isMuted) playNotificationSound();
+        markManagerNoteAsRead(m._key);
+      });
+      _saveManagerNoteLocalKeys();
+    }
+
+    updateManagerMessageBadge();
+    // تحديث صندوق الرسائل إذا كان مفتوحاً
+    if (document.getElementById('page-manager-messages') && !document.getElementById('page-manager-messages').classList.contains('hidden')) {
+      renderManagerMessagesInbox();
+    }
+  });
+}
+
+function isManagerNoteForMe(note) {
+  if (!note) return false;
+  const target = note.target || '';
+  const recipientType = note.recipientType || '';
+  if (note.wilaya && note.wilaya !== selectedWilaya) return false;
+  if (recipientType === 'all') return true;
+  if (recipientType === 'departments' && (currentRole === 'department' || currentRole === 'directorate')) return true;
+  if (recipientType === 'institutions' && currentRole === 'center') return true;
+  if (recipientType === 'specific_dept' && currentRole === 'department') {
+    return currentDepartment === target.replace('dept:', '');
+  }
+  if (recipientType === 'specific_inst' && currentRole === 'center') {
+    return getCenterName() === target.replace('inst:', '');
+  }
+  return false;
+}
+
+// تحديث شارة الرسائل غير المقروءة
+function updateManagerMessageBadge() {
+  const badge = document.getElementById('navBadgeManagerMsgs');
+  if (!badge) return;
+  if (currentRole === 'directorate' && isWilayaManager) {
+    // المدير الولائي: عدد الرسائل المرسلة
+    const count = receivedManagerMessages.length;
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline-flex' : 'none';
+  } else {
+    // المصالح/المؤسسات: رسائل غير محذوفة وغير مقروءة
+    const myId = getMyManagerNoteId();
+    const unread = receivedManagerMessages.filter(m =>
+      !_dismissedManagerNoteKeys.has(m._key) &&
+      !(m.readBy && m.readBy[encodeURIComponent(myId)])
+    ).length;
+    badge.textContent = unread;
+    badge.style.display = unread > 0 ? 'inline-flex' : 'none';
+  }
+}
+
+// 🚨 عرض الرسالة الحمراء المخيفة
+function showWilayaManagerAlert(note) {
+  const existing = document.getElementById('wilayaManagerAlertOverlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'wilayaManagerAlertOverlay';
+  overlay.className = 'wilaya-manager-alert-overlay';
+
+  const targetLabel = note.targetLabel || '';
+  const targetBadge = targetLabel ? '<div class="wma-target-badge"><i class="fa-solid fa-crosshairs"></i> موجه إلى: ' + escapeHtml(targetLabel) + '</div>' : '';
+  const timeStr = note.createdAt ? new Date(note.createdAt).toLocaleString('ar-DZ', { hour:'2-digit', minute:'2-digit', day:'numeric', month:'short' }) : '';
+
+  overlay.innerHTML = `
+    <div class="wilaya-manager-alert-card">
+      <button class="wma-close-btn" onclick="closeWilayaManagerAlert()" title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+      <div class="wma-icon"><i class="fa-solid fa-bullhorn"></i></div>
+      <div class="wma-sender"><i class="fa-solid fa-user-tie"></i> ${escapeHtml(note.senderName || 'المدير الولائي')}</div>
+      ${targetBadge}
+      <div class="wma-message">${escapeHtml(note.text)}</div>
+      <div class="wma-countdown">يُغلق تلقائياً خلال <span id="wmaCountdownNum">15</span> ثانية</div>
+      <div class="wma-bar"><div class="wma-bar-fill"></div></div>
+      <div style="margin-top:10px; font-size:12px; color:rgba(255,255,255,0.3);">${timeStr}</div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  let seconds = 15;
+  const countdownEl = document.getElementById('wmaCountdownNum');
+  const countdownTimer = setInterval(() => {
+    seconds--;
+    if (countdownEl) countdownEl.textContent = seconds;
+    if (seconds <= 0) { clearInterval(countdownTimer); closeWilayaManagerAlert(); }
+  }, 1000);
+  overlay.dataset.timerId = countdownTimer;
+
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeWilayaManagerAlert(); });
+  const escHandler = function(e) { if (e.key === 'Escape') { closeWilayaManagerAlert(); document.removeEventListener('keydown', escHandler); } };
+  document.addEventListener('keydown', escHandler);
+}
+
+function closeWilayaManagerAlert() {
+  const overlay = document.getElementById('wilayaManagerAlertOverlay');
+  if (!overlay) return;
+  if (overlay.dataset.timerId) clearInterval(parseInt(overlay.dataset.timerId));
+  const card = overlay.querySelector('.wilaya-manager-alert-card');
+  if (card) { card.style.transition = 'all 0.35s ease'; card.style.transform = 'scale(0.85) translateY(20px)'; card.style.opacity = '0'; }
+  setTimeout(() => overlay.remove(), 350);
+}
+
+// 📬 حذف رسالة من صندوق المستقبل (محلي فقط)
+function dismissManagerMessage(key) {
+  _dismissedManagerNoteKeys.add(key);
+  _saveManagerNoteLocalKeys();
+  renderManagerMessagesInbox();
+  updateManagerMessageBadge();
+}
+
+// 🗑️ حذف رسالة أرسلها المدير الولائي من Firebase نهائياً
+function deleteManagerSentMessage(key) {
+  if (!key) return;
+  if (!confirm('هل أنت متأكد من حذف هذه الرسالة؟ سيتم حذفها نهائياً من الخادم ولن يراها أحد بعد الآن.')) return;
+  database.ref('managerNotes/' + key).remove().then(function() {
+    showToast('🗑️ تم الحذف', 'تم حذف الرسالة نهائياً.');
+  }).catch(function(err) {
+    console.error('فشل حذف رسالة المدير الولائي:', err);
+    showToast('⚠️ خطأ', 'تعذر حذف الرسالة من الخادم.');
+  });
+}
+
+function stopManagerNotesListener() {
+  if (_managerNotesListener) { _managerNotesListener.off(); _managerNotesListener = null; }
+  _managerNotesInitialized = false;
+}
+
+// ============================================================
+// 📬 عرض صندوق رسائل المدير الولائي
+// ============================================================
+function renderManagerMessagesInbox() {
+  const container = document.getElementById('managerMessagesInbox');
+  if (!container) return;
+
+  const isWM = !!(currentRole === 'directorate' && isWilayaManager);
+  const myId = getMyManagerNoteId();
+
+  if (isWM) {
+    // === عرض المدير الولائي: الرسائل المرسلة مع إيصالات القراءة ===
+    let cardsHtml = receivedManagerMessages.map(m => {
+      const timeStr = m.createdAt ? new Date(m.createdAt).toLocaleString('ar-DZ', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+      const targetLabel = m.targetLabel || 'الجميع';
+      const readBy = m.readBy || {};
+      const readCount = Object.keys(readBy).length;
+
+      // حساب عدد المستهدفين
+      let totalTargets = 0;
+      if (m.recipientType === 'all') totalTargets = departments.length + INSTITUTIONS_DATA.length;
+      else if (m.recipientType === 'departments') totalTargets = departments.length;
+      else if (m.recipientType === 'institutions') totalTargets = INSTITUTIONS_DATA.length;
+      else if (m.recipientType === 'specific_dept') totalTargets = 1;
+      else if (m.recipientType === 'specific_inst') totalTargets = 1;
+
+      const pct = totalTargets > 0 ? Math.round((readCount / totalTargets) * 100) : 0;
+      const readClass = pct === 100 ? 'status-badge resolved' : (pct > 0 ? 'pill pill-medium' : 'status-badge pending');
+
+      return `
+        <div class="form-card" style="margin-bottom:16px; border-right:5px solid var(--algeria-red);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-weight:900; font-size:16px; color:var(--algeria-red);"><i class="fa-solid fa-bullhorn"></i> رسالة رسمية</span>
+              <span class="pill pill-normal">${escapeHtml(targetLabel)}</span>
+            </div>
+            <span style="font-size:13px; color:var(--text-dim); font-weight:700;"><i class="fa-regular fa-clock"></i> ${timeStr}</span>
+          </div>
+          <div style="font-size:17px; line-height:1.9; color:var(--text); white-space:pre-wrap; background:var(--bg-card-2); padding:14px; border-radius:12px; margin-bottom:12px;">${escapeHtml(m.text)}</div>
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <span class="${readClass}"><i class="fa-solid fa-eye"></i> قراءة: ${readCount}/${totalTargets} (${pct}%)</span>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn-mini view-btn" onclick="openManagerNoteReadStatus('${m._key}')"><i class="fa-solid fa-users-viewfinder"></i> تفاصيل القراءة</button>
+              <button class="btn-mini danger" onclick="deleteManagerSentMessage('${m._key}')"><i class="fa-solid fa-trash"></i> حذف الرسالة</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    if (receivedManagerMessages.length === 0) {
+      cardsHtml = '<div class="empty-msg">لم يتم إرسال أي رسالة بعد.</div>';
+    }
+
+    container.innerHTML = `
+      <div class="page-header"><h2><i class="fa-solid fa-paper-plane"></i> الرسائل المرسلة وحالة القراءة</h2></div>
+      ${cardsHtml}
+    `;
+
+  } else {
+    // === عرض المصالح/المؤسسات/المديرية: الرسائل المستلمة ===
+    const visibleMessages = receivedManagerMessages.filter(m => !_dismissedManagerNoteKeys.has(m._key));
+
+    let cardsHtml = visibleMessages.map(m => {
+      const timeStr = m.createdAt ? new Date(m.createdAt).toLocaleString('ar-DZ', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+      const targetLabel = m.targetLabel || '';
+      const isRead = !!(m.readBy && m.readBy[encodeURIComponent(myId)]);
+      const readBadge = isRead
+        ? '<span class="status-badge resolved" style="font-size:12px;"><i class="fa-solid fa-circle-check"></i> تمت القراءة</span>'
+        : '<span class="status-badge pending" style="font-size:12px;"><i class="fa-solid fa-bell"></i> جديد</span>';
+
+      return `
+        <div class="form-card" style="margin-bottom:16px; border-right:5px solid var(--algeria-red);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-weight:900; font-size:16px; color:var(--algeria-red);"><i class="fa-solid fa-user-tie"></i> ${escapeHtml(m.senderName || 'المدير الولائي')}</span>
+              ${targetLabel ? '<span class="pill pill-normal" style="font-size:12px;">' + escapeHtml(targetLabel) + '</span>' : ''}
+              ${readBadge}
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:13px; color:var(--text-dim); font-weight:700;"><i class="fa-regular fa-clock"></i> ${timeStr}</span>
+              <button class="btn-mini danger" onclick="dismissManagerMessage('${m._key}')" title="حذف الرسالة"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+          <div style="font-size:17px; line-height:1.9; color:var(--text); white-space:pre-wrap; background:var(--bg-card-2); padding:14px; border-radius:12px;">${escapeHtml(m.text)}</div>
+        </div>
+      `;
+    }).join('');
+
+    if (visibleMessages.length === 0) {
+      cardsHtml = '<div class="empty-msg">لا توجد رسائل من المدير الولائي.</div>';
+    }
+
+    container.innerHTML = `
+      <div class="page-header"><h2><i class="fa-solid fa-envelope"></i> رسائل المدير الولائي</h2></div>
+      ${cardsHtml}
+    `;
+
+    // تعليم الرسائل المرئية كمقروءة
+    visibleMessages.forEach(m => markManagerNoteAsRead(m._key));
+  }
+}
+
+// 👁️ نافذة تفاصيل القراءة للمدير الولائي
+function openManagerNoteReadStatus(noteKey) {
+  const note = receivedManagerMessages.find(m => m._key === noteKey);
+  if (!note) return;
+
+  const readBy = note.readBy || {};
+  const target = note.target || '';
+  const recipientType = note.recipientType || '';
+
+  // بناء قائمة المستهدفين
+  let targets = [];
+  if (recipientType === 'all') {
+    departments.forEach(d => targets.push({ id: 'dept:' + d.id, name: d.name, type: 'مصلحة' }));
+    INSTITUTIONS_DATA.forEach(inst => targets.push({ id: 'inst:' + inst.name, name: inst.name, type: inst.type === 'private' ? 'خاصة' : 'عمومية' }));
+  } else if (recipientType === 'departments') {
+    departments.forEach(d => targets.push({ id: 'dept:' + d.id, name: d.name, type: 'مصلحة' }));
+  } else if (recipientType === 'institutions') {
+    INSTITUTIONS_DATA.forEach(inst => targets.push({ id: 'inst:' + inst.name, name: inst.name, type: inst.type === 'private' ? 'خاصة' : 'عمومية' }));
+  } else if (recipientType === 'specific_dept') {
+    const d = departments.find(x => ('dept:' + x.id) === target);
+    if (d) targets.push({ id: 'dept:' + d.id, name: d.name, type: 'مصلحة' });
+  } else if (recipientType === 'specific_inst') {
+    const inst = INSTITUTIONS_DATA.find(x => ('inst:' + x.name) === target);
+    if (inst) targets.push({ id: 'inst:' + inst.name, name: inst.name, type: inst.type === 'private' ? 'خاصة' : 'عمومية' });
+  }
+
+  const readCount = targets.filter(t => readBy[encodeURIComponent(t.id)]).length;
+  const total = targets.length;
+  const pct = total > 0 ? Math.round((readCount / total) * 100) : 0;
+
+  let rowsHtml = targets.map(t => {
+    const isRead = !!readBy[encodeURIComponent(t.id)];
+    const statusHtml = isRead
+      ? '<span class="status-badge resolved" style="font-size:12px;"><i class="fa-solid fa-circle-check"></i> قرأ</span>'
+      : '<span class="status-badge pending" style="font-size:12px;"><i class="fa-solid fa-clock"></i> لم يقرأ</span>';
+    return `<tr>
+      <td style="font-weight:700;">${escapeHtml(t.name)}</td>
+      <td>${t.type}</td>
+      <td>${statusHtml}</td>
+    </tr>`;
+  }).join('');
+
+  if (targets.length === 0) {
+    rowsHtml = '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-dim);">لا يوجد مستهدفون.</td></tr>';
+  }
+
+  document.getElementById('readModalTitle').textContent = '👁️ حالة القراءة: ' + (note.text || '').substring(0, 40) + '...';
+  document.getElementById('readModalSubtitle').textContent = 'النسبة الكلية: ' + readCount + ' من ' + total + ' (' + pct + '%)';
+
+  document.getElementById('readModalBody').innerHTML = `
+    <div style="background:var(--bg-card-2); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-weight:800; font-size:15px;">📊 نسبة القراءة</span>
+        <span style="font-weight:900; font-size:17px; color:var(--algeria-green);">${pct}% (${readCount}/${total})</span>
+      </div>
+      <div style="width:100%; height:10px; background:var(--border-light); border-radius:10px; overflow:hidden;">
+        <div style="width:${pct}%; height:100%; background:var(--grad-brand); border-radius:10px;"></div>
+      </div>
+    </div>
+    <div style="max-height:350px; overflow-y:auto;">
+      <table style="width:100%; border-collapse:separate; border-spacing:0 6px;">
+        <thead><tr>
+          <th style="text-align:right; font-size:14px;">الاسم</th>
+          <th style="text-align:right; font-size:14px;">النوع</th>
+          <th style="text-align:center; font-size:14px;">الحالة</th>
+        </tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById('readStatusModal').classList.add('open');
 }
 
 // ============================================================
@@ -7092,6 +8077,25 @@ function closeIncomingIssueChat(showNext=true) {
 // 📢 المراسلات والمهام ودليل الاستعمال وحالة الاطلاع
 // ============================================================
 
+// ضغط الصور تلقائياً قبل التخزين لتقليل استهلاك Firebase
+function optimizeUploadFile(file, maxWidth = 1600, quality = 0.78) {
+  return new Promise((resolve, reject) => {
+    if (!file || !(file.type || '').startsWith('image/') || file.type === 'image/gif' || file.type === 'image/svg+xml') {
+      const r = new FileReader(); r.onload = e => resolve({ data:e.target.result, file, size:file.size, compressed:false }); r.onerror=reject; r.readAsDataURL(file); return;
+    }
+    const r = new FileReader(); r.onload = e => {
+      const img = new Image(); img.onload = () => {
+        const scale = Math.min(1, maxWidth / img.width); const c=document.createElement('canvas');
+        c.width=Math.round(img.width*scale); c.height=Math.round(img.height*scale); c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        c.toBlob(blob => { if(!blob){resolve({data:e.target.result,file,size:file.size,compressed:false});return;}
+          const out = new File([blob], file.name.replace(/\.[^.]+$/, '')+'.jpg', {type:'image/jpeg'});
+          const fr=new FileReader(); fr.onload=x=>resolve({data:x.target.result,file:out,size:blob.size,compressed:true}); fr.readAsDataURL(blob);
+        },'image/jpeg',quality);
+      }; img.onerror=()=>resolve({data:e.target.result,file,size:file.size,compressed:false}); img.src=e.target.result;
+    }; r.onerror=reject; r.readAsDataURL(file);
+  });
+}
+
 function guessAttachmentCategory(mimeType) {
   if (!mimeType) return 'file';
   if (mimeType.startsWith('image/')) return 'image';
@@ -7113,19 +8117,11 @@ function handleBroadcastFileAttach(e, category) {
     e.target.value = '';
     return;
   }
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    broadcastPendingAttachment = {
-      name: file.name,
-      type: file.type,
-      data: ev.target.result,
-      category: category || guessAttachmentCategory(file.type),
-      size: file.size,
-      file: file // تخزين كائن الملف الأصلي لتجنب التحويل الثقيل
-    };
+  optimizeUploadFile(file).then(opt => {
+    broadcastPendingAttachment = { name: opt.file.name, type: opt.file.type, data: opt.data, category: category || guessAttachmentCategory(file.type), size: opt.size, file: opt.file, compressed: opt.compressed };
     renderBroadcastAttachPreview();
-  };
-  reader.readAsDataURL(file);
+    if (opt.compressed) showToast('✅ تم ضغط الصورة', 'تم تقليص حجم الصورة تلقائياً قبل رفعها.');
+  }).catch(() => showToast('⚠️ تعذر تجهيز المرفق', 'يرجى إعادة اختيار الملف.'));
   e.target.value = '';
 }
 
@@ -7154,19 +8150,11 @@ function handleGuideFileAttach(e, category) {
     e.target.value = '';
     return;
   }
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    guidePendingAttachment = {
-      name: file.name,
-      type: file.type,
-      data: ev.target.result,
-      category: category || guessAttachmentCategory(file.type),
-      size: file.size,
-      file: file // تخزين كائن الملف الأصلي لتجنب التحويل الثقيل
-    };
+  optimizeUploadFile(file).then(opt => {
+    guidePendingAttachment = { name: opt.file.name, type: opt.file.type, data: opt.data, category: category || guessAttachmentCategory(file.type), size: opt.size, file: opt.file, compressed: opt.compressed };
     renderGuideAttachPreview();
-  };
-  reader.readAsDataURL(file);
+    if (opt.compressed) showToast('✅ تم ضغط الصورة', 'تم تقليص حجم الصورة تلقائياً قبل رفعها.');
+  }).catch(() => showToast('⚠️ تعذر تجهيز المرفق', 'يرجى إعادة اختيار الملف.'));
   e.target.value = '';
 }
 
@@ -7998,10 +8986,16 @@ function _fillLazyGuideAttachmentPlaceholders(refKey, att) {
 }
 
 function deleteUserGuide(guideId) {
-  if (!confirm("هل أنت متأكد من حذف دليل الاستعمال هذا؟")) return;
+  if (!confirm("هل أنت متأكد من حذف دليل الاستعمال هذا؟ سيتم حذف المرفق أيضاً.")) return;
+  const guide = userGuides.find(g => g.id === guideId);
+  // حذف مرفق الدليل من Firebase
+  if (guide && guide.attachment) {
+    if (guide.attachment.refKey) database.ref('guideAttachments/' + guide.attachment.refKey).remove().catch(function(){});
+    if (guide.attachment.data) database.ref('guideAttachments/' + guideId).remove().catch(function(){});
+  }
   userGuides = userGuides.filter(g => g.id !== guideId);
   database.ref('data/userGuides').set(userGuides).then(() => {
-    showToast("🗑️ تم الحذف", "تم حذف دليل الاستعمال بنجاح.");
+    showToast("🗑️ تم الحذف", "تم حذف دليل الاستعمال والمرفق نهائياً.");
     renderUserGuidesPage();
   });
 }
@@ -8847,6 +9841,8 @@ function logout() {
   if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
     if (_passwordDirectorateRef) { _passwordDirectorateRef.off(); _passwordDirectorateRef = null; }
     stopFirebaseStorageMonitor();
+    clearInterval(window._wilayaManagerStatsTimer);
+    window._wilayaManagerStatsTimer = null;
     document.getElementById('passwordRequestStack')?.remove();
     document.getElementById('incomingIssueChat')?.remove();
     _incomingIssueQueue.length = 0; _incomingIssueOpenCode = null; _incomingCurrentIssue = null;
@@ -8854,7 +9850,9 @@ function logout() {
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('loginError').style.display = 'none';
     if (currentRole === 'directorate') { stopInterDirectorates(); }
+    stopManagerNotesListener();
     currentRole = null;
+    isWilayaManager = false;
     currentDepartment = null;
     localStorage.removeItem(LS_KEYS.remember);
     clearSession();
@@ -9004,7 +10002,6 @@ async function measureFirebaseDbBytes() {
 
 // جلب القياس الحقيقي وتحديث بطاقة لوحة التحكم + ودجت الشريط الجانبي
 async function refreshFirebaseStorageUsage(manual) {
-  if (currentRole !== 'directorate') return;
   if (_fbStorageBusy) return;
   _fbStorageBusy = true;
   const btn = document.getElementById('storageRefreshBtn');
@@ -9012,6 +10009,11 @@ async function refreshFirebaseStorageUsage(manual) {
   const oldBtn = btn ? btn.innerHTML : '';
   if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ القياس...';
   if (note && manual === true) note.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ تنزيل قاعدة البيانات من خادم Firebase وقياس حجمها الحقيقي...';
+  // إظهار حالة التحميل في بطاقات المصالح والمؤسسات
+  const deptNote = document.getElementById('deptStorageNote');
+  const centerNote = document.getElementById('centerStorageNote');
+  if (deptNote && manual === true) deptNote.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ القياس...';
+  if (centerNote && manual === true) centerNote.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ القياس...';
   try {
     const used = await measureFirebaseDbBytes();
     const free = Math.max(0, RTDB_QUOTA_BYTES - used);
@@ -9019,18 +10021,43 @@ async function refreshFirebaseStorageUsage(manual) {
     const pctStr = (pct > 0 && pct < 0.01) ? '0.01' : pct.toFixed(2);
 
     const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    
+    // تحديث بطاقة المديرية
     setTxt('storageUsedVal', formatStorageBytes(used));
     setTxt('storageFreeVal', formatStorageBytes(free));
     setTxt('storageQuotaVal', formatStorageBytes(RTDB_QUOTA_BYTES));
     setTxt('storagePctVal', pctStr + ' %');
     setTxt('storageBarPct', pctStr + ' %');
 
+    // تحديث بطاقة المصالح
+    setTxt('deptStorageUsed', formatStorageBytes(used));
+    setTxt('deptStorageFree', formatStorageBytes(free));
+    setTxt('deptStoragePct', pctStr + ' %');
+    setTxt('deptStorageBarPct', pctStr + ' %');
+
+    // تحديث بطاقة المؤسسات
+    setTxt('centerStorageUsed', formatStorageBytes(used));
+    setTxt('centerStorageFree', formatStorageBytes(free));
+    setTxt('centerStoragePct', pctStr + ' %');
+    setTxt('centerStorageBarPct', pctStr + ' %');
+
     const level = pct >= 85 ? 'danger' : (pct >= 60 ? 'warn' : 'ok');
+    
+    // شريط التقدم - المديرية
     const fill = document.getElementById('storageBarFill');
     if (fill) { fill.style.width = Math.max(pct, used > 0 ? 1.2 : 0) + '%'; fill.className = 'storage-bar-fill ' + level; }
+    // شريط التقدم - المصالح
+    const deptFill = document.getElementById('deptStorageBarFill');
+    if (deptFill) { deptFill.style.width = Math.max(pct, used > 0 ? 1.2 : 0) + '%'; deptFill.className = 'storage-bar-fill ' + level; }
+    // شريط التقدم - المؤسسات
+    const centerFill = document.getElementById('centerStorageBarFill');
+    if (centerFill) { centerFill.style.width = Math.max(pct, used > 0 ? 1.2 : 0) + '%'; centerFill.className = 'storage-bar-fill ' + level; }
 
     const timeStr = new Date().toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
-    if (note) note.innerHTML = '<i class="fa-solid fa-circle-check"></i> قياس حقيقي مباشر من خادم Firebase (إجمالي بيانات المشروع: ' + formatStorageBytes(used) + ') — آخر تحديث: ' + timeStr + ' • السعة القصوى المعروضة حسب خطة Spark المجانية (1 جيجابايت).';
+    const successNote = '<i class="fa-solid fa-circle-check"></i> قياس حقيقي مباشر من خادم Firebase (إجمالي بيانات المشروع: ' + formatStorageBytes(used) + ') — آخر تحديث: ' + timeStr + ' • السعة القصوى المعروضة حسب خطة Spark المجانية (1 جيجابايت).';
+    if (note) note.innerHTML = successNote;
+    if (deptNote) deptNote.innerHTML = successNote;
+    if (centerNote) centerNote.innerHTML = successNote;
 
     // تحديث الودجت المصغر في الشريط الجانبي
     const sswFill = document.getElementById('sswFill');
@@ -9043,7 +10070,10 @@ async function refreshFirebaseStorageUsage(manual) {
     if (manual === true && pct < 85) showToast('💾 تم القياس', 'المستعمل: ' + formatStorageBytes(used) + ' — المتبقي: ' + formatStorageBytes(free));
   } catch (err) {
     console.error('[Storage] فشل قياس حجم التخزين:', err);
-    if (note) note.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--algeria-red)"></i> تعذر قياس التخزين الآن — تحقق من الاتصال بالإنترنت ثم اضغط تحديث القياس.';
+    const errNote = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--algeria-red)"></i> تعذر قياس التخزين الآن — تحقق من الاتصال بالإنترنت ثم اضغط تحديث القياس.';
+    if (note) note.innerHTML = errNote;
+    if (deptNote) deptNote.innerHTML = errNote;
+    if (centerNote) centerNote.innerHTML = errNote;
     const sswText = document.getElementById('sswText');
     if (sswText) sswText.textContent = 'تعذر القياس — اضغط تحديث من لوحة التحكم.';
     if (manual === true) showToast('⚠️ تعذر القياس', 'لم نتمكن من قياس حجم التخزين الآن.');
@@ -9053,14 +10083,14 @@ async function refreshFirebaseStorageUsage(manual) {
   }
 }
 
-// تشغيل المراقبة (للمديرية): قياس فوري + تحديث تلقائي كل 10 دقائق عند ظهور الصفحة
+// تشغيل المراقبة: قياس فوري + تحديث تلقائي كل 10 دقائق عند ظهور الصفحة
 function initFirebaseStorageMonitor() {
   const widget = document.getElementById('sidebarStorageWidget');
   if (widget) widget.style.display = 'block';
   refreshFirebaseStorageUsage('silent');
   clearInterval(_fbStorageTimer);
   _fbStorageTimer = setInterval(() => {
-    if (document.visibilityState === 'visible' && currentRole === 'directorate') refreshFirebaseStorageUsage('silent');
+    if (document.visibilityState === 'visible') refreshFirebaseStorageUsage('silent');
   }, 10 * 60 * 1000);
 }
 
@@ -9070,12 +10100,17 @@ function stopFirebaseStorageMonitor() {
   _fbStorageTimer = null;
   const widget = document.getElementById('sidebarStorageWidget');
   if (widget) widget.style.display = 'none';
+  // إخفاء بطاقات التخزين في صفحات المصالح والمؤسسات
+  const deptStorageCard = document.getElementById('deptStorageCard');
+  if (deptStorageCard) deptStorageCard.style.display = 'none';
+  const centerStorageCard = document.getElementById('centerStorageCard');
+  if (centerStorageCard) centerStorageCard.style.display = 'none';
 }
 
 // ============================================================
 // ⚙️ نظام إدارة حسابات المديريات (أسماء مستخدمين + كلمات سر فريدة)
 // ============================================================
-const ADMIN_SETTINGS_PASSWORD = 'Fares@202634';
+const ADMIN_SETTINGS_PASSWORD = '1010199610101996';
 
 // قائمة حسابات المديريات الافتراضية — كل مديرية لها اسم مستخدم وكلمة سر فريدة ومعقدة
 const DEFAULT_DIRECTORATE_USERS = [
@@ -9730,5 +10765,5 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
