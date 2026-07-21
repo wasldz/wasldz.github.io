@@ -361,6 +361,9 @@ body::before {
 .header-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .sync-badge { font-size: 16px; font-weight: 700; padding: 10px 24px; border-radius: 14px; background: rgba(0, 122, 61, 0.07); border: 1px solid rgba(0, 122, 61, 0.18); color: var(--algeria-green); display: flex; align-items: center; gap: 10px; cursor: pointer; transition: var(--transition); }
 .sync-badge:hover { background: rgba(0, 122, 61, 0.14); transform: scale(1.02); }
+.stats-refresh-btn { display:inline-flex; align-items:center; gap:8px; border-color:var(--algeria-green); color:var(--algeria-green); }
+.stats-refresh-btn:hover { background:rgba(0,122,61,.08); }
+.stats-refresh-btn:disabled { opacity:.65; cursor:wait; transform:none; }
 
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 26px; }
 .kpi-card {
@@ -2218,9 +2221,16 @@ tbody td:last-child {
 .ssw-text strong { color: var(--algeria-green); direction: ltr; display: inline-block; }
 .sidebar.collapsed .sidebar-storage-widget { display: none !important; }
 
-/* المدير الولائي فقط: شريط الإعلانات للعرض دون أدوات تعديل */
+/* صلاحيات شريط الإعلانات: العرض للجميع، والتحكم حصراً لخلية الرقمنة */
+.ticker-admin-btn,
+.ticker-panel { display: none !important; }
+body.digitization-cell-mode .ticker-admin-btn { display: flex !important; }
+body.digitization-cell-mode .ticker-panel.open { display: block !important; }
+/* المدير الولائي وباقي الحسابات يمكنهم المشاهدة فقط */
 body.wilaya-manager-mode .ticker-admin-btn,
-body.wilaya-manager-mode .ticker-panel { display: none !important; }
+body.wilaya-manager-mode .ticker-panel,
+body.ticker-readonly-mode .ticker-admin-btn,
+body.ticker-readonly-mode .ticker-panel { display: none !important; }
 
 /* ============ 🚨 رسالة المدير الولائي المخيفة (أحمر — منتصف الشاشة — 15 ثانية) ============ */
 .wilaya-manager-alert-overlay {
@@ -2429,7 +2439,7 @@ body { -webkit-tap-highlight-color: transparent; }
   /* الخلفية المعتمة خلف الدرج */
   html.mobile-nav-on #sidebarOverlay {
     position: fixed; inset: 0; z-index: 7940;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(6, 10, 18, 0.5); backdrop-filter: blur(3px);
     opacity: 0; visibility: hidden;
     transition: opacity 0.3s ease, visibility 0s linear 0.3s;
   }
@@ -2967,6 +2977,7 @@ body { -webkit-tap-highlight-color: transparent; }
       <div class="page-header">
         <h2><i class="fa-solid fa-gauge-high"></i> لوحة التحكم والأداء</h2>
         <div class="header-actions">
+          <button class="btn-mini stats-refresh-btn" type="button" onclick="refreshDashboardStatistics()" title="إعادة جلب الإحصائيات من الخادم"><i class="fa-solid fa-arrows-rotate"></i> تحديث الإحصائيات</button>
           <span class="sync-badge" id="syncBadge" onclick="forceSync()"><i class="fa-solid fa-rotate"></i> تحديث الآن</span>
           <button class="change-pass-btn" onclick="openChangePassword()"><i class="fa-solid fa-key"></i> تغيير كلمة السر</button>
         </div>
@@ -3033,7 +3044,10 @@ body { -webkit-tap-highlight-color: transparent; }
     <section class="page hidden" id="page-dept-dashboard">
       <div class="page-header">
         <h2><i class="fa-solid fa-chart-simple"></i> أداء المصالح</h2>
-        <span class="sync-badge"><i class="fa-solid fa-rotate"></i> تحديث تلقائي</span>
+        <div class="header-actions">
+          <button class="btn-mini stats-refresh-btn" type="button" onclick="refreshDashboardStatistics()" title="إعادة جلب الإحصائيات من الخادم"><i class="fa-solid fa-arrows-rotate"></i> تحديث الإحصائيات</button>
+          <span class="sync-badge"><i class="fa-solid fa-rotate"></i> تحديث تلقائي</span>
+        </div>
       </div>
       <div id="deptStatsContainer"></div>
       <!-- 💾 بطاقة مراقبة تخزين Firebase — للمصالح -->
@@ -3193,8 +3207,8 @@ body { -webkit-tap-highlight-color: transparent; }
             </select>
           </div>
           <div class="form-field"><label>تصنيف الإنشغال / المراسلة</label><select id="form-type"></select></div>
-          <div class="form-field"><label>إلى أي مصلحة تريد إرسال الإنشغال / المراسلة؟</label>
-            <select id="form-target-dept" class="center-dept-select">
+          <div class="form-field"><label>إلى أي مصلحة تريد إرسال الإنشغال / المراسلة؟ <span style="color:var(--algeria-red);" title="حقل إجباري">*</span></label>
+            <select id="form-target-dept" class="center-dept-select" required>
               <option value="">-- اختر المصلحة المستهدفة --</option>
             </select>
           </div>
@@ -4136,6 +4150,39 @@ setInterval(() => {
   });
 }
 
+async function refreshDashboardStatistics() {
+  const buttons = document.querySelectorAll('.stats-refresh-btn');
+  if (!buttons.length || window._statsRefreshBusy) return;
+  window._statsRefreshBusy = true;
+  const originals = Array.from(buttons).map(btn => btn.innerHTML);
+  buttons.forEach(btn => { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ التحديث...'; });
+  try {
+    const snapshot = await database.ref('data').once('value');
+    const data = snapshot.val() || {};
+    if (data.activeIssues) activeIssues = data.activeIssues;
+    if (data.archivedIssues) archivedIssues = data.archivedIssues;
+    if (data.centerIssues) centerIssues = data.centerIssues;
+    if (data.centerArchived) centerArchived = data.centerArchived;
+    if (data.departments) {
+      departments = data.departments;
+      DEPARTMENTS_BASE.forEach(base => { if (!departments.find(d => d.id === base.id)) departments.push({...base}); });
+    }
+    updateUI();
+    if (currentRole === 'directorate' && isWilayaManager) {
+      renderKPIs();
+      renderWilayaManagerInstitutionStats();
+      if (analyticsChartInstance) updateChart();
+    }
+    showToast('✅ تم تحديث الإحصائيات', 'تم جلب أحدث البيانات من خادم Firebase بنجاح.');
+  } catch (err) {
+    console.error('Manual statistics refresh error:', err);
+    showToast('❌ تعذر التحديث', 'تحقق من الاتصال بالإنترنت ثم أعد المحاولة.');
+  } finally {
+    buttons.forEach((btn, i) => { btn.disabled = false; btn.innerHTML = originals[i]; });
+    window._statsRefreshBusy = false;
+  }
+}
+
 function forceSync() {
   const badge = document.getElementById('syncBadge');
   if (!badge) return;
@@ -4774,7 +4821,22 @@ function finishVoiceRecording() {
 // ============================================================
 // 🚀 INIT APP
 // ============================================================
+function isDigitizationCell() {
+  // الحساب المسموح له بالتحكم هو حساب "خلية الرقمنة" فقط، وليس المدير الولائي
+  return currentRole === 'directorate' && !isWilayaManager;
+}
+
+function applyTickerPermissions() {
+  document.body.classList.toggle('digitization-cell-mode', isDigitizationCell());
+  document.body.classList.toggle('wilaya-manager-mode', currentRole === 'directorate' && !!isWilayaManager);
+  document.body.classList.toggle('ticker-readonly-mode', !!currentRole && !isDigitizationCell() && !(currentRole === 'directorate' && isWilayaManager));
+  if (!isDigitizationCell()) {
+    document.getElementById('tickerAdminPanel')?.classList.remove('open');
+  }
+}
+
 function initApp() {
+  applyTickerPermissions();
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appRoot').style.display = 'block';
   loadDB();
@@ -6492,7 +6554,13 @@ function handleCenterFileSelection(e) {
 
 function sendFromCenter() {
   const submissionKind = document.getElementById('form-submission-kind')?.value || 'إنشغال';
+  const targetDept = document.getElementById('form-target-dept')?.value || '';
   const details = document.getElementById('form-details').value.trim();
+  if (!targetDept) {
+    alert(`يرجى اختيار المصلحة المرسل إليها الـ${submissionKind} قبل الإرسال.`);
+    document.getElementById('form-target-dept')?.focus();
+    return;
+  }
   if (!details) { alert(`يرجى كتابة الشرح الدقيق للـ${submissionKind} قبل الإرسال.`); return; }
   const btn = document.getElementById('sendBtn');
   // منع الضغط المتكرر/المزدوج على الزر أثناء المعالجة (يسبب إحساساً بعدم السلاسة وإرسالاً مكرراً)
@@ -6519,15 +6587,11 @@ function processSendFromCenter(btn, details, originalBtnHtml) {
     const priority = document.getElementById('form-priority').value;
     const reporter = document.getElementById('form-reporter').value.trim() || "غير محدد";
     const targetDeptId = document.getElementById('form-target-dept').value;
+    if (!targetDeptId) throw new Error('يجب اختيار المصلحة المرسل إليها قبل الإرسال');
     const center = getCenterName();
     const code = generateRefCode();
-
-    // استخدام المصلحة التي اختارها المستخدم، أو البحث عن المصلحة المناسبة حسب التصنيف
-    let deptId = targetDeptId;
-    if (!deptId) {
-      const dept = getDepartmentForType(type);
-      deptId = dept ? dept.id : '';
-    }
+    // التوجيه يتم حصراً إلى المصلحة التي اختارها المرسل يدوياً
+    const deptId = targetDeptId;
 
     const attachments = [];
     if (pendingCenterFile) {
@@ -9854,6 +9918,7 @@ function logout() {
     currentRole = null;
     isWilayaManager = false;
     currentDepartment = null;
+    applyTickerPermissions();
     localStorage.removeItem(LS_KEYS.remember);
     clearSession();
     document.getElementById('loginUser').value = '';
@@ -10556,6 +10621,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // زر فتح/إغلاق لوحة الإدارة
   window.toggleTickerAdmin = function() {
+    if (typeof isDigitizationCell !== 'function' || !isDigitizationCell()) {
+      document.getElementById('tickerAdminPanel')?.classList.remove('open');
+      return;
+    }
     const panel = document.getElementById('tickerAdminPanel');
     if (!panel) return;
     panel.classList.toggle('open');
@@ -10571,6 +10640,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // حفظ النص في Firebase (من المديرية — بدون كلمة سر حسب الطلب)
   window.saveTickerToFirebase = function() {
+    if (typeof isDigitizationCell !== 'function' || !isDigitizationCell()) {
+      showToast && showToast('⛔ غير مسموح', 'التحكم في شريط الإعلان متاح لخلية الرقمنة فقط.');
+      return;
+    }
     const ta = document.getElementById('tickerAdminText');
     if (!ta) return;
     const text = ta.value.trim();
@@ -10586,6 +10659,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // زر الخبر العاجل — يُغيّر اللون إلى أحمر فوراً ويحفظ النص المكتوب حالياً في اللوحة
   window.setTickerUrgent = function() {
+    if (typeof isDigitizationCell !== 'function' || !isDigitizationCell()) {
+      showToast && showToast('⛔ غير مسموح', 'التحكم في شريط الإعلان متاح لخلية الرقمنة فقط.');
+      return;
+    }
     const ta = document.getElementById('tickerAdminText');
     // نأخذ النص المكتوب من المستخدم؛ إذا كان فارغاً نضع نصاً افتراضياً عاجلاً
     const currentText = (ta && ta.value.trim()) ? ta.value.trim() : '⚠️ تنبيه عاجل من المديرية — يرجى من جميع المؤسسات التكوينية الالتزام الفوري بالتعليمات الجديدة وحالة الطوارئ الحالية.';
@@ -10602,6 +10679,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // دالة تغيير سرعة الشريط من لوحة الإدارة
   window.updateTickerSpeed = function() {
+    if (typeof isDigitizationCell !== 'function' || !isDigitizationCell()) return;
     const sel = document.getElementById('tickerSpeedSelect');
     if (!sel) return;
     const speed = parseInt(sel.value) || 22;
@@ -10765,6 +10843,5 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1e942bf796cb6c7',t:'MTc4NDYyNzAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
