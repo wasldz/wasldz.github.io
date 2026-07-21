@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>وصل — برج بوعريريج 🇩🇿</title>
+<title>وصل — منصة ربط المديرية بالمؤسسات 🇩🇿</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2716%27 height=%2732%27 fill=%27%23007a3d%27/%3E%3Crect x=%2716%27 width=%2716%27 height=%2732%27 fill=%27%23ffffff%27/%3E%3Ctext x=%2716%27 y=%2721%27 font-size=%2714%27 fill=%27%23d21034%27 text-anchor=%27middle%27%3E%E2%98%AA%3C/text%3E%3C/svg%3E">
 
 <!-- Firebase SDK -->
@@ -284,7 +284,7 @@ body::before {
 .login-card h1 { font-size: 30px; font-weight: 900; color: var(--text); letter-spacing: 1px; }
 .login-card .subtitle { color: var(--text-dim); font-size: 17px; font-weight: 600; margin-top: 4px; }
 
-.role-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.role-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
 .role-selector button { padding: 17px 14px; border-radius: 16px; font-weight: 800; font-size: 18px; background: var(--bg-card-2); border: 2px solid var(--border); color: var(--text-dim); transition: var(--transition); cursor: pointer; font-family: inherit; }
 .role-selector button i { margin-left: 12px; font-size: 20px; }
 .role-selector button:hover { border-color: var(--algeria-green); color: var(--text); transform: translateY(-2px); }
@@ -361,9 +361,6 @@ body::before {
 .header-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .sync-badge { font-size: 16px; font-weight: 700; padding: 10px 24px; border-radius: 14px; background: rgba(0, 122, 61, 0.07); border: 1px solid rgba(0, 122, 61, 0.18); color: var(--algeria-green); display: flex; align-items: center; gap: 10px; cursor: pointer; transition: var(--transition); }
 .sync-badge:hover { background: rgba(0, 122, 61, 0.14); transform: scale(1.02); }
-.stats-refresh-btn { display:inline-flex; align-items:center; gap:8px; border-color:var(--algeria-green); color:var(--algeria-green); }
-.stats-refresh-btn:hover { background:rgba(0,122,61,.08); }
-.stats-refresh-btn:disabled { opacity:.65; cursor:wait; transform:none; }
 
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 26px; }
 .kpi-card {
@@ -2221,16 +2218,9 @@ tbody td:last-child {
 .ssw-text strong { color: var(--algeria-green); direction: ltr; display: inline-block; }
 .sidebar.collapsed .sidebar-storage-widget { display: none !important; }
 
-/* صلاحيات شريط الإعلانات: العرض للجميع، والتحكم حصراً لخلية الرقمنة */
-.ticker-admin-btn,
-.ticker-panel { display: none !important; }
-body.digitization-cell-mode .ticker-admin-btn { display: flex !important; }
-body.digitization-cell-mode .ticker-panel.open { display: block !important; }
-/* المدير الولائي وباقي الحسابات يمكنهم المشاهدة فقط */
+/* المدير الولائي فقط: شريط الإعلانات للعرض دون أدوات تعديل */
 body.wilaya-manager-mode .ticker-admin-btn,
-body.wilaya-manager-mode .ticker-panel,
-body.ticker-readonly-mode .ticker-admin-btn,
-body.ticker-readonly-mode .ticker-panel { display: none !important; }
+body.wilaya-manager-mode .ticker-panel { display: none !important; }
 
 /* ============ 🚨 رسالة المدير الولائي المخيفة (أحمر — منتصف الشاشة — 15 ثانية) ============ */
 .wilaya-manager-alert-overlay {
@@ -2832,6 +2822,7 @@ body { -webkit-tap-highlight-color: transparent; }
         </select>
         <button id="loginRoleDepartment" onclick="selectLoginRole('department')"><i class="fa-solid fa-users-gear"></i> مصالح المديرية</button>
         <button id="loginRoleCenter" onclick="selectLoginRole('center')"><i class="fa-solid fa-school"></i> مركز/معهد/مدرسة </button>
+        <button id="loginRoleEmployee" onclick="selectLoginRole('employee')"><i class="fa-solid fa-user-graduate"></i> موظف</button>
       </div>
 
       <!-- حقول المديرية -->
@@ -2883,6 +2874,18 @@ body { -webkit-tap-highlight-color: transparent; }
         </div>
         <div class="center-hint" id="centerHint"><i class="fa-solid fa-circle-info"></i> يمكنك طلب كلمة السر مباشرة من المديرية (حسان بلحاج)</div>
         <div id="passwordRequestStatus" style="display:none;margin-top:9px;text-align:center;font-size:14px;font-weight:700;color:var(--text-dim);"></div>
+      </div>
+
+      <!-- حقول الموظف -->
+      <div id="employeeFields" style="display:none;">
+        <div class="login-fields-row">
+          <div class="login-field"><label><i class="fa-solid fa-search"></i> ابحث عن المؤسسة</label><input type="text" id="loginEmployeeSearch" placeholder="اكتب اسم المؤسسة..." onkeyup="filterEmployeeInstSelect()"></div>
+          <div class="login-field"><label><i class="fa-solid fa-building"></i> اختر المؤسسة</label><select id="loginEmployeeInst"><option value="">-- اختر المؤسسة --</option></select></div>
+          <div class="login-field"><label><i class="fa-solid fa-key"></i> كلمة السر الخاصة بك</label><input type="password" id="loginEmployeePass" placeholder="كلمة السر الممنوحة لك من المؤسسة" onkeyup="if(event.key==='Enter')handleLogin()"></div>
+        </div>
+        <div style="font-size:14px; color:var(--text-dim); padding:8px 12px; background:var(--bg-card-2); border-radius:10px; margin-bottom:10px; text-align:center;">
+          <i class="fa-solid fa-info-circle"></i> كلمة السر تُولّد تلقائياً عند إضافتك من طرف مؤسستك — يمكنك من خلالها إرسال إنشغال أو شكوى مباشرة إلى المدير الولائي
+        </div>
       </div>
 
       <div class="login-field" style="text-align:right; margin-bottom:10px;">
@@ -2977,7 +2980,6 @@ body { -webkit-tap-highlight-color: transparent; }
       <div class="page-header">
         <h2><i class="fa-solid fa-gauge-high"></i> لوحة التحكم والأداء</h2>
         <div class="header-actions">
-          <button class="btn-mini stats-refresh-btn" type="button" onclick="refreshDashboardStatistics()" title="إعادة جلب الإحصائيات من الخادم"><i class="fa-solid fa-arrows-rotate"></i> تحديث الإحصائيات</button>
           <span class="sync-badge" id="syncBadge" onclick="forceSync()"><i class="fa-solid fa-rotate"></i> تحديث الآن</span>
           <button class="change-pass-btn" onclick="openChangePassword()"><i class="fa-solid fa-key"></i> تغيير كلمة السر</button>
         </div>
@@ -3044,10 +3046,7 @@ body { -webkit-tap-highlight-color: transparent; }
     <section class="page hidden" id="page-dept-dashboard">
       <div class="page-header">
         <h2><i class="fa-solid fa-chart-simple"></i> أداء المصالح</h2>
-        <div class="header-actions">
-          <button class="btn-mini stats-refresh-btn" type="button" onclick="refreshDashboardStatistics()" title="إعادة جلب الإحصائيات من الخادم"><i class="fa-solid fa-arrows-rotate"></i> تحديث الإحصائيات</button>
-          <span class="sync-badge"><i class="fa-solid fa-rotate"></i> تحديث تلقائي</span>
-        </div>
+        <span class="sync-badge"><i class="fa-solid fa-rotate"></i> تحديث تلقائي</span>
       </div>
       <div id="deptStatsContainer"></div>
       <!-- 💾 بطاقة مراقبة تخزين Firebase — للمصالح -->
@@ -3207,8 +3206,8 @@ body { -webkit-tap-highlight-color: transparent; }
             </select>
           </div>
           <div class="form-field"><label>تصنيف الإنشغال / المراسلة</label><select id="form-type"></select></div>
-          <div class="form-field"><label>إلى أي مصلحة تريد إرسال الإنشغال / المراسلة؟ <span style="color:var(--algeria-red);" title="حقل إجباري">*</span></label>
-            <select id="form-target-dept" class="center-dept-select" required>
+          <div class="form-field"><label>إلى أي مصلحة تريد إرسال الإنشغال / المراسلة؟</label>
+            <select id="form-target-dept" class="center-dept-select">
               <option value="">-- اختر المصلحة المستهدفة --</option>
             </select>
           </div>
@@ -3378,6 +3377,60 @@ body { -webkit-tap-highlight-color: transparent; }
     <section class="page hidden" id="page-manager-messages">
       <div class="page-header"><h2><i class="fa-solid fa-envelope"></i> رسائل المدير الولائي</h2></div>
       <div id="managerMessagesInbox"></div>
+    </section>
+
+    <!-- ============ 👥 إدارة الموظفين (في كل مؤسسة) ============ -->
+    <section class="page hidden" id="page-employees">
+      <div class="page-header"><h2><i class="fa-solid fa-id-card"></i> إدارة الموظفين</h2><span class="center-badge"><i class="fa-solid fa-building"></i> <span id="empMgrCenterName">المؤسسة</span></span></div>
+      <div class="emp-layout">
+        <div class="form-card emp-form-card">
+          <h3 style="font-size:20px; font-weight:900; color:var(--algeria-green); margin-bottom:16px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-user-plus"></i> إضافة موظف جديد</h3>
+          <div class="emp-fields-grid">
+            <div class="form-field"><label>الفئة</label><select id="empCategory"><option value="worker">عامل</option><option value="teacher">أستاذ</option><option value="admin">إداري</option></select></div>
+            <div class="form-field"><label>الاسم</label><input type="text" id="empFirstName" placeholder="الاسم"></div>
+            <div class="form-field"><label>اللقب</label><input type="text" id="empLastName" placeholder="اللقب"></div>
+            <div class="form-field"><label>تاريخ الميلاد</label><input type="date" id="empBirthDate"></div>
+            <div class="form-field"><label>مكان الميلاد</label><input type="text" id="empBirthPlace" placeholder="مكان الميلاد"></div>
+            <div class="form-field"><label>الرتبة</label><input type="text" id="empRank" placeholder="مثال: تقني سامي في الإعلام الآلي..."></div>
+            <div class="form-field"><label>الوظيفة</label><input type="text" id="empJob" placeholder="مثال: مكلف بالرقمنة..."></div>
+            <div class="form-field"><label>كلمة السر (تولد تلقائياً)</label><div class="emp-pass-row"><input type="text" id="empPassword" readonly placeholder="تُولّد تلقائياً" style="font-family:'Courier New',monospace; direction:ltr;"><button type="button" class="btn-mini" onclick="regenerateEmpPassPreview()"><i class="fa-solid fa-rotate"></i></button></div></div>
+          </div>
+          <button class="btn-primary" style="width:100%; justify-content:center; margin-top:14px;" onclick="addEmployee()"><i class="fa-solid fa-floppy-disk"></i> حفظ الموظف</button>
+        </div>
+        <div class="form-card emp-list-card">
+          <div class="emp-list-head">
+            <h3 style="font-size:18px; font-weight:900; color:var(--text);"><i class="fa-solid fa-users"></i> قائمة الموظفين <span id="empCount" style="font-size:14px; color:var(--text-dim);"></span></h3>
+            <div class="emp-filter-row">
+              <select id="empFilterCat" onchange="renderEmployeesList()"><option value="all">كل الفئات</option><option value="worker">عمال</option><option value="teacher">أساتذة</option><option value="admin">إداريون</option></select>
+              <input type="text" id="empSearch" placeholder="🔍 بحث بالاسم..." oninput="renderEmployeesList()">
+            </div>
+          </div>
+          <div id="employeesList" class="emp-list-body"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 📨 الموظف: إرسال إنشغال/شكوى ============ -->
+    <section class="page hidden" id="page-employee-send">
+      <div class="page-header"><h2><i class="fa-solid fa-paper-plane"></i> إرسال إنشغال / شكوى إلى المدير الولائي</h2></div>
+      <div id="employeeSendContainer"></div>
+    </section>
+
+    <!-- ============ 📥 الموظف: شكاواي المرسلة ============ -->
+    <section class="page hidden" id="page-employee-list">
+      <div class="page-header"><h2><i class="fa-solid fa-inbox"></i> شكاواي وإنشغالاتي المرسلة</h2></div>
+      <div id="employeeMyComplaintsContainer"></div>
+    </section>
+
+    <!-- ============ 📬 استقبال الشكاوي (المدير الولائي) ============ -->
+    <section class="page hidden" id="page-complaints-reception">
+      <div class="page-header"><h2><i class="fa-solid fa-inbox"></i> استقبال الشكاوي والإنشغالات</h2><button class="sync-badge" onclick="forceRefreshComplaints()"><i class="fa-solid fa-rotate"></i> تحديث</button></div>
+      <div class="filter-bar">
+        <input type="text" id="complaints-search" placeholder="بحث بالاسم أو المؤسسة أو الموضوع..." oninput="renderComplaintsReception()">
+        <select id="complaints-status" onchange="renderComplaintsReception()"><option value="">كل الحالات</option><option value="جديد">🆕 جديدة</option><option value="قيد المعالجة">قيد المعالجة</option><option value="تمت المعالجة">تمت المعالجة</option><option value="مغلق">مغلقة</option></select>
+        <select id="complaints-kind" onchange="renderComplaintsReception()"><option value="">الكل</option><option value="شكوى">شكاوي</option><option value="إنشغال">إنشغالات</option></select>
+      </div>
+      <div id="complaintsReceptionList"></div>
     </section>
 
 <!-- MODALS -->
@@ -3551,6 +3604,7 @@ const DEPARTMENTS_BASE = [
 let MASTER_PASSWORD = "1996";
 let WILAYA_MANAGER_PASSWORD = null; // null = نستخدم الافتراضية (Mgr@XX_2026)
 let currentRole = null;
+let currentEmployee = null; // الموظف المسجّل الدخول (عامل/أستاذ/إداري)
 let currentDepartment = null;
 let activeIssues = [];
 let userGuides = [];
@@ -4150,39 +4204,6 @@ setInterval(() => {
   });
 }
 
-async function refreshDashboardStatistics() {
-  const buttons = document.querySelectorAll('.stats-refresh-btn');
-  if (!buttons.length || window._statsRefreshBusy) return;
-  window._statsRefreshBusy = true;
-  const originals = Array.from(buttons).map(btn => btn.innerHTML);
-  buttons.forEach(btn => { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ التحديث...'; });
-  try {
-    const snapshot = await database.ref('data').once('value');
-    const data = snapshot.val() || {};
-    if (data.activeIssues) activeIssues = data.activeIssues;
-    if (data.archivedIssues) archivedIssues = data.archivedIssues;
-    if (data.centerIssues) centerIssues = data.centerIssues;
-    if (data.centerArchived) centerArchived = data.centerArchived;
-    if (data.departments) {
-      departments = data.departments;
-      DEPARTMENTS_BASE.forEach(base => { if (!departments.find(d => d.id === base.id)) departments.push({...base}); });
-    }
-    updateUI();
-    if (currentRole === 'directorate' && isWilayaManager) {
-      renderKPIs();
-      renderWilayaManagerInstitutionStats();
-      if (analyticsChartInstance) updateChart();
-    }
-    showToast('✅ تم تحديث الإحصائيات', 'تم جلب أحدث البيانات من خادم Firebase بنجاح.');
-  } catch (err) {
-    console.error('Manual statistics refresh error:', err);
-    showToast('❌ تعذر التحديث', 'تحقق من الاتصال بالإنترنت ثم أعد المحاولة.');
-  } finally {
-    buttons.forEach((btn, i) => { btn.disabled = false; btn.innerHTML = originals[i]; });
-    window._statsRefreshBusy = false;
-  }
-}
-
 function forceSync() {
   const badge = document.getElementById('syncBadge');
   if (!badge) return;
@@ -4251,7 +4272,7 @@ function updateUI() {
     renderDepartmentIssues();
     renderDeptKPIs();
     populateDropdowns();
-  } else {
+  } else if (currentRole === 'center') {
     renderChatHub();
     refreshCenterUI();
     populateCenterTargetDepts();
@@ -4343,12 +4364,14 @@ function verifyWilayaManagerLogin(password) {
 function selectLoginRole(role) {
   selectedLoginRole = role;
   document.querySelectorAll('.role-selector button').forEach(b => b.classList.remove('active'));
-  document.getElementById('loginRole' + role.charAt(0).toUpperCase() + role.slice(1)).classList.add('active');
+  const roleBtn = document.getElementById('loginRole' + role.charAt(0).toUpperCase() + role.slice(1));
+  if (roleBtn) roleBtn.classList.add('active');
   
   document.getElementById('directorateFields').style.display = 'none';
   document.getElementById('departmentFields').style.display = 'none';
   document.getElementById('centerFields').style.display = 'none';
   document.getElementById('centerHint').style.display = 'none';
+  const empFields = document.getElementById('employeeFields'); if (empFields) empFields.style.display = 'none';
   
   if (role === 'directorate') {
     document.getElementById('directorateFields').style.display = 'block';
@@ -4356,6 +4379,9 @@ function selectLoginRole(role) {
   } else if (role === 'department') {
     document.getElementById('departmentFields').style.display = 'block';
     populateLoginDeptSelect();
+  } else if (role === 'employee') {
+    if (empFields) empFields.style.display = 'block';
+    populateEmployeeInstSelect();
   } else {
     document.getElementById('centerFields').style.display = 'block';
     document.getElementById('centerHint').style.display = 'block';
@@ -4391,7 +4417,7 @@ function filterCenterSelect() {
 // ============================================================
 function saveSession() {
   try {
-    sessionStorage.setItem(LS_KEYS.session, JSON.stringify({ role: currentRole, department: currentDepartment, wilaya: selectedWilaya, isWilayaManager: !!isWilayaManager }));
+    sessionStorage.setItem(LS_KEYS.session, JSON.stringify({ role: currentRole, department: currentDepartment, wilaya: selectedWilaya, isWilayaManager: !!isWilayaManager, employee: currentEmployee ? { id: currentEmployee.id, firstName: currentEmployee.firstName, lastName: currentEmployee.lastName, category: currentEmployee.category, rank: currentEmployee.rank, job: currentEmployee.job } : null }));
   } catch(e) {}
 }
 
@@ -4410,6 +4436,7 @@ function restoreSession() {
     isWilayaManager = !!parsed.isWilayaManager;
     currentDepartment = parsed.department || null;
     selectedWilaya = parsed.wilaya || "34";
+    if (parsed.employee) currentEmployee = parsed.employee;
     const select = document.getElementById('loginWilayaSelect');
     if (select) select.value = selectedWilaya;
     initApp();
@@ -4466,7 +4493,7 @@ function handleLogin() {
       err.style.display = 'block';
       err.textContent = '⚠️ كلمة المرور غير صحيحة أو المصلحة غير مسجلة! يرجى الاتصال بالمديرية.';
     }
-  } else {
+  } else if (selectedLoginRole === 'center') {
     const center = document.getElementById('loginCenterSelect').value;
     const pass = document.getElementById('loginCenterPass').value.trim();
     if (!center) { err.style.display = 'block'; err.textContent = '⚠️ يرجى اختيار المؤسسة!'; return; }
@@ -4480,6 +4507,24 @@ function handleLogin() {
       err.style.display = 'block';
       err.textContent = '⚠️ كلمة السر غير صحيحة! يرجى الاتصال بالمديرية.';
     }
+  } else if (selectedLoginRole === 'employee') {
+    const inst = document.getElementById('loginEmployeeInst').value;
+    const pass = (document.getElementById('loginEmployeePass').value || '').trim();
+    if (!inst) { err.style.display = 'block'; err.textContent = '⚠️ يرجى اختيار المؤسسة!'; return; }
+    if (!pass) { err.style.display = 'block'; err.textContent = '⚠️ يرجى إدخال كلمة السر!'; return; }
+    err.style.display = 'none';
+    verifyEmployeeLogin(inst, pass, function(ok, emp) {
+      if (ok) {
+        currentRole = 'employee';
+        setCenterName(inst);
+        currentEmployee = emp;
+        saveSession();
+        initApp();
+      } else {
+        err.style.display = 'block';
+        err.textContent = '⚠️ كلمة السر غير صحيحة أو غير مسجلة في هذه المؤسسة!';
+      }
+    });
   }
 }
 
@@ -4821,22 +4866,7 @@ function finishVoiceRecording() {
 // ============================================================
 // 🚀 INIT APP
 // ============================================================
-function isDigitizationCell() {
-  // الحساب المسموح له بالتحكم هو حساب "خلية الرقمنة" فقط، وليس المدير الولائي
-  return currentRole === 'directorate' && !isWilayaManager;
-}
-
-function applyTickerPermissions() {
-  document.body.classList.toggle('digitization-cell-mode', isDigitizationCell());
-  document.body.classList.toggle('wilaya-manager-mode', currentRole === 'directorate' && !!isWilayaManager);
-  document.body.classList.toggle('ticker-readonly-mode', !!currentRole && !isDigitizationCell() && !(currentRole === 'directorate' && isWilayaManager));
-  if (!isDigitizationCell()) {
-    document.getElementById('tickerAdminPanel')?.classList.remove('open');
-  }
-}
-
 function initApp() {
-  applyTickerPermissions();
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appRoot').style.display = 'block';
   loadDB();
@@ -4948,6 +4978,7 @@ function setupInterface() {
     renderDepartmentsList();
     renderDeptDashboard();
     if (isWilayaManager) renderWilayaManagerInstitutionStats();
+    if (isWilayaManager) startComplaintsReceptionListener();
     renderAuditLog();
     populateDeptFilters();
     document.getElementById('page-dashboard').classList.remove('hidden');
@@ -4976,7 +5007,7 @@ function setupInterface() {
     const deptStorageCard = document.getElementById('deptStorageCard');
     if (deptStorageCard) deptStorageCard.style.display = 'block';
     initFirebaseStorageMonitor();
-  } else {
+  } else if (currentRole === 'center') {
     document.getElementById('institutionsPanel').style.display = 'none';
     document.getElementById('fileTypesPanel').style.display = 'block';
     document.getElementById('centerInfoPanel').style.display = 'block';
@@ -4990,6 +5021,14 @@ function setupInterface() {
     const centerStorageCard = document.getElementById('centerStorageCard');
     if (centerStorageCard) centerStorageCard.style.display = 'block';
     initFirebaseStorageMonitor();
+  } else if (currentRole === 'employee') {
+    document.getElementById('institutionsPanel').style.display = 'none';
+    document.getElementById('fileTypesPanel').style.display = 'none';
+    document.getElementById('centerInfoPanel').style.display = 'none';
+    document.getElementById('fileTypeManageRow').style.display = 'none';
+    document.getElementById('page-employee-send').classList.remove('hidden');
+    startEmployeeComplaintsListener();
+    switchTab('employee-send');
   }
   
   setInterval(checkForNewMessages, 3000);
@@ -5013,6 +5052,7 @@ function setupSidebar() {
     badge.className = 'role-badge directorate';
     navList.innerHTML = `
       <li><button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> الإحصائيات العامة</button></li>
+      <li><button class="nav-btn" data-tab="complaints-reception" onclick="switchTab('complaints-reception')"><i class="fa-solid fa-inbox"></i> استقبال الشكاوي <span class="nav-badge" id="navBadgeComplaints" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="center-issues" onclick="switchTab('center-issues')"><i class="fa-solid fa-school"></i> إنشغالات المؤسسات التكوينية <span class="nav-badge" id="navBadgeCenterIssues" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="dept-dashboard" onclick="switchTab('dept-dashboard')"><i class="fa-solid fa-chart-simple"></i> إحصائيات المصالح والمؤسسات</button></li>
       <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-bullhorn"></i> إرسال رسالة رسمية</button></li>
@@ -5065,7 +5105,7 @@ function setupSidebar() {
       <li><button class="nav-btn" data-tab="manager-messages" onclick="switchTab('manager-messages')"><i class="fa-solid fa-envelope"></i> رسائل المدير الولائي <span class="nav-badge" id="navBadgeManagerMsgs" style="display:none;"></span></button></li>
             <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
     `;
-  } else {
+  } else if (currentRole === 'center') {
     const centerName = getCenterName();
     avatar.innerHTML = '<i class="fa-solid fa-school"></i>';
     name.textContent = centerName;
@@ -5083,14 +5123,32 @@ function setupSidebar() {
       <li><button class="nav-btn" data-tab="broadcast" onclick="switchTab('broadcast')"><i class="fa-solid fa-envelope-open-text"></i> المراسلات والمهام <span class="nav-badge" id="navBadgeBroadcastCenter" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="user-guides" onclick="switchTab('user-guides')"><i class="fa-solid fa-book-bookmark"></i> دليل الاستعمال <span class="nav-badge" id="navBadgeUserGuidesCenter" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="teachers" onclick="switchTab('teachers')"><i class="fa-solid fa-chalkboard-user"></i> الأساتذة المتدخلين</button></li>
+      <li><button class="nav-btn" data-tab="employees" onclick="switchTab('employees')"><i class="fa-solid fa-id-card"></i> إدارة الموظفين</button></li>
       <li><button class="nav-btn" data-tab="manager-messages" onclick="switchTab('manager-messages')"><i class="fa-solid fa-envelope"></i> رسائل المدير الولائي <span class="nav-badge" id="navBadgeManagerMsgs" style="display:none;"></span></button></li>
       <li><button class="nav-btn" data-tab="notes" onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i> المفكرة</button></li>
+    `;
+  } else if (currentRole === 'employee') {
+    const emp = currentEmployee || {};
+    const fullName = ((emp.firstName || '') + ' ' + (emp.lastName || '')).trim() || 'موظف';
+    avatar.innerHTML = '<i class="fa-solid fa-user-graduate"></i>';
+    name.textContent = fullName;
+    const catLabel = emp.category === 'admin' ? 'إداري' : (emp.category === 'teacher' ? 'أستاذ' : (emp.category === 'worker' ? 'عامل' : 'موظف'));
+    title.textContent = getCenterName() + ' — ' + catLabel + (emp.job ? ' · ' + emp.job : '');
+    badge.textContent = 'موظف';
+    badge.className = 'role-badge center';
+    const bannerName = document.getElementById('directorateBannerName');
+    const bannerSub = document.getElementById('directorateBannerSub');
+    if (bannerName) bannerName.textContent = getCenterName() + ' — مديرية ولاية ' + getWilayaName(selectedWilaya);
+    if (bannerSub) bannerSub.textContent = 'الولاية رقم ' + selectedWilaya + ' — الجمهورية الجزائرية الديمقراطية الشعبية';
+    navList.innerHTML = `
+      <li><button class="nav-btn active" data-tab="employee-send" onclick="switchTab('employee-send')"><i class="fa-solid fa-paper-plane"></i> إرسال إنشغال / شكوى</button></li>
+      <li><button class="nav-btn" data-tab="employee-list" onclick="switchTab('employee-list')"><i class="fa-solid fa-inbox"></i> شكاواي المرسلة <span class="nav-badge" id="navBadgeEmployeeMine" style="display:none;"></span></button></li>
     `;
   }
 }
 
 function switchTab(tab) {
-  if (currentRole === 'directorate' && isWilayaManager && !['dashboard','center-issues','dept-dashboard','notes','manager-messages'].includes(tab)) tab = 'dashboard';
+  if (currentRole === 'directorate' && isWilayaManager && !['dashboard','center-issues','dept-dashboard','notes','manager-messages','complaints-reception'].includes(tab)) tab = 'dashboard';
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   const target = document.getElementById('page-' + tab);
   if (target) target.classList.remove('hidden');
@@ -5107,11 +5165,15 @@ function switchTab(tab) {
   if (tab === 'audit-log' && currentRole === 'directorate') renderAuditLog();
   if (tab === 'inter-directorates' && currentRole === 'directorate') initInterDirectorates();
   if (tab === 'teachers') initTeachersPage();
+  if (tab === 'employees') renderEmployeesPage();
   if (tab === 'dashboard' && currentRole === 'directorate') refreshFirebaseStorageUsage('silent');
   if (tab === 'dept-dashboard' && currentRole === 'department') refreshFirebaseStorageUsage('silent');
   if (tab === 'send-panel' && currentRole === 'center') refreshFirebaseStorageUsage('silent');
   if (tab === 'manager-messages') renderManagerMessagesInbox();
   if (tab === 'center-issues' && currentRole === 'directorate' && isWilayaManager) { renderCenterIssuesForWilayaManager(); _centerIssuesFiltersPopulated = false; }
+  if (tab === 'employee-send') renderEmployeeSendPage();
+  if (tab === 'employee-list') { startEmployeeComplaintsListener(); renderEmployeeMyComplaints(); }
+  if (tab === 'complaints-reception') { startComplaintsReceptionListener(); renderComplaintsReception(); }
 }
 
 // ============================================================
@@ -6554,13 +6616,7 @@ function handleCenterFileSelection(e) {
 
 function sendFromCenter() {
   const submissionKind = document.getElementById('form-submission-kind')?.value || 'إنشغال';
-  const targetDept = document.getElementById('form-target-dept')?.value || '';
   const details = document.getElementById('form-details').value.trim();
-  if (!targetDept) {
-    alert(`يرجى اختيار المصلحة المرسل إليها الـ${submissionKind} قبل الإرسال.`);
-    document.getElementById('form-target-dept')?.focus();
-    return;
-  }
   if (!details) { alert(`يرجى كتابة الشرح الدقيق للـ${submissionKind} قبل الإرسال.`); return; }
   const btn = document.getElementById('sendBtn');
   // منع الضغط المتكرر/المزدوج على الزر أثناء المعالجة (يسبب إحساساً بعدم السلاسة وإرسالاً مكرراً)
@@ -6587,11 +6643,15 @@ function processSendFromCenter(btn, details, originalBtnHtml) {
     const priority = document.getElementById('form-priority').value;
     const reporter = document.getElementById('form-reporter').value.trim() || "غير محدد";
     const targetDeptId = document.getElementById('form-target-dept').value;
-    if (!targetDeptId) throw new Error('يجب اختيار المصلحة المرسل إليها قبل الإرسال');
     const center = getCenterName();
     const code = generateRefCode();
-    // التوجيه يتم حصراً إلى المصلحة التي اختارها المرسل يدوياً
-    const deptId = targetDeptId;
+
+    // استخدام المصلحة التي اختارها المستخدم، أو البحث عن المصلحة المناسبة حسب التصنيف
+    let deptId = targetDeptId;
+    if (!deptId) {
+      const dept = getDepartmentForType(type);
+      deptId = dept ? dept.id : '';
+    }
 
     const attachments = [];
     if (pendingCenterFile) {
@@ -9915,10 +9975,11 @@ function logout() {
     document.getElementById('loginError').style.display = 'none';
     if (currentRole === 'directorate') { stopInterDirectorates(); }
     stopManagerNotesListener();
+    stopEmployeeListeners();
     currentRole = null;
     isWilayaManager = false;
     currentDepartment = null;
-    applyTickerPermissions();
+    currentEmployee = null;
     localStorage.removeItem(LS_KEYS.remember);
     clearSession();
     document.getElementById('loginUser').value = '';
@@ -10577,7 +10638,627 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1b3cfd3d884b6d4',t:'MTc4NDA2NjU0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1bb90be5ac9b6ce',t:'MTc4NDE0Nzg0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c393f468de336f',t:'MTc4NDIzMTg2Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c3cff62ffe336f',t:'MTc4NDIzNDMyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c3f095ee55b6bf',t:'MTc4NDIzNTY2MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><!-- زر إداري مخفي (للمديرية) لفتح لوحة تعديل الشريط -->
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c3cff62ffe336f',t:'MTc4NDIzNDMyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1c3f095ee55b6bf',t:'MTc4NDIzNTY2MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<!-- ================================================================== -->
+<!-- 🆕 وحدة الموظفين + استقبال الشكاوي (عامل/أستاذ/إداري ← المدير الولائي) -->
+<!-- ================================================================== -->
+<!-- emp_module_loaded_marker -->
+<style>
+.emp-layout { display:grid; grid-template-columns: 0.85fr 1.15fr; gap:18px; }
+.emp-fields-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.emp-fields-grid .form-field { margin:0; }
+.emp-fields-grid .full { grid-column:1/-1; }
+.emp-pass-row { display:flex; gap:8px; align-items:center; }
+.emp-pass-row input { flex:1; font-weight:800; color:var(--algeria-green); }
+.emp-list-head { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+.emp-filter-row { display:flex; gap:8px; flex-wrap:wrap; }
+.emp-filter-row select, .emp-filter-row input { padding:10px 14px; border:2px solid var(--border); border-radius:11px; background:var(--input-bg); color:var(--text); font-family:inherit; font-size:15px; }
+.emp-filter-row input { min-width:180px; }
+.emp-list-body { max-height:640px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
+.emp-card { display:flex; justify-content:space-between; align-items:center; gap:14px; background:var(--bg-card-2); border:1px solid var(--border); border-radius:16px; padding:16px 18px; transition:var(--transition); }
+.emp-card:hover { border-color:var(--algeria-green); transform:translateY(-2px); box-shadow:var(--shadow-light); }
+.emp-card-main { display:flex; align-items:center; gap:14px; flex:1; min-width:0; }
+.emp-avatar { width:48px; height:48px; border-radius:50%; background:var(--grad-brand); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:20px; flex-shrink:0; }
+.emp-card-info { min-width:0; flex:1; }
+.emp-card-name { font-size:17px; font-weight:800; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.emp-card-meta { display:flex; flex-wrap:wrap; gap:14px; margin-top:6px; font-size:13px; color:var(--text-dim); font-weight:700; }
+.emp-card-meta i { color:var(--algeria-green); margin-left:4px; }
+.emp-pass-box { margin-top:8px; font-size:14px; font-weight:800; color:var(--text-dim); display:flex; align-items:center; gap:6px; }
+.emp-pass-box code { background:var(--bg-card); border:1px dashed var(--algeria-green); color:var(--algeria-green); padding:2px 10px; border-radius:8px; font-family:'Courier New',monospace; font-size:16px; letter-spacing:1px; direction:ltr; }
+.emp-card-actions { display:flex; flex-direction:column; gap:8px; flex-shrink:0; }
+.emp-cat-badge { font-size:12px; font-weight:800; padding:3px 12px; border-radius:99px; }
+.emp-cat-badge.cat-worker { background:rgba(0,122,61,0.12); color:var(--algeria-green); }
+.emp-cat-badge.cat-teacher { background:rgba(212,175,55,0.16); color:#8a6c0a; }
+.emp-cat-badge.cat-admin { background:rgba(0,56,142,0.12); color:#003b8e; }
+
+.emp-info-banner { background:linear-gradient(135deg,rgba(0,122,61,0.08),var(--bg-card-2)); border:1px solid var(--border); border-radius:18px; padding:18px 22px; margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr; gap:10px 24px; }
+.eib-row { font-size:16px; display:flex; gap:8px; align-items:center; }
+.eib-row span { color:var(--text-dim); font-weight:700; }
+.eib-row strong { color:var(--text); }
+
+.cr-card { margin-bottom:16px; border-right:5px solid var(--algeria-red); }
+.cr-card[data-kind="إنشغال"] { border-right-color:var(--algeria-green); }
+.cr-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
+.cr-head-left { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.cr-head-right { display:flex; align-items:center; gap:10px; }
+.cr-code { font-family:'Courier New',monospace; font-weight:900; color:var(--algeria-green); background:var(--bg-card-2); padding:3px 10px; border-radius:8px; font-size:14px; }
+.cr-time-top { font-size:13px; color:var(--text-dim); font-weight:700; }
+.cr-sender-info { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:6px 16px; background:var(--bg-card-2); border:1px solid var(--border); border-radius:12px; padding:12px 16px; margin-bottom:10px; font-size:14px; }
+.cr-sender-info i { color:var(--algeria-green); margin-left:4px; }
+.cr-subject { font-size:18px; font-weight:900; color:var(--text); margin-bottom:6px; }
+.cr-details { font-size:16px; line-height:1.9; color:var(--text); white-space:pre-wrap; background:var(--bg-card-2); border-radius:12px; padding:14px 16px; margin-bottom:12px; }
+.cr-thread { display:flex; flex-direction:column; gap:10px; max-height:340px; overflow-y:auto; background:var(--bg-card-2); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:12px; }
+.cr-empty { text-align:center; color:var(--text-dim); font-size:14px; padding:14px; }
+.cr-bubble { max-width:82%; padding:11px 15px; border-radius:16px; line-height:1.8; font-size:15px; word-break:break-word; white-space:pre-wrap; }
+.cr-from-manager { align-self:flex-start; background:linear-gradient(135deg,rgba(224,27,63,0.10),var(--bg-card)); border:1px solid rgba(224,27,63,0.25); border-bottom-right-radius:5px; }
+.cr-from-emp { align-self:flex-end; background:var(--grad-brand-dark); color:#fff; border-bottom-left-radius:5px; }
+.cr-from-emp .cr-sender { color:var(--gold-light); }
+.cr-from-emp .cr-time { color:rgba(255,255,255,0.6); }
+.cr-sender { display:block; font-size:12px; font-weight:900; margin-bottom:3px; color:var(--algeria-red); }
+.cr-text { font-size:15px; }
+.cr-time { display:block; font-size:11px; opacity:0.65; margin-top:4px; }
+.cr-reply-row { display:flex; gap:8px; align-items:center; }
+.cr-reply-row input { flex:1; padding:13px 18px; border:2px solid var(--border); border-radius:14px; background:var(--input-bg); color:var(--text); font-family:inherit; font-size:16px; }
+.cr-reply-row input:focus { outline:none; border-color:var(--algeria-green); }
+.cr-status-row { display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
+.cr-status-row label { font-weight:800; font-size:15px; color:var(--text-dim); }
+@media(max-width:900px){ .emp-layout{ grid-template-columns:1fr; } .emp-fields-grid{ grid-template-columns:1fr; } .emp-info-banner{ grid-template-columns:1fr; } }
+</style>
+
+<script>
+/* ===================== الحالة العامة للوحدة ===================== */
+let employeesList = [];                 // موظفو المؤسسة الحالية
+let employeesListener = null;
+let employeeComplaints = [];            // كل شكاوي الولاية (للموظف: يُرشّح ما يخصه)
+let employeeComplaintsListener = null;
+let complaintsForReception = [];        // شكاوي الاستقبال لدى المدير الولائي
+let complaintsReceptionListener = null;
+let _complaintsReceptionInitialized = false;
+let _seenComplaintKeys = new Set();
+
+/* ===================== مساعدات ===================== */
+function _empInstKey(wilaya, name) {
+  return 'w' + wilaya + '_' + String(name || '').replace(/[.#$\[\]\/]/g, '_');
+}
+function employeesRef() {
+  return database.ref('data/employees/' + _empInstKey(selectedWilaya, getCenterName()));
+}
+function empComplaintsWilayaRef() {
+  return database.ref('data/employeeComplaints/w' + selectedWilaya);
+}
+function empComplaintRef(key) {
+  return database.ref('data/employeeComplaints/w' + selectedWilaya + '/' + key);
+}
+function empCategoryLabel(cat) {
+  return cat === 'admin' ? 'إداري' : (cat === 'teacher' ? 'أستاذ' : (cat === 'worker' ? 'عامل' : 'موظف'));
+}
+function generateEmployeePassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+}
+function _uniqueEmpPassword(excludeId) {
+  let p = generateEmployeePassword(), tries = 0;
+  while (employeesList.some(e => e.id !== excludeId && e.password === p)) { p = generateEmployeePassword(); if (++tries > 30) break; }
+  return p;
+}
+
+/* ===================== اختيار المؤسسة في شاشة الدخول ===================== */
+function populateEmployeeInstSelect() {
+  const select = document.getElementById('loginEmployeeInst');
+  if (!select) return;
+  select.innerHTML = '<option value="">-- اختر المؤسسة --</option>';
+  (INSTITUTIONS_DATA || []).forEach(function (inst) {
+    select.innerHTML += '<option value="' + escapeHtml(inst.name) + '">' + escapeHtml(inst.name) + '</option>';
+  });
+  filterEmployeeInstSelect();
+}
+function filterEmployeeInstSelect() {
+  const search = (document.getElementById('loginEmployeeSearch')?.value || '').trim().toLowerCase();
+  const select = document.getElementById('loginEmployeeInst');
+  if (!select) return;
+  const options = select.querySelectorAll('option');
+  for (let i = 1; i < options.length; i++) {
+    options[i].style.display = options[i].textContent.toLowerCase().includes(search) ? '' : 'none';
+  }
+  let visibleCount = 0, visibleValue = '';
+  for (let i = 1; i < options.length; i++) {
+    if (options[i].style.display !== 'none') { visibleCount++; visibleValue = options[i].value; }
+  }
+  if (visibleCount === 1 && search.length > 0) select.value = visibleValue;
+}
+
+/* ===================== التحقق من دخول الموظف ===================== */
+function verifyEmployeeLogin(inst, pass, cb) {
+  if (!inst || !pass) { cb(false, null); return; }
+  database.ref('data/employees/' + _empInstKey(selectedWilaya, inst)).once('value').then(function (s) {
+    const arr = s.val() || [];
+    const emp = (Array.isArray(arr) ? arr : []).find(function (e) { return e && e.password === pass; });
+    cb(!!emp, emp || null);
+  }).catch(function () { cb(false, null); });
+}
+
+/* ===================== إدارة الموظفين داخل المؤسسة ===================== */
+function renderEmployeesPage() {
+  const cn = document.getElementById('empMgrCenterName');
+  if (cn) cn.textContent = getCenterName();
+  startEmployeesListener();
+  const pw = document.getElementById('empPassword');
+  if (pw && !pw.value) pw.value = generateEmployeePassword();
+  renderEmployeesList();
+}
+function startEmployeesListener() {
+  if (employeesListener) { employeesListener.off(); }
+  employeesListener = employeesRef();
+  employeesListener.on('value', function (s) {
+    const v = s.val();
+    employeesList = Array.isArray(v) ? v : [];
+    renderEmployeesList();
+  });
+}
+function regenerateEmpPassPreview() {
+  const pw = document.getElementById('empPassword');
+  if (pw) pw.value = _uniqueEmpPassword(null);
+}
+function addEmployee() {
+  if (currentRole !== 'center') { showToast('غير مسموح', 'هذه الخاصية متاحة للمؤسسة فقط'); return; }
+  const category = document.getElementById('empCategory').value;
+  const firstName = (document.getElementById('empFirstName').value || '').trim();
+  const lastName = (document.getElementById('empLastName').value || '').trim();
+  const birthDate = (document.getElementById('empBirthDate').value || '').trim();
+  const birthPlace = (document.getElementById('empBirthPlace').value || '').trim();
+  const rank = (document.getElementById('empRank').value || '').trim();
+  const job = (document.getElementById('empJob').value || '').trim();
+  let password = (document.getElementById('empPassword').value || '').trim();
+  if (!firstName || !lastName) { showToast('⚠️ بيانات ناقصة', 'الاسم واللقب مطلوبان'); return; }
+  if (!password) password = generateEmployeePassword();
+  while (employeesList.some(function (e) { return e.password === password; })) password = generateEmployeePassword();
+  const emp = {
+    id: 'EMP' + Date.now().toString(36) + Math.floor(Math.random() * 1000),
+    category: category, firstName: firstName, lastName: lastName,
+    birthDate: birthDate, birthPlace: birthPlace, rank: rank, job: job, password: password,
+    createdAt: firebase.database.ServerValue.TIMESTAMP
+  };
+  employeesList.push(emp);
+  employeesRef().set(employeesList).then(function () {
+    showToast('✅ تمت الإضافة', 'تم تسجيل ' + empCategoryLabel(category) + ': ' + firstName + ' ' + lastName + ' — كلمة السر: ' + password);
+    ['empFirstName', 'empLastName', 'empBirthDate', 'empBirthPlace', 'empRank', 'empJob'].forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('empPassword').value = generateEmployeePassword();
+    renderEmployeesList();
+  }).catch(function (e) { showToast('❌ خطأ', 'تعذر الحفظ: ' + (e.message || '')); });
+}
+function deleteEmployee(id) {
+  if (!confirm('هل أنت متأكد من حذف هذا الموظف نهائياً؟')) return;
+  employeesList = employeesList.filter(function (e) { return e.id !== id; });
+  employeesRef().set(employeesList).then(function () {
+    showToast('🗑️ تم الحذف', 'تم حذف الموظف');
+    renderEmployeesList();
+  });
+}
+function regenEmployeePassword(id) {
+  const emp = employeesList.find(function (e) { return e.id === id; });
+  if (!emp) return;
+  const np = _uniqueEmpPassword(id);
+  emp.password = np;
+  employeesRef().set(employeesList).then(function () {
+    showToast('🔑 كلمة سر جديدة', 'كلمة السر الجديدة: ' + np);
+  });
+}
+function renderEmployeesList() {
+  const box = document.getElementById('employeesList');
+  if (!box) return;
+  const cat = document.getElementById('empFilterCat') ? document.getElementById('empFilterCat').value : 'all';
+  const q = (document.getElementById('empSearch') ? document.getElementById('empSearch').value : '').trim().toLowerCase();
+  let list = employeesList.slice().sort(function (a, b) { return (a.firstName || '').localeCompare(b.firstName || ''); });
+  if (cat !== 'all') list = list.filter(function (e) { return e.category === cat; });
+  if (q) list = list.filter(function (e) { return ((e.firstName || '') + ' ' + (e.lastName || '')).toLowerCase().indexOf(q) !== -1; });
+  const cnt = document.getElementById('empCount');
+  if (cnt) cnt.textContent = '(' + employeesList.length + ' موظف)';
+  if (!list.length) {
+    box.innerHTML = '<div class="empty-msg">لا يوجد موظفون مطابقون. أضف موظفاً جديداً من النموذج المجاور.</div>';
+    return;
+  }
+  box.innerHTML = list.map(function (e) {
+    const fullName = (e.firstName || '') + ' ' + (e.lastName || '');
+    const meta = [];
+    if (e.birthDate || e.birthPlace) meta.push('<span><i class="fa-solid fa-cake-candles"></i> ' + escapeHtml(e.birthDate || '—') + (e.birthPlace ? ' · ' + escapeHtml(e.birthPlace) : '') + '</span>');
+    if (e.rank) meta.push('<span><i class="fa-solid fa-medal"></i> ' + escapeHtml(e.rank) + '</span>');
+    if (e.job) meta.push('<span><i class="fa-solid fa-briefcase"></i> ' + escapeHtml(e.job) + '</span>');
+    return '<div class="emp-card">' +
+      '<div class="emp-card-main">' +
+        '<div class="emp-avatar">' + escapeHtml((e.firstName || '?').charAt(0)) + '</div>' +
+        '<div class="emp-card-info">' +
+          '<div class="emp-card-name">' + escapeHtml(fullName) + ' <span class="emp-cat-badge cat-' + (e.category || 'worker') + '">' + empCategoryLabel(e.category) + '</span></div>' +
+          '<div class="emp-card-meta">' + meta.join('') + '</div>' +
+          '<div class="emp-pass-box"><i class="fa-solid fa-key"></i> كلمة السر: <code>' + escapeHtml(e.password || '') + '</code></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="emp-card-actions">' +
+        '<button class="btn-mini" onclick="regenEmployeePassword(\'' + e.id + '\')" title="توليد كلمة سر جديدة"><i class="fa-solid fa-rotate"></i> كلمة سر جديدة</button>' +
+        '<button class="btn-mini danger" onclick="deleteEmployee(\'' + e.id + '\')" title="حذف"><i class="fa-solid fa-trash"></i></button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ===================== الموظف: إرسال شكوى/إنشغال ===================== */
+function renderEmployeeSendPage() {
+  const c = document.getElementById('employeeSendContainer');
+  if (!c) return;
+  const emp = currentEmployee || {};
+  const fullName = ((emp.firstName || '') + ' ' + (emp.lastName || '')).trim();
+  c.innerHTML =
+    '<div class="emp-info-banner">' +
+      '<div class="eib-row"><span><i class="fa-solid fa-user"></i> الاسم واللقب:</span><strong>' + escapeHtml(fullName) + '</strong></div>' +
+      '<div class="eib-row"><span><i class="fa-solid fa-id-badge"></i> الفئة:</span><strong>' + empCategoryLabel(emp.category) + '</strong></div>' +
+      (emp.rank ? '<div class="eib-row"><span><i class="fa-solid fa-medal"></i> الرتبة:</span><strong>' + escapeHtml(emp.rank) + '</strong></div>' : '') +
+      (emp.job ? '<div class="eib-row"><span><i class="fa-solid fa-briefcase"></i> الوظيفة:</span><strong>' + escapeHtml(emp.job) + '</strong></div>' : '') +
+      '<div class="eib-row"><span><i class="fa-solid fa-building"></i> المؤسسة:</span><strong>' + escapeHtml(getCenterName()) + '</strong></div>' +
+      '<div class="eib-row"><span><i class="fa-solid fa-location-dot"></i> تُوجَّه إلى:</span><strong style="color:var(--algeria-red)">المدير الولائي — ' + escapeHtml(getWilayaName(selectedWilaya)) + '</strong></div>' +
+    '</div>' +
+    '<div class="form-card">' +
+      '<div class="form-grid">' +
+        '<div class="form-field"><label>طبيعة الرسالة</label><select id="empKind"><option value="شكوى">شكوى</option><option value="إنشغال">إنشغال</option></select></div>' +
+        '<div class="form-field"><label>درجة الأهمية</label><select id="empPriority"><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select></div>' +
+        '<div class="form-field full"><label>الموضوع</label><input type="text" id="empSubject" placeholder="عنوان مختصر للشكوى أو الإنشغال..."></div>' +
+        '<div class="form-field full"><label>التفاصيل الكاملة</label><textarea id="empDetails" placeholder="اشرح موضوعك بالتفصيل..."></textarea></div>' +
+      '</div>' +
+      '<button class="btn-gold" style="width:100%;justify-content:center;margin-top:14px;" onclick="sendEmployeeComplaint()"><i class="fa-solid fa-paper-plane"></i> إرسال إلى المدير الولائي</button>' +
+    '</div>';
+}
+function sendEmployeeComplaint() {
+  const emp = currentEmployee || {};
+  const kind = document.getElementById('empKind').value;
+  const priority = document.getElementById('empPriority').value;
+  const subject = (document.getElementById('empSubject').value || '').trim();
+  const details = (document.getElementById('empDetails').value || '').trim();
+  if (!subject) { showToast('⚠️ بيانات ناقصة', 'يرجى كتابة الموضوع'); return; }
+  if (!details) { showToast('⚠️ بيانات ناقصة', 'يرجى كتابة التفاصيل'); return; }
+  const fullName = ((emp.firstName || '') + ' ' + (emp.lastName || '')).trim();
+  const d = new Date();
+  const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+  const code = 'EMP-' + selectedWilaya + '-' + stamp + '-' + String(Math.floor(Math.random() * 9000) + 1000);
+  const obj = {
+    code: code, wilaya: selectedWilaya, center: getCenterName(),
+    employeeId: emp.id || '', employeeName: fullName, employeeCategory: emp.category || '',
+    rank: emp.rank || '', job: emp.job || '',
+    kind: kind, priority: priority, subject: subject, details: details, status: 'جديد',
+    createdAt: firebase.database.ServerValue.TIMESTAMP,
+    updatedAt: firebase.database.ServerValue.TIMESTAMP,
+    thread: [{ from: 'employee', sender: fullName, text: details, time: firebase.database.ServerValue.TIMESTAMP }]
+  };
+  var newRef = empComplaintsWilayaRef().push(obj);
+  newRef.then(function () {
+    // ✅ تأكيد التسليم في الخادم بالقراءة المباشرة للمفتاح المُنشأ
+    newRef.once('value').then(function (snap) {
+      if (snap.exists()) {
+        showToast('✅ تم التسليم فعلياً', 'وصلت ' + kind + ' إلى المدير الولائي — الرمز: ' + code);
+      } else {
+        showToast('⚠️ تنبيه', 'لم يُسجَّل الإرسال في الخادم. راجع قواعد أمان Firebase للمسار data/employeeComplaints');
+      }
+    }).catch(function () {
+      showToast('✅ تم الإرسال', 'تم إرسال ' + kind + ' إلى المدير الولائي');
+    });
+    document.getElementById('empSubject').value = '';
+    document.getElementById('empDetails').value = '';
+    renderEmployeeMyComplaints();
+  }).catch(function (e) {
+    showToast('❌ خطأ في الإرسال', 'تعذر الإرسال — تحقق من الاتصال وقواعد أمان Firebase للمسار data/employeeComplaints' + (e && e.code ? ' (' + e.code + ')' : ''));
+  });
+}
+
+/* ===================== الموظف: شكاواي المرسلة ===================== */
+function renderEmployeeMyComplaints() {
+  const c = document.getElementById('employeeMyComplaintsContainer');
+  if (!c) return;
+  const emp = currentEmployee || {};
+  const fullName = ((emp.firstName || '') + ' ' + (emp.lastName || '')).trim();
+  const myCenter = getCenterName();
+  function isMine(x) {
+    return (emp.id && x.employeeId === emp.id)
+        || (x.center === myCenter && x.employeeName === fullName)
+        || (x.center === myCenter && !x.employeeId);
+  }
+  function paint() {
+    const mine = employeeComplaints.filter(isMine).sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+    let withReply = 0;
+    mine.forEach(function (x) { const t = x.thread || []; if (t.length && t[t.length - 1].from === 'manager') withReply++; });
+    const b = document.getElementById('navBadgeEmployeeMine');
+    if (b) { b.textContent = withReply; b.style.display = withReply > 0 ? 'inline-flex' : 'none'; }
+    if (!mine.length) {
+      c.innerHTML = '<div class="panel" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(0,122,61,0.08),var(--bg-card-2));"><h3 style="margin:0;font-size:18px;color:var(--algeria-green);"><i class="fa-solid fa-comments"></i> متابعة ردود المدير الولائي</h3><p style="margin:8px 0 0;color:var(--text-dim);font-size:15px;">من هنا تتابع ردّ المدير الولائي على كل شكوى أو إنشغال ترسله.</p></div><div class="empty-msg">لا توجد شكاوى أو إنشغالات مرسلة بعد.</div>';
+      return;
+    }
+    c.innerHTML = '<div class="panel" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(0,122,61,0.08),var(--bg-card-2));display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;"><div><h3 style="margin:0;font-size:18px;color:var(--algeria-green);"><i class="fa-solid fa-comments"></i> متابعة ردود المدير الولائي</h3><p style="margin:6px 0 0;color:var(--text-dim);font-size:14px;">ردود المدير الولائي تظهر باللون الأحمر تحت كل شكوى.</p></div><button class="btn-mini" onclick="renderEmployeeMyComplaints()"><i class="fa-solid fa-rotate"></i> تحديث</button></div>' + mine.map(function (x) { return complaintCardHtml(x, false); }).join('');
+  }
+  if (!employeeComplaints.length) {
+    c.innerHTML = '<div class="empty-msg"><i class="fa-solid fa-spinner fa-spin" style="font-size:40px;display:block;margin-bottom:12px;opacity:0.4"></i>جارٍ جلب شكاواك...</div>';
+    empComplaintsWilayaRef().once('value').then(function (s) {
+      const raw = s.val() || {};
+      employeeComplaints = Object.keys(raw).map(function (k) { const v = raw[k]; v._key = k; return v; });
+      paint();
+    }).catch(function () { paint(); });
+  } else { paint(); }
+}
+function employeeReplyComplaint(key) {
+  const inp = document.getElementById('empreply_' + key);
+  const text = (inp && inp.value ? inp.value : '').trim();
+  if (!text) return;
+  const c = employeeComplaints.find(function (x) { return x._key === key; });
+  if (!c) return;
+  const emp = currentEmployee || {};
+  const fullName = ((emp.firstName || '') + ' ' + (emp.lastName || '')).trim();
+  const thread = (c.thread || []).slice();
+  thread.push({ from: 'employee', sender: fullName, text: text, time: firebase.database.ServerValue.TIMESTAMP });
+  empComplaintRef(key).update({ thread: thread, updatedAt: firebase.database.ServerValue.TIMESTAMP }).then(function () {
+    showToast('✅ تم الإرسال', 'تمت إضافة متابعتك');
+  });
+}
+
+/* ===================== المدير الولائي: استقبال الشكاوي ===================== */
+function startComplaintsReceptionListener() {
+  if (complaintsReceptionListener) return;
+  complaintsReceptionListener = empComplaintsWilayaRef();
+  complaintsReceptionListener.on('value', function (s) {
+    const raw = s.val() || {};
+    complaintsForReception = Object.keys(raw).map(function (k) { const v = raw[k]; v._key = k; return v; })
+      .sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+    const nouv = complaintsForReception.filter(function (c) { return c.status === 'جديد'; }).length;
+    const b = document.getElementById('navBadgeComplaints');
+    if (b) { b.textContent = nouv; b.style.display = nouv > 0 ? 'inline-flex' : 'none'; }
+    if (!_complaintsReceptionInitialized) {
+      _complaintsReceptionInitialized = true;
+      complaintsForReception.forEach(function (c) { _seenComplaintKeys.add(c._key); });
+      // تنبيه فوري عند الدخول إن وُجدت شكاوي جديدة لم تُعاين بعد
+      var freshOnLoad = complaintsForReception.filter(function (c) { return c.status === 'جديد'; });
+      if (freshOnLoad.length) { setTimeout(function () { showComplaintArrivalPopup(freshOnLoad[0]); }, 800); }
+    } else {
+      const now = Date.now();
+      complaintsForReception.forEach(function (c) {
+        if (_seenComplaintKeys.has(c._key)) return;
+        _seenComplaintKeys.add(c._key);
+        const age = now - (c.createdAt || 0);
+        if (age > 120000) return;
+        showComplaintArrivalPopup(c);
+        showToast('📩 ' + (c.kind || 'شكوى') + ' جديد', (c.employeeName || 'موظف') + ' — ' + (c.center || '') + (c.subject ? ' · ' + c.subject : ''));
+        if (!isMuted) playNotificationSound();
+      });
+    }
+    if (document.getElementById('page-complaints-reception') && !document.getElementById('page-complaints-reception').classList.contains('hidden')) {
+      renderComplaintsReception();
+    }
+  });
+}
+function renderComplaintsReception() {
+  const box = document.getElementById('complaintsReceptionList');
+  if (!box) return;
+  // 🔁 إن كانت القائمة فارغة، نحاول جلب البيانات مباشرة من الخادم (ضمان الوصول)
+  if (!complaintsForReception.length) {
+    box.innerHTML = '<div class="empty-msg"><i class="fa-solid fa-spinner fa-spin" style="font-size:40px;display:block;margin-bottom:12px;opacity:0.4"></i>جارٍ جلب الشكاوي من الخادم...</div>';
+    empComplaintsWilayaRef().once('value').then(function (s) {
+      const raw = s.val() || {};
+      complaintsForReception = Object.keys(raw).map(function (k) { const v = raw[k]; v._key = k; return v; })
+        .sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+      _complaintsReceptionInitialized = true;
+      complaintsForReception.forEach(function (c) { _seenComplaintKeys.add(c._key); });
+      renderComplaintsReceptionNow(box);
+    }).catch(function () { box.innerHTML = '<div class="empty-msg">تعذر جلب الشكاوي — تحقق من اتصال Firebase وقواعد الأمان للمسار data/employeeComplaints.</div>'; });
+    return;
+  }
+  renderComplaintsReceptionNow(box);
+}
+function renderComplaintsReceptionNow(box) {
+  const q = (document.getElementById('complaints-search') ? document.getElementById('complaints-search').value : '').trim().toLowerCase();
+  const st = document.getElementById('complaints-status') ? document.getElementById('complaints-status').value : '';
+  const kd = document.getElementById('complaints-kind') ? document.getElementById('complaints-kind').value : '';
+  let list = complaintsForReception.slice();
+  if (st) list = list.filter(function (c) { return c.status === st; });
+  if (kd) list = list.filter(function (c) { return c.kind === kd; });
+  if (q) list = list.filter(function (c) { return ((c.employeeName || '') + ' ' + (c.center || '') + ' ' + (c.subject || '') + ' ' + (c.code || '')).toLowerCase().indexOf(q) !== -1; });
+  if (!list.length) { box.innerHTML = '<div class="empty-msg">لا توجد شكاوي أو إنشغالات مطابقة.</div>'; return; }
+  box.innerHTML = list.map(function (c) { return complaintCardHtml(c, true); }).join('');
+}
+function forceRefreshComplaints() {
+  startComplaintsReceptionListener();
+  complaintsForReception = [];
+  renderComplaintsReception();
+}
+function managerReplyComplaint(key) {
+  const inp = document.getElementById('crreply_' + key);
+  const text = (inp && inp.value ? inp.value : '').trim();
+  if (!text) return;
+  const c = complaintsForReception.find(function (x) { return x._key === key; });
+  if (!c) return;
+  const thread = (c.thread || []).slice();
+  thread.push({ from: 'manager', sender: 'المدير الولائي', text: text, time: firebase.database.ServerValue.TIMESTAMP });
+  const newStatus = c.status === 'جديد' ? 'قيد المعالجة' : c.status;
+  empComplaintRef(key).update({ thread: thread, status: newStatus, updatedAt: firebase.database.ServerValue.TIMESTAMP }).then(function () {
+    showToast('✅ تم الرد', 'تم إرسال ردك إلى الموظف');
+  });
+}
+function setComplaintStatus(key, status) {
+  const c = complaintsForReception.find(function (x) { return x._key === key; });
+  if (!c) return;
+  const thread = (c.thread || []).slice();
+  thread.push({ from: 'manager', sender: 'النظام', text: 'تم تحديث الحالة إلى: ' + status, time: firebase.database.ServerValue.TIMESTAMP });
+  empComplaintRef(key).update({ status: status, thread: thread, updatedAt: firebase.database.ServerValue.TIMESTAMP }).then(function () {
+    showToast('🔄 تم التحديث', 'الحالة: ' + status);
+  });
+}
+
+/* ===================== بطاقة شكوى مشتركة ===================== */
+function complaintStatusBadge(s) {
+  if (s === 'قيد المعالجة') return '<span class="pill pill-medium">قيد المعالجة</span>';
+  if (s === 'تمت المعالجة') return '<span class="status-badge resolved"><i class="fa-solid fa-circle-check"></i> تمت المعالجة</span>';
+  if (s === 'مغلق') return '<span class="pill pill-normal">مغلق</span>';
+  return '<span class="status-badge pending"><i class="fa-solid fa-circle-dot"></i> جديد</span>';
+}
+function complaintCardHtml(x, isManager) {
+  const time = x.createdAt ? new Date(x.createdAt).toLocaleString('ar-DZ', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+  const kindPill = x.kind === 'شكوى' ? '<span class="pill pill-urgent">شكوى</span>' : '<span class="pill pill-normal">إنشغال</span>';
+  const prio = x.priority === 'مستعجل جداً' ? '<span class="pill pill-urgent">مستعجل جداً 🔴</span>'
+    : (x.priority === 'متوسط' ? '<span class="pill pill-medium">متوسط 🟡</span>' : '<span class="pill pill-normal">عادي 🟢</span>');
+  const thread = (x.thread || []).map(function (m) {
+    const mt = m.time ? new Date(m.time).toLocaleString('ar-DZ', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+    if (m.from === 'manager') {
+      return '<div class="cr-bubble cr-from-manager"><span class="cr-sender"><i class="fa-solid fa-user-tie"></i> ' + escapeHtml(m.sender || 'المدير الولائي') + '</span><div class="cr-text">' + escapeHtml(m.text || '') + '</div><span class="cr-time">' + mt + '</span></div>';
+    }
+    return '<div class="cr-bubble cr-from-emp"><span class="cr-sender"><i class="fa-solid fa-user"></i> ' + escapeHtml(m.sender || 'الموظف') + '</span><div class="cr-text">' + escapeHtml(m.text || '') + '</div><span class="cr-time">' + mt + '</span></div>';
+  }).join('');
+  const replyBox = isManager
+    ? '<div class="cr-reply-row"><input type="text" id="crreply_' + x._key + '" placeholder="اكتب ردك على هذه الشكوى..." onkeydown="if(event.key===\'Enter\')managerReplyComplaint(\'' + x._key + '\')"><button class="btn-mini success" onclick="managerReplyComplaint(\'' + x._key + '\')"><i class="fa-solid fa-paper-plane"></i> رد</button></div>' +
+      '<div class="cr-status-row"><label>تحديث الحالة:</label><select class="status-select" onchange="setComplaintStatus(\'' + x._key + '\', this.value)"><option ' + (x.status === 'جديد' ? 'selected' : '') + '>جديد</option><option ' + (x.status === 'قيد المعالجة' ? 'selected' : '') + '>قيد المعالجة</option><option ' + (x.status === 'تمت المعالجة' ? 'selected' : '') + '>تمت المعالجة</option><option ' + (x.status === 'مغلق' ? 'selected' : '') + '>مغلق</option></select><button class="btn-mini danger" onclick="deleteComplaint(\'' + x._key + '\')" title="حذف الشكوى نهائياً"><i class="fa-solid fa-trash"></i> حذف الشكوى</button></div>'
+    : '<div class="cr-reply-row"><input type="text" id="empreply_' + x._key + '" placeholder="أضف معلومات أو متابعة..." onkeydown="if(event.key===\'Enter\')employeeReplyComplaint(\'' + x._key + '\')"><button class="btn-mini" onclick="employeeReplyComplaint(\'' + x._key + '\')"><i class="fa-solid fa-paper-plane"></i> إرسال</button></div>';
+  const senderInfo = isManager
+    ? '<div class="cr-sender-info">' +
+        '<div><i class="fa-solid fa-user"></i> <strong>' + escapeHtml(x.employeeName || 'موظف') + '</strong> <span class="emp-cat-badge cat-' + (x.employeeCategory || 'worker') + '">' + empCategoryLabel(x.employeeCategory) + '</span></div>' +
+        '<div><i class="fa-solid fa-building"></i> ' + escapeHtml(x.center || '') + '</div>' +
+        (x.rank ? '<div><i class="fa-solid fa-medal"></i> ' + escapeHtml(x.rank) + '</div>' : '') +
+        (x.job ? '<div><i class="fa-solid fa-briefcase"></i> ' + escapeHtml(x.job) + '</div>' : '') +
+      '</div>'
+    : '';
+  return '<div class="form-card cr-card" data-kind="' + escapeHtml(x.kind || '') + '">' +
+    '<div class="cr-head">' +
+      '<div class="cr-head-left"><span class="cr-code">' + escapeHtml(x.code || '') + '</span> ' + kindPill + ' ' + prio + '</div>' +
+      '<div class="cr-head-right">' + complaintStatusBadge(x.status) + ' <span class="cr-time-top"><i class="fa-regular fa-clock"></i> ' + time + '</span></div>' +
+    '</div>' +
+    senderInfo +
+    '<div class="cr-subject"><i class="fa-solid fa-heading"></i> ' + escapeHtml(x.subject || '') + '</div>' +
+    '<div class="cr-details">' + escapeHtml(x.details || '') + '</div>' +
+    '<div class="cr-thread">' + (thread || '<div class="cr-empty">لا توجد محادثة بعد.</div>') + '</div>' +
+    replyBox +
+  '</div>';
+}
+
+/* ===================== الموظف: مستمع شكاوي الولاية ===================== */
+function startEmployeeComplaintsListener(force) {
+  if (force) {
+    // تحديث فوري بالقراءة المباشرة من الخادم
+    empComplaintsWilayaRef().once('value').then(function (s) {
+      const raw = s.val() || {};
+      employeeComplaints = Object.keys(raw).map(function (k) { const v = raw[k]; v._key = k; return v; });
+      renderEmployeeMyComplaints();
+    }).catch(function () {});
+  }
+  if (employeeComplaintsListener) return;
+  employeeComplaintsListener = empComplaintsWilayaRef();
+  employeeComplaintsListener.on('value', function (s) {
+    const raw = s.val() || {};
+    employeeComplaints = Object.keys(raw).map(function (k) { const v = raw[k]; v._key = k; return v; });
+    if (document.getElementById('page-employee-list') && !document.getElementById('page-employee-list').classList.contains('hidden')) {
+      renderEmployeeMyComplaints();
+    } else {
+      const emp = currentEmployee || {};
+      const withReply = employeeComplaints.filter(function (x) { return x.employeeId === emp.id && (x.thread || []).length && x.thread[x.thread.length - 1].from === 'manager'; }).length;
+      const b = document.getElementById('navBadgeEmployeeMine');
+      if (b) { b.textContent = withReply; b.style.display = withReply > 0 ? 'inline-flex' : 'none'; }
+    }
+  });
+}
+
+/* ===================== إيقاف كل المستمعين ===================== */
+function stopEmployeeListeners() {
+  if (employeesListener) { try { employeesListener.off(); } catch (e) {} employeesListener = null; }
+  if (employeeComplaintsListener) { try { employeeComplaintsListener.off(); } catch (e) {} employeeComplaintsListener = null; }
+  if (complaintsReceptionListener) { try { complaintsReceptionListener.off(); } catch (e) {} complaintsReceptionListener = null; }
+  employeesList = []; employeeComplaints = []; complaintsForReception = [];
+  _complaintsReceptionInitialized = false;
+}
+
+console.log('👥 وحدة الموظفين + استقبال الشكاوي محمّلة');
+</script>
+
+
+<!-- ============ 🔔 نافذة تنبيه الشكاوي + حذف الشكوى ============ -->
+<!-- complaint_popup_loaded_marker -->
+<style>
+.complaint-popup-overlay { position:fixed; inset:0; z-index:11500; background:rgba(6,10,18,0.55); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:20px; animation:cpOverlayIn .35s ease; }
+@keyframes cpOverlayIn { from{opacity:0} to{opacity:1} }
+.complaint-popup-card { position:relative; width:min(520px,95vw); background:var(--bg-card); border-radius:24px; overflow:hidden; box-shadow:0 24px 70px rgba(0,122,61,0.35); animation:cpCardIn .45s cubic-bezier(.34,1.56,.64,1); border:1px solid var(--border); }
+@keyframes cpCardIn { from{transform:scale(.85) translateY(20px);opacity:0} to{transform:none;opacity:1} }
+.cp-pop-head { background:linear-gradient(135deg,var(--algeria-green),var(--algeria-green-light)); color:#fff; padding:18px 22px; display:flex; align-items:center; gap:14px; }
+.cp-pop-icon { width:54px; height:54px; border-radius:50%; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; animation:cpPulse 1.6s infinite; }
+@keyframes cpPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.4)} 50%{box-shadow:0 0 0 12px rgba(255,255,255,0)} }
+.cp-pop-title { font-size:20px; font-weight:900; line-height:1.4; }
+.cp-pop-sub { font-size:13px; opacity:.92; margin-top:2px; }
+.cp-pop-body { padding:18px 22px 6px; }
+.cp-pop-row { font-size:15px; margin-bottom:7px; line-height:1.7; }
+.cp-pop-row span.cp-label { color:var(--text-dim); font-weight:700; margin-left:4px; }
+.cp-pop-msg { background:var(--bg-card-2); border-radius:12px; padding:12px 14px; font-size:15px; line-height:1.8; margin:10px 0 4px; white-space:pre-wrap; color:var(--text); }
+.cp-pop-actions { display:flex; gap:10px; padding:14px 22px 6px; flex-wrap:wrap; }
+.cp-pop-actions button { flex:1; min-width:150px; justify-content:center; }
+.cp-pop-close { position:absolute; top:12px; left:12px; width:34px; height:34px; border-radius:50%; border:1px solid rgba(255,255,255,.4); background:rgba(255,255,255,.15); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; }
+.cp-pop-close:hover { background:rgba(255,255,255,.3); }
+.cp-pop-count { text-align:center; font-size:12px; color:var(--text-dim); padding:0 22px 14px; }
+.cp-pop-count span { color:var(--algeria-red); font-weight:900; }
+@media(max-width:520px){ .cp-pop-actions button{ min-width:100%; } }
+</style>
+<script>
+/* 🗑️ حذف شكوى من طرف المدير الولائي */
+function deleteComplaint(key) {
+  if (!key) return;
+  if (!confirm('هل تريد حذف هذه الشكوى نهائياً؟ لن يتمكن الموظف من رؤيتها بعد الآن.')) return;
+  empComplaintRef(key).remove().then(function () {
+    showToast('🗑️ تم الحذف', 'تم حذف الشكوى نهائياً.');
+  }).catch(function (e) {
+    showToast('❌ تعذر الحذف', 'تحقق من قواعد أمان Firebase للمسار data/employeeComplaints' + (e && e.code ? ' (' + e.code + ')' : ''));
+  });
+}
+
+/* 🔔 نافذة منبثقة عند ورود شكوى/إنشغال جديد لدى المدير الولائي */
+let _complaintPopupTimer = null;
+function showComplaintArrivalPopup(c) {
+  closeComplaintArrivalPopup(true);
+  const kind = c.kind || 'شكوى';
+  const time = c.createdAt ? new Date(c.createdAt).toLocaleString('ar-DZ', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' }) : '';
+  const details = (c.details || '');
+  const overlay = document.createElement('div');
+  overlay.id = 'complaintPopupOverlay';
+  overlay.className = 'complaint-popup-overlay';
+  overlay.innerHTML =
+    '<div class="complaint-popup-card">' +
+      '<button class="cp-pop-close" onclick="closeComplaintArrivalPopup()" title="إغلاق"><i class="fa-solid fa-xmark"></i></button>' +
+      '<div class="cp-pop-head">' +
+        '<div class="cp-pop-icon"><i class="fa-solid fa-inbox"></i></div>' +
+        '<div><div class="cp-pop-title">📥 ' + escapeHtml(kind) + ' جديدة واردة</div>' +
+        '<div class="cp-pop-sub">من مؤسسة ' + escapeHtml(c.center || '') + (time ? ' — ' + escapeHtml(time) : '') + '</div></div>' +
+      '</div>' +
+      '<div class="cp-pop-body">' +
+        '<div class="cp-pop-row"><span class="cp-label">الاسم:</span> <strong>' + escapeHtml(c.employeeName || 'موظف') + '</strong> <span class="emp-cat-badge cat-' + (c.employeeCategory || 'worker') + '">' + empCategoryLabel(c.employeeCategory) + '</span></div>' +
+        (c.rank ? '<div class="cp-pop-row"><span class="cp-label">الرتبة:</span> ' + escapeHtml(c.rank) + '</div>' : '') +
+        (c.job ? '<div class="cp-pop-row"><span class="cp-label">الوظيفة:</span> ' + escapeHtml(c.job) + '</div>' : '') +
+        '<div class="cp-pop-row"><span class="cp-label">الموضوع:</span> <strong>' + escapeHtml(c.subject || '') + '</strong></div>' +
+        '<div class="cp-pop-msg">' + escapeHtml(details.slice(0, 320)) + (details.length > 320 ? '…' : '') + '</div>' +
+      '</div>' +
+      '<div class="cp-pop-actions">' +
+        '<button class="btn-primary" onclick="closeComplaintArrivalPopup();switchTab(\'complaints-reception\');"><i class="fa-solid fa-folder-open"></i> فتح استقبال الشكاوي</button>' +
+        '<button class="btn-mini" onclick="closeComplaintArrivalPopup()">لاحقاً</button>' +
+      '</div>' +
+      '<div class="cp-pop-count">تُغلق تلقائياً خلال <span id="cpCountNum">15</span> ثانية</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeComplaintArrivalPopup(); });
+  let secs = 15;
+  const numEl = function () { return document.getElementById('cpCountNum'); };
+  _complaintPopupTimer = setInterval(function () {
+    secs--;
+    const el = numEl(); if (el) el.textContent = secs;
+    if (secs <= 0) closeComplaintArrivalPopup();
+  }, 1000);
+}
+function closeComplaintArrivalPopup(silent) {
+  if (_complaintPopupTimer) { clearInterval(_complaintPopupTimer); _complaintPopupTimer = null; }
+  const ov = document.getElementById('complaintPopupOverlay');
+  if (ov) {
+    const card = ov.querySelector('.complaint-popup-card');
+    if (card && !silent) { card.style.transition = 'all .25s ease'; card.style.transform = 'scale(.9)'; card.style.opacity = '0'; setTimeout(function () { ov.remove(); }, 250); }
+    else { ov.remove(); }
+  }
+}
+</script>
+
+<!-- زر إداري مخفي (للمديرية) لفتح لوحة تعديل الشريط -->
 <button class="ticker-admin-btn" onclick="toggleTickerAdmin()" title="لوحة إدارة الشريط الإخباري" aria-label="فتح لوحة تعديل الشريط الإخباري">
   <i class="fa-solid fa-gear"></i>
 </button>
@@ -10621,10 +11302,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // زر فتح/إغلاق لوحة الإدارة
   window.toggleTickerAdmin = function() {
-    if (typeof isDigitizationCell !== 'function' || !isDigitizationCell()) {
-      document.getElementById('tickerAdminPanel')?.classList.remove('open');
-      return;
-    }
     const panel = document.getElementById('tickerAdminPanel');
     if (!panel) return;
     panel.classList.toggle('open');
@@ -10640,10 +11317,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // حفظ النص في Firebase (من المديرية — بدون كلمة سر حسب الطلب)
   window.saveTickerToFirebase = function() {
-    if (typeof isDigitizationCell !== 'function' || !isDigitizationCell()) {
-      showToast && showToast('⛔ غير مسموح', 'التحكم في شريط الإعلان متاح لخلية الرقمنة فقط.');
-      return;
-    }
     const ta = document.getElementById('tickerAdminText');
     if (!ta) return;
     const text = ta.value.trim();
@@ -10659,10 +11332,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // زر الخبر العاجل — يُغيّر اللون إلى أحمر فوراً ويحفظ النص المكتوب حالياً في اللوحة
   window.setTickerUrgent = function() {
-    if (typeof isDigitizationCell !== 'function' || !isDigitizationCell()) {
-      showToast && showToast('⛔ غير مسموح', 'التحكم في شريط الإعلان متاح لخلية الرقمنة فقط.');
-      return;
-    }
     const ta = document.getElementById('tickerAdminText');
     // نأخذ النص المكتوب من المستخدم؛ إذا كان فارغاً نضع نصاً افتراضياً عاجلاً
     const currentText = (ta && ta.value.trim()) ? ta.value.trim() : '⚠️ تنبيه عاجل من المديرية — يرجى من جميع المؤسسات التكوينية الالتزام الفوري بالتعليمات الجديدة وحالة الطوارئ الحالية.';
@@ -10679,7 +11348,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // دالة تغيير سرعة الشريط من لوحة الإدارة
   window.updateTickerSpeed = function() {
-    if (typeof isDigitizationCell !== 'function' || !isDigitizationCell()) return;
     const sel = document.getElementById('tickerSpeedSelect');
     if (!sel) return;
     const speed = parseInt(sel.value) || 22;
@@ -10843,5 +11511,5 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1e942bf796cb6c7',t:'MTc4NDYyNzAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ec1fb07aa0b6c7',t:'MTc4NDY1NzAyMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
