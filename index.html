@@ -4951,6 +4951,7 @@ function setupInterface() {
   displayRandomQuote();
   
   document.body.classList.toggle('wilaya-manager-mode', currentRole === 'directorate' && isWilayaManager);
+  document.body.classList.toggle('employee-mode', currentRole === 'employee');
   setupSidebar();
   if (currentRole === 'directorate' && isWilayaManager) setupWilayaManagerNotes();
   // تفعيل مستمع رسائل المدير الولائي للجميع
@@ -5026,6 +5027,8 @@ function setupInterface() {
     document.getElementById('fileTypesPanel').style.display = 'none';
     document.getElementById('centerInfoPanel').style.display = 'none';
     document.getElementById('fileTypeManageRow').style.display = 'none';
+    stopFirebaseStorageMonitor();
+    ['firebaseStorageCard','deptStorageCard','centerStorageCard','sidebarStorageWidget'].forEach(function (id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
     document.getElementById('page-employee-send').classList.remove('hidden');
     startEmployeeComplaintsListener();
     switchTab('employee-send');
@@ -9980,6 +9983,7 @@ function logout() {
     isWilayaManager = false;
     currentDepartment = null;
     currentEmployee = null;
+    document.body.classList.remove('employee-mode');
     localStorage.removeItem(LS_KEYS.remember);
     clearSession();
     document.getElementById('loginUser').value = '';
@@ -10702,6 +10706,7 @@ document.addEventListener('DOMContentLoaded', function() {
 .cr-reply-row input:focus { outline:none; border-color:var(--algeria-green); }
 .cr-status-row { display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
 .cr-status-row label { font-weight:800; font-size:15px; color:var(--text-dim); }
+.emp-attach-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
 @media(max-width:900px){ .emp-layout{ grid-template-columns:1fr; } .emp-fields-grid{ grid-template-columns:1fr; } .emp-info-banner{ grid-template-columns:1fr; } }
 </style>
 
@@ -10886,6 +10891,7 @@ function renderEmployeesList() {
 function renderEmployeeSendPage() {
   const c = document.getElementById('employeeSendContainer');
   if (!c) return;
+  employeePendingAttachment = null;
   const emp = currentEmployee || {};
   const fullName = ((emp.firstName || '') + ' ' + (emp.lastName || '')).trim();
   c.innerHTML =
@@ -10903,10 +10909,62 @@ function renderEmployeeSendPage() {
         '<div class="form-field"><label>درجة الأهمية</label><select id="empPriority"><option value="عادي">عادي 🟢</option><option value="متوسط">متوسط 🟡</option><option value="مستعجل جداً">مستعجل جداً 🔴</option></select></div>' +
         '<div class="form-field full"><label>الموضوع</label><input type="text" id="empSubject" placeholder="عنوان مختصر للشكوى أو الإنشغال..."></div>' +
         '<div class="form-field full"><label>التفاصيل الكاملة</label><textarea id="empDetails" placeholder="اشرح موضوعك بالتفصيل..."></textarea></div>' +
+        '<div class="form-field full"><label><i class="fa-solid fa-paperclip"></i> إرفاق صورة / فيديو / ملف (اختياري)</label>' +
+          '<div class="emp-attach-row">' +
+            '<label class="btn-mini" style="background:rgba(0,122,61,0.08);color:var(--algeria-green);border-color:var(--algeria-green);cursor:pointer;"><i class="fa-solid fa-image"></i> صورة<input type="file" accept="image/*" hidden onchange="handleEmployeeFile(event,\'image\')"></label>' +
+            '<label class="btn-mini" style="background:rgba(212,175,55,0.12);color:#9a7418;border-color:var(--gold);cursor:pointer;"><i class="fa-solid fa-film"></i> فيديو<input type="file" accept="video/*" hidden onchange="handleEmployeeFile(event,\'video\')"></label>' +
+            '<label class="btn-mini" style="background:rgba(224,27,63,0.08);color:var(--algeria-red);border-color:var(--algeria-red);cursor:pointer;"><i class="fa-solid fa-file-arrow-up"></i> ملف<input type="file" accept="*/*" hidden onchange="handleEmployeeFile(event,\'file\')"></label>' +
+          '</div>' +
+          '<div id="employeeAttachPreview"></div>' +
+        '</div>' +
       '</div>' +
       '<button class="btn-gold" style="width:100%;justify-content:center;margin-top:14px;" onclick="sendEmployeeComplaint()"><i class="fa-solid fa-paper-plane"></i> إرسال إلى المدير الولائي</button>' +
     '</div>';
 }
+/* ===================== إرفاق ملفات بالشكوى (صورة/فيديو/ملف) ===================== */
+let employeePendingAttachment = null;
+function _empGuessCat(type) {
+  if (!type) return 'file';
+  if (type.indexOf('image/') === 0) return 'image';
+  if (type.indexOf('video/') === 0) return 'video';
+  if (type.indexOf('audio/') === 0) return 'audio';
+  return 'file';
+}
+function handleEmployeeFile(e, type) {
+  const f = e.target.files[0];
+  if (!f) return;
+  if (f.size > 5 * 1024 * 1024) {
+    showToast('⚠️ ملف كبير', 'الحد الأقصى للمرفق هو 5 ميغابايت.');
+    e.target.value = '';
+    return;
+  }
+  const r = new FileReader();
+  r.onload = function (x) {
+    employeePendingAttachment = { name: f.name, type: f.type, data: x.target.result, category: type || _empGuessCat(f.type), size: f.size };
+    renderEmployeeAttachPreview();
+  };
+  r.readAsDataURL(f);
+  e.target.value = '';
+}
+function clearEmployeeFile() {
+  employeePendingAttachment = null;
+  renderEmployeeAttachPreview();
+}
+function renderEmployeeAttachPreview() {
+  const p = document.getElementById('employeeAttachPreview');
+  if (!p) return;
+  if (!employeePendingAttachment) { p.innerHTML = ''; return; }
+  const a = employeePendingAttachment;
+  const sizeTxt = a.size ? ' (' + (a.size / 1048576).toFixed(2) + ' MB)' : '';
+  let prev = '';
+  if (a.category === 'image') prev = '<img src="' + a.data + '" style="max-width:200px;max-height:150px;border-radius:10px;display:block;margin-bottom:8px;">';
+  else if (a.category === 'video') prev = '<video src="' + a.data + '" style="max-width:220px;max-height:150px;border-radius:10px;display:block;margin-bottom:8px;"></video>';
+  p.innerHTML = '<div style="margin-top:10px;padding:12px;background:var(--bg-card-2);border:1px solid var(--border);border-radius:12px;">' + prev +
+    '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><i class="fa-solid fa-paperclip" style="color:var(--algeria-green)"></i>' +
+    '<span style="font-weight:700;font-size:14px;">' + escapeHtml(a.name) + sizeTxt + '</span>' +
+    '<button class="btn-mini danger" style="margin-right:auto;" onclick="clearEmployeeFile()"><i class="fa-solid fa-circle-xmark"></i> إزالة</button></div></div>';
+}
+
 function sendEmployeeComplaint() {
   const emp = currentEmployee || {};
   const kind = document.getElementById('empKind').value;
@@ -10924,6 +10982,7 @@ function sendEmployeeComplaint() {
     employeeId: emp.id || '', employeeName: fullName, employeeCategory: emp.category || '',
     rank: emp.rank || '', job: emp.job || '',
     kind: kind, priority: priority, subject: subject, details: details, status: 'جديد',
+    attachment: employeePendingAttachment || null,
     createdAt: firebase.database.ServerValue.TIMESTAMP,
     updatedAt: firebase.database.ServerValue.TIMESTAMP,
     thread: [{ from: 'employee', sender: fullName, text: details, time: firebase.database.ServerValue.TIMESTAMP }]
@@ -10942,6 +11001,8 @@ function sendEmployeeComplaint() {
     });
     document.getElementById('empSubject').value = '';
     document.getElementById('empDetails').value = '';
+    employeePendingAttachment = null;
+    renderEmployeeAttachPreview();
     renderEmployeeMyComplaints();
   }).catch(function (e) {
     showToast('❌ خطأ في الإرسال', 'تعذر الإرسال — تحقق من الاتصال وقواعد أمان Firebase للمسار data/employeeComplaints' + (e && e.code ? ' (' + e.code + ')' : ''));
@@ -11126,6 +11187,7 @@ function complaintCardHtml(x, isManager) {
     senderInfo +
     '<div class="cr-subject"><i class="fa-solid fa-heading"></i> ' + escapeHtml(x.subject || '') + '</div>' +
     '<div class="cr-details">' + escapeHtml(x.details || '') + '</div>' +
+    (x.attachment ? renderMediaDisplayHtml(x.attachment) : '') +
     '<div class="cr-thread">' + (thread || '<div class="cr-empty">لا توجد محادثة بعد.</div>') + '</div>' +
     replyBox +
   '</div>';
@@ -11230,6 +11292,7 @@ function showComplaintArrivalPopup(c) {
         (c.job ? '<div class="cp-pop-row"><span class="cp-label">الوظيفة:</span> ' + escapeHtml(c.job) + '</div>' : '') +
         '<div class="cp-pop-row"><span class="cp-label">الموضوع:</span> <strong>' + escapeHtml(c.subject || '') + '</strong></div>' +
         '<div class="cp-pop-msg">' + escapeHtml(details.slice(0, 320)) + (details.length > 320 ? '…' : '') + '</div>' +
+        (c.attachment ? '<div class="cp-pop-row" style="color:var(--algeria-green);font-weight:800;"><i class="fa-solid fa-paperclip"></i> مرفق مُضمَّن: ' + escapeHtml(c.attachment.name || '') + '</div>' : '') +
       '</div>' +
       '<div class="cp-pop-actions">' +
         '<button class="btn-primary" onclick="closeComplaintArrivalPopup();switchTab(\'complaints-reception\');"><i class="fa-solid fa-folder-open"></i> فتح استقبال الشكاوي</button>' +
@@ -11257,6 +11320,28 @@ function closeComplaintArrivalPopup(silent) {
   }
 }
 </script>
+
+
+<!-- ============ 🎯 وضع الموظف + إصلاحات الهاتف (z-index) ============ -->
+<!-- employee_mobile_fix_marker -->
+<style>
+/* وضع الموظف: إخفاء شريط الإعلانات وأدوات تعديله + إخفاء كل إحصائيات التخزين */
+body.employee-mode #institutionTicker,
+body.employee-mode .ticker-admin-btn,
+body.employee-mode #tickerAdminPanel,
+body.employee-mode .sidebar-storage-widget,
+body.employee-mode .storage-monitor-card { display: none !important; }
+
+/* إبقاء أزرار التحكم السفلية فوق الشريط الإعلاني لتكون قابلة للضغط دائماً */
+.theme-toggle, #muteToggleBtn { z-index: 10001 !important; }
+
+/* الهاتف: رفع الدرج المنزلق وخلفيته فوق الشريط الإعلاني حتى لا يغطيه */
+@media (max-width: 992px) {
+  html.mobile-nav-on .sidebar { z-index: 10050 !important; }
+  html.mobile-nav-on #sidebarOverlay { z-index: 10040 !important; }
+  html.mobile-nav-on #mobileTopbar { z-index: 10060 !important; }
+}
+</style>
 
 <!-- زر إداري مخفي (للمديرية) لفتح لوحة تعديل الشريط -->
 <button class="ticker-admin-btn" onclick="toggleTickerAdmin()" title="لوحة إدارة الشريط الإخباري" aria-label="فتح لوحة تعديل الشريط الإخباري">
@@ -11438,10 +11523,10 @@ function closeComplaintArrivalPopup(silent) {
     document.body.appendChild(overlay);
 
     var btn = topbar.querySelector('#mobileMenuBtn');
-    btn.addEventListener('click', function () {
+    btn.onclick = function () {
       if (!sidebar) return;
       if (sidebar.classList.contains('mobile-open')) { closeDrawer(); } else { openDrawer(); }
-    });
+    };
     overlay.addEventListener('click', closeDrawer);
 
     if (sidebar) {
@@ -11511,5 +11596,5 @@ function closeComplaintArrivalPopup(silent) {
 })();
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ec1fb07aa0b6c7',t:'MTc4NDY1NzAyMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ec4faebc13b6d4',t:'MTc4NDY1ODk4Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
