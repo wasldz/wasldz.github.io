@@ -3916,10 +3916,73 @@ function loadDB() {
 // أو رسالة شات). هذا هو سبب "الثقل" الحقيقي: كل استدعاء لـ saveToFirebase()
 // كان يرسل الأرشيف الكامل من جديد حتى لو لم يتغيّر شيء فيه، مما يجعل Firebase
 // يعيد بثّه لكل المستخدمين المتصلين عبر مستمع data/archivedIssues.
+// 🔧 تطبيع قوائم الإنشغالات القادمة من Firebase:
+// Firebase Realtime Database قد يحوّل المصفوفات إلى كائنات {0:..,1:..} عند
+// أي ثغرة في الفهارس، وعندها .length/.filter/.find تتعطل ويبدو أن "الإنشغال لم يصل".
+function normalizeIssuesArray(val) {
+  if (!val) return [];
+  if (Array.isArray(val)) return val.filter(Boolean);
+  if (typeof val === 'object') {
+    return Object.keys(val)
+      .filter(k => val[k] != null)
+      .sort((a, b) => {
+        const na = Number(a), nb = Number(b);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return String(a).localeCompare(String(b));
+      })
+      .map(k => val[k])
+      .filter(Boolean);
+  }
+  return [];
+}
+
+// دمج قائمتين من الإنشغالات حسب code (الأحدث/الأكمل يفوز لنفس الرمز)
+// الهدف: عدم مسح إنشغال وصله جهاز آخر أثناء حفظ محلي متزامن.
+function mergeIssuesByCode(remoteList, localList) {
+  const map = new Map();
+  const put = (item) => {
+    if (!item || typeof item !== 'object') return;
+    const code = item.code;
+    if (!code) {
+      // عناصر بلا رمز نُبقيها بمفتاح اصطناعي
+      map.set('__nocode_' + map.size + '_' + (item.createdAt || Date.now()), item);
+      return;
+    }
+    const prev = map.get(code);
+    if (!prev) { map.set(code, item); return; }
+    // نفضّل النسخة الأحدث زمنياً، وعند التساوي نفضّل المحلية (local يُمرَّر ثانياً)
+    const pt = prev.updatedAt || prev.createdAt || 0;
+    const it = item.updatedAt || item.createdAt || 0;
+    if (it >= pt) map.set(code, { ...prev, ...item });
+  };
+  (remoteList || []).forEach(put);
+  (localList || []).forEach(put);
+  return Array.from(map.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+}
+
+// طابور تحديثات بعيدة وصلت أثناء الحفظ المحلي — تُدمَج بعد انتهاء الحفظ
+let _pendingRemoteUpdates = {};
+
 let _lastPushedJSON = {};
 let _saveInProgress = false; // ✅ حماية: منع المستمعات من الكتابة فوق البيانات أثناء الحفظ
+let _pushQueueRunning = false; // منع تداخل/حلقة لا نهائية بين المستمع والدفع
+
 
 function _pushToFirebaseNow() {
+  if (_pushQueueRunning) {
+    // إذا كان دفع جارياً، نُجدول محاولة لاحقة قصيرة بعد انتهائه
+    clearTimeout(window.__pushRetryTimer);
+    window.__pushRetryTimer = setTimeout(() => {
+      if (!_pushQueueRunning && !_saveInProgress) _pushToFirebaseNow();
+    }, 500);
+    return Promise.resolve();
+  }
+  // تطبيع محلي دائماً قبل المقارنة/الإرسال
+  activeIssues = normalizeIssuesArray(activeIssues);
+  archivedIssues = normalizeIssuesArray(archivedIssues);
+  centerIssues = normalizeIssuesArray(centerIssues);
+  centerArchived = normalizeIssuesArray(centerArchived);
+
   const candidates = {
     activeIssues: activeIssues,
     archivedIssues: archivedIssues,
@@ -3929,6 +3992,9 @@ function _pushToFirebaseNow() {
     departments: departments,
     auditLog: auditLog
   };
+
+  // الحقول التي تُدمَج بالرمز code حتى لا يمسح جهازٌ إنشغالات جهاز آخر (last-write-wins)
+  const mergeKeys = new Set(['activeIssues', 'archivedIssues', 'centerIssues', 'centerArchived']);
 
   const toSend = {};
   const sentKeys = [];
@@ -3944,34 +4010,115 @@ function _pushToFirebaseNow() {
 
   if (!hasChanges) return Promise.resolve(); // لا شيء تغيّر فعلياً
 
-  // ✅ حفظ كل حقل بشكل مستقل في مساره الخاص بـ Firebase
-  // هذا أكثر أماناً من update() على data/ لأنه:
-  // 1. يتجنب حد الحجم الإجمالي (16MB) لعملية write واحدة
-  // 2. إذا فشل حقل واحد (مثلاً بسبب مرفق كبير)، الباقي يُحفظ بنجاح
-  // 3. يُشغّل المستمع المناسب فقط بدلاً من إعادة بث كل البيانات
-  _saveInProgress = true; // ✅ حماية: منع المستمعات من الكتابة فوق البيانات
+  _pushQueueRunning = true;
+  _saveInProgress = true; // ✅ حماية مؤقتة أثناء الكتابة الشبكية
   const promises = sentKeys.map(key => {
-    return database.ref('data/' + key).set(toSend[key]).then(() => {
-      // ✅ نجح الحفظ لهذا الحقل — نُعلّمه كمتزامن
+    const ref = database.ref('data/' + key);
+
+    // 🔀 للإنشغالات: transaction + دمج حسب code حتى يصل الإنشغال لكل الأجهزة
+    if (mergeKeys.has(key)) {
+      return ref.transaction((current) => {
+        const remote = normalizeIssuesArray(current);
+        const local = normalizeIssuesArray(toSend[key]);
+        // local أولاً ثم remote؟ لا: remote أولاً ثم local حتى تعديلاتنا المحلية تفوز لنفس الرمز
+        // مع الإبقاء على أي إنشغال موجود عند الطرف الآخر فقط
+        return mergeIssuesByCode(remote, local);
+      }).then((result) => {
+        if (result && result.committed) {
+          const merged = normalizeIssuesArray(result.snapshot.val());
+          // حدّث الذاكرة المحلية بالنتيجة المدمجة النهائية من الخادم
+          if (key === 'activeIssues') activeIssues = merged;
+          else if (key === 'archivedIssues') archivedIssues = merged;
+          else if (key === 'centerIssues') centerIssues = merged;
+          else if (key === 'centerArchived') centerArchived = merged;
+          _lastPushedJSON[key] = JSON.stringify(merged);
+          console.log('[Firebase] ✅ تم دمج وحفظ:', key, '(' + merged.length + ' عنصر)');
+        } else {
+          console.warn('[Firebase] ⚠️ لم يُعتمد transaction لـ', key, '— إعادة محاولة set');
+          return ref.set(toSend[key]).then(() => {
+            _lastPushedJSON[key] = JSON.stringify(toSend[key]);
+          });
+        }
+      }).catch(err => {
+        console.error('[Firebase] ❌ فشل transaction:', key, err && err.message);
+        // احتياط: set عادي
+        return ref.set(toSend[key]).then(() => {
+          _lastPushedJSON[key] = JSON.stringify(toSend[key]);
+          console.log('[Firebase] ✅ تم الحفظ (احتياط set):', key);
+        }).catch(err2 => {
+          console.error('[Firebase] ❌ فشل حفظ:', key, err2 && err2.message);
+        });
+      });
+    }
+
+    // بقية الحقول: set عادي
+    return ref.set(toSend[key]).then(() => {
       _lastPushedJSON[key] = JSON.stringify(candidates[key]);
-      console.log('[Firebase] ✅ تم حفظ:', key, '(' + (toSend[key].length || 0) + ' عنصر)');
+      console.log('[Firebase] ✅ تم حفظ:', key, '(' + (toSend[key] && toSend[key].length || 0) + ' عنصر)');
     }).catch(err => {
-      console.error('[Firebase] ❌ فشل حفظ:', key, err.message);
-      // نحتفظ بالبيانات المحلية رغم الفشل — سنحاول مرة أخرى عند الحفظ التالي
+      console.error('[Firebase] ❌ فشل حفظ:', key, err && err.message);
     });
   });
 
   return Promise.all(promises).then(() => {
-    _saveInProgress = false; // ✅ انتهت عملية الحفظ — نسمح للمستعمعات بالعمل مجدداً
+    _saveInProgress = false;
+    _pushQueueRunning = false;
+    // تطبيق أي تحديث بعيد وصل أثناء الحفظ
+    _flushPendingRemoteUpdates();
     if (sentKeys.length > 0) {
       console.log('[Firebase] 📤 تم حفظ ' + sentKeys.length + ' حقل: ' + sentKeys.join(', '));
     }
-    // ✅ بعد الحفظ: نُعيد تشغيل واجهة المستخدم لعرض آخر البيانات
     updateUI();
   }).catch(err => {
     _saveInProgress = false;
+    _pushQueueRunning = false;
+    _flushPendingRemoteUpdates();
     console.error('[Firebase] ❌ خطأ عام في الحفظ:', err);
     showToast('⚠️ تحذير', 'فشل الحفظ على الخادم، حاول تحديث الصفحة أو التحقق من الاتصال');
+  });
+}
+
+// تطبيق التحديثات البعيدة المؤجّلة (مع دمج الإنشغالات)
+function _flushPendingRemoteUpdates() {
+  const pending = _pendingRemoteUpdates;
+  _pendingRemoteUpdates = {};
+  if (!pending || !Object.keys(pending).length) return;
+  const applyMap = {
+    activeIssues: (v) => {
+      const remote = normalizeIssuesArray(v);
+      const rc = new Set(remote.map(i => i && i.code).filter(Boolean));
+      const lo = activeIssues.filter(i => i && i.code && !rc.has(i.code));
+      activeIssues = mergeIssuesByCode(remote, lo);
+      _markSynced('activeIssues', remote);
+    },
+    archivedIssues: (v) => {
+      const remote = normalizeIssuesArray(v);
+      const rc = new Set(remote.map(i => i && i.code).filter(Boolean));
+      const lo = archivedIssues.filter(i => i && i.code && !rc.has(i.code));
+      archivedIssues = mergeIssuesByCode(remote, lo);
+      _markSynced('archivedIssues', remote);
+    },
+    centerIssues: (v) => {
+      const remote = normalizeIssuesArray(v);
+      const rc = new Set(remote.map(i => i && i.code).filter(Boolean));
+      const lo = centerIssues.filter(i => i && i.code && !rc.has(i.code));
+      centerIssues = mergeIssuesByCode(remote, lo);
+      _markSynced('centerIssues', remote);
+    },
+    centerArchived: (v) => {
+      const remote = normalizeIssuesArray(v);
+      const rc = new Set(remote.map(i => i && i.code).filter(Boolean));
+      const lo = centerArchived.filter(i => i && i.code && !rc.has(i.code));
+      centerArchived = mergeIssuesByCode(remote, lo);
+      _markSynced('centerArchived', remote);
+    },
+    userGuides: (v) => { userGuides = v || []; _markSynced('userGuides', userGuides); },
+    fileTypes: (v) => { if (v) { fileTypes = v; _markSynced('fileTypes', fileTypes); } },
+    departments: (v) => { if (v) { departments = v; _markSynced('departments', departments); } },
+    auditLog: (v) => { if (v) { auditLog = v; _markSynced('auditLog', auditLog); } }
+  };
+  Object.keys(pending).forEach(k => {
+    if (applyMap[k]) applyMap[k](pending[k]);
   });
 }
 
@@ -3984,7 +4131,7 @@ function saveToFirebase() {
   // ✅ الحفظ فوري (بدون تأخير) لضمان عدم ضياع البيانات عند إعادة التحميل.
   // كان يُستخدم debounce سابقاً لكن كان يسبب مشكلة: خلال فترة التأخير (400ms)
   // مستمع Firebase يستقبل بيانات قديمة ويكتب فوق التغييرات المحلية الجديدة.
-  _pushToFirebaseNow();
+  return _pushToFirebaseNow();
 }
 
 // عند إغلاق الصفحة بسرعة قد يضيع تغيير لم يُرسل بعد بسبب الـ debounce (400ms).
@@ -4064,19 +4211,34 @@ setInterval(() => {
 }, 60000);
 
   database.ref('data/activeIssues').on('value', (snapshot) => {
-    const val = snapshot.val();
-    if (!val) return;
-    // ✅ لا نكتب فوق البيانات المحلية إذا كان هناك حفظ قيد التنفيذ
-    if (_saveInProgress) return;
+    const raw = snapshot.val();
+    // null = لا بيانات بعد — لا نمسح القائمة المحلية أثناء جلسة نشطة
+    if (raw == null) return;
+    const val = normalizeIssuesArray(raw);
+    // ✅ أثناء الحفظ: لا نتجاهل التحديث — نؤجّله للدمج بعده حتى لا يضيع إنشغال من جهاز آخر
+    if (_saveInProgress) {
+      _pendingRemoteUpdates.activeIssues = val;
+      return;
+    }
     const oldCount = activeIssues.length;
-    activeIssues = val;
-    if (currentRole === 'center') detectIncomingDirectorateIssues(val);
+    const oldCodes = new Set(activeIssues.map(i => i && i.code).filter(Boolean));
+    // احتفظ فقط بالإنشغالات المحلية التي لم تظهر بعد على الخادم (لم تُحفَظ بعد)
+    const remoteCodes = new Set(val.map(i => i && i.code).filter(Boolean));
+    const localOnly = activeIssues.filter(i => i && i.code && !remoteCodes.has(i.code));
+    activeIssues = mergeIssuesByCode(val, localOnly);
+    if (currentRole === 'center') detectIncomingDirectorateIssues(activeIssues);
+    // نُسجّل نسخة الخادم فقط كـ"متزامنة" حتى يُدفَع أي localOnly في الحفظ التالي
     _markSynced('activeIssues', val);
+    if (localOnly.length && !_saveInProgress && !_pushQueueRunning) {
+      // دفع مؤجّل للإنشغالات المحلية التي لم تصل بعد للخادم (بدون تداخل مع المستمع)
+      clearTimeout(window.__localOnlyPushTimer);
+      window.__localOnlyPushTimer = setTimeout(() => { try { _pushToFirebaseNow(); } catch (e) { console.warn(e); } }, 300);
+    }
     pulseSyncBadge();
-    if (activeIssues.length > oldCount) {
+    if (activeIssues.length > oldCount || activeIssues.some(i => i && i.code && !oldCodes.has(i.code))) {
       if (currentRole === 'directorate') {
         // المديرية العامة تستقبل فقط الإنشغالات غير الموجهة مباشرة إلى مصلحة.
-        const newIssue = val.find(i => i.code && !_notifiedIssueCodes.has(i.code) && i.source === 'center');
+        const newIssue = activeIssues.find(i => i && i.code && !oldCodes.has(i.code) && !_notifiedIssueCodes.has(i.code) && i.source === 'center');
         if (newIssue) {
           _lastIssueNotifiedCode = newIssue.code;
           _notifiedIssueCodes.add(newIssue.code);
@@ -4109,7 +4271,7 @@ setInterval(() => {
         }
       } else if (currentRole === 'department') {
         // لا تتلقى أي مصلحة إشعاراً إلا عن الإنشغال الموجه إليها تحديداً.
-        const newIssue = val.find(i => i.code && !_notifiedIssueCodes.has(i.code) && i.department === currentDepartment);
+        const newIssue = activeIssues.find(i => i && i.code && !oldCodes.has(i.code) && !_notifiedIssueCodes.has(i.code) && i.department === currentDepartment);
         if (newIssue) {
           _lastIssueNotifiedCode = newIssue.code;
           _notifiedIssueCodes.add(newIssue.code);
@@ -4131,29 +4293,41 @@ setInterval(() => {
   });
 
   database.ref('data/archivedIssues').on('value', (snapshot) => {
-    const val = snapshot.val();
-    if (!val) return;
-    if (_saveInProgress) return; // ✅ حماية أثناء الحفظ
-    archivedIssues = val;
+    const raw = snapshot.val();
+    if (raw == null) return;
+    const val = normalizeIssuesArray(raw);
+    if (_saveInProgress) { _pendingRemoteUpdates.archivedIssues = val; return; }
+    const remoteCodesA = new Set(val.map(i => i && i.code).filter(Boolean));
+    const localOnlyA = archivedIssues.filter(i => i && i.code && !remoteCodesA.has(i.code));
+    archivedIssues = mergeIssuesByCode(val, localOnlyA);
     _markSynced('archivedIssues', val);
+    if (localOnlyA.length && !_saveInProgress && !_pushQueueRunning) { clearTimeout(window.__localOnlyPushTimer); window.__localOnlyPushTimer = setTimeout(() => { try { _pushToFirebaseNow(); } catch (e) {} }, 300); }
     pulseSyncBadge();
     updateUI();
   });
 
   database.ref('data/centerIssues').on('value', (snapshot) => {
-    const val = snapshot.val();
-    if (!val) return;
-    if (_saveInProgress) return; // ✅ حماية أثناء الحفظ
+    const raw = snapshot.val();
+    if (raw == null) return;
+    const val = normalizeIssuesArray(raw);
+    if (_saveInProgress) { _pendingRemoteUpdates.centerIssues = val; return; }
     const oldCount = centerIssues.length;
-    centerIssues = val;
+    const oldCodes = new Set(centerIssues.map(i => i && i.code).filter(Boolean));
+    const remoteCodes = new Set(val.map(i => i && i.code).filter(Boolean));
+    const localOnly = centerIssues.filter(i => i && i.code && !remoteCodes.has(i.code));
+    centerIssues = mergeIssuesByCode(val, localOnly);
     _markSynced('centerIssues', val);
+    if (localOnly.length && !_saveInProgress && !_pushQueueRunning) {
+      clearTimeout(window.__localOnlyPushTimer);
+      window.__localOnlyPushTimer = setTimeout(() => { try { _pushToFirebaseNow(); } catch (e) { console.warn(e); } }, 300);
+    }
     pulseSyncBadge();
-    if (centerIssues.length > oldCount) {
+    if (centerIssues.length > oldCount || centerIssues.some(i => i && i.code && !oldCodes.has(i.code))) {
       // مستمع احتياطي في حال وصلت نسخة centerIssues قبل activeIssues.
       // نستخدم _notifiedIssueCodes (Set) لمنع تكرار الإشعار عن نفس الإنشغال
       // الذي سبق لمستمع activeIssues بإشعاره.
       if (currentRole === 'directorate') {
-        const newIssue = val.find(i => i.code && !_notifiedIssueCodes.has(i.code) && i.source === 'center');
+        const newIssue = centerIssues.find(i => i && i.code && !oldCodes.has(i.code) && !_notifiedIssueCodes.has(i.code) && i.source === 'center');
         if (newIssue) {
           _lastIssueNotifiedCode = newIssue.code;
           _notifiedIssueCodes.add(newIssue.code);
@@ -4176,7 +4350,7 @@ setInterval(() => {
           }
         }
       } else if (currentRole === 'department') {
-        const newIssue = val.find(i => i.code && !_notifiedIssueCodes.has(i.code) && i.department === currentDepartment);
+        const newIssue = centerIssues.find(i => i && i.code && !oldCodes.has(i.code) && !_notifiedIssueCodes.has(i.code) && i.department === currentDepartment);
         if (newIssue) {
           _lastIssueNotifiedCode = newIssue.code;
           _notifiedIssueCodes.add(newIssue.code);
@@ -4189,10 +4363,15 @@ setInterval(() => {
   });
 
   database.ref('data/centerArchived').on('value', (snapshot) => {
-    const val = snapshot.val();
-    if (!val) return;
-    centerArchived = val;
+    const raw = snapshot.val();
+    if (raw == null) return;
+    const val = normalizeIssuesArray(raw);
+    if (_saveInProgress) { _pendingRemoteUpdates.centerArchived = val; return; }
+    const remoteCodesCA = new Set(val.map(i => i && i.code).filter(Boolean));
+    const localOnlyCA = centerArchived.filter(i => i && i.code && !remoteCodesCA.has(i.code));
+    centerArchived = mergeIssuesByCode(val, localOnlyCA);
     _markSynced('centerArchived', val);
+    if (localOnlyCA.length && !_saveInProgress && !_pushQueueRunning) { clearTimeout(window.__localOnlyPushTimer); window.__localOnlyPushTimer = setTimeout(() => { try { _pushToFirebaseNow(); } catch (e) {} }, 300); }
     pulseSyncBadge();
     updateUI();
   });
@@ -4240,10 +4419,14 @@ function forceSync() {
   database.ref('data').once('value').then((snapshot) => {
     const data = snapshot.val();
     if (data) {
-      if (data.activeIssues) activeIssues = data.activeIssues;
-      if (data.archivedIssues) archivedIssues = data.archivedIssues;
-      if (data.centerIssues) centerIssues = data.centerIssues;
-      if (data.centerArchived) centerArchived = data.centerArchived;
+      if (data.activeIssues) activeIssues = normalizeIssuesArray(data.activeIssues);
+      if (data.archivedIssues) archivedIssues = normalizeIssuesArray(data.archivedIssues);
+      if (data.centerIssues) centerIssues = normalizeIssuesArray(data.centerIssues);
+      if (data.centerArchived) centerArchived = normalizeIssuesArray(data.centerArchived);
+      _markSynced('activeIssues', activeIssues);
+      _markSynced('archivedIssues', archivedIssues);
+      _markSynced('centerIssues', centerIssues);
+      _markSynced('centerArchived', centerArchived);
       if (data.fileTypes) {
         fileTypes = data.fileTypes;
         console.log('[v0] تم تحديث التصنيفات من خادم Firebase:', fileTypes.length);
@@ -4909,10 +5092,10 @@ function initApp() {
   
   database.ref('data').once('value').then((snapshot) => {
     const data = snapshot.val() || {};
-    if (data.activeIssues) activeIssues = data.activeIssues;
-    if (data.archivedIssues) archivedIssues = data.archivedIssues;
-    if (data.centerIssues) centerIssues = data.centerIssues;
-    if (data.centerArchived) centerArchived = data.centerArchived;
+    if (data.activeIssues) activeIssues = normalizeIssuesArray(data.activeIssues);
+    if (data.archivedIssues) archivedIssues = normalizeIssuesArray(data.archivedIssues);
+    if (data.centerIssues) centerIssues = normalizeIssuesArray(data.centerIssues);
+    if (data.centerArchived) centerArchived = normalizeIssuesArray(data.centerArchived);
     if (data.fileTypes) {
       fileTypes = data.fileTypes;
       console.log('[Firebase] تم تحميل التصنيفات من once(value):', JSON.stringify(fileTypes));
@@ -6586,16 +6769,20 @@ function submitNewIssue() {
     transferHistory: []
   };
   activeIssues.unshift(newIssue);
-  saveToFirebase();
-  if (!isMuted) playNotificationSound();
-  showToast("✅ تم الحفظ", `تم تدوين الإنشغال ${newIssue.code} بنجاح! ${dept ? 'تم توجيهه إلى ' + dept.name : ''}`);
-  document.getElementById('add-form-author').value = '';
-  document.getElementById('add-form-details').value = '';
-  renderKPIs();
-  updateChart();
-  renderList();
-  renderDeptDashboard();
-  switchTab('list');
+  Promise.resolve(saveToFirebase()).then(() => {
+    if (!isMuted) playNotificationSound();
+    showToast("✅ تم الحفظ", `تم تدوين الإنشغال ${newIssue.code} بنجاح ووصل للخادم! ${dept ? 'تم توجيهه إلى ' + dept.name : ''}`);
+    document.getElementById('add-form-author').value = '';
+    document.getElementById('add-form-details').value = '';
+    renderKPIs();
+    updateChart();
+    renderList();
+    renderDeptDashboard();
+    switchTab('list');
+  }).catch(err => {
+    console.error(err);
+    showToast('❌ فشل الحفظ', 'تعذر حفظ الإنشغال على الخادم. تحقق من الاتصال ثم أعد المحاولة.');
+  });
 }
 
 function generateRefCode() {
@@ -6727,37 +6914,58 @@ function processSendFromCenter(btn, details, originalBtnHtml) {
     };
     activeIssues.unshift(activeCopy);
 
-    // لا نسمح لفشل التخزين المحلي (مثلاً امتلاء المساحة بسبب مرفقات كبيرة)
-    // بإيقاف الإرسال بالكامل أو تجميد الزر إلى الأبد
-    try {
-      saveToFirebase();
-    } catch (storageErr) {
-      console.error('تعذر حفظ نسخة محلية كاملة (قد تكون المساحة ممتلئة):', storageErr);
-      // نحاول رغم ذلك دفع البيانات إلى Firebase مباشرة حتى لو فشل التخزين المحلي
-      try { _debouncedPushToFirebase(); } catch (e2) { console.error(e2); }
-      showToast("⚠️ تنبيه", "تم إرسال الإنشغال لكن قد تكون مساحة التخزين المحلي ممتلئة. يفضل حذف بعض المرفقات القديمة.");
-    }
-
-    if (!isMuted) { try { playNotificationSound(); } catch (soundErr) { console.warn('تعذر تشغيل صوت التنبيه:', soundErr); } }
+    // حفظ فوري مع انتظار تأكيد Firebase — يضمن وصول الإنشغال للأجهزة الأخرى
     const deptName = getDepartmentName(deptId);
-    showToast("✅ تم الإرسال", `تم إرسال ${submissionKind} ${code} بنجاح! ${deptName ? 'تم توجيهه إلى ' + deptName : ''}`);
-    document.getElementById('form-details').value = '';
-    document.getElementById('form-reporter').value = '';
-    document.getElementById('form-file').value = '';
-    document.getElementById('form-priority').selectedIndex = 0;
-    document.getElementById('form-submission-kind').selectedIndex = 0;
-    document.getElementById('form-target-dept').value = '';
-    resetPasteZone();
-    renderChatHub();
-    renderList();
-    renderKPIs();
-    updateChart();
-    renderDeptDashboard();
+    Promise.resolve()
+      .then(() => _pushToFirebaseNow())
+      .then(() => {
+        // تأكيد وجود الإنشغال فعلياً على الخادم
+        return database.ref('data/activeIssues').once('value').then(snap => {
+          const list = normalizeIssuesArray(snap.val());
+          const found = list.some(i => i && i.code === code);
+          if (!found) {
+            // محاولة دفع إضافية إذا لم يظهر بعد
+            return _pushToFirebaseNow().then(() => {
+              return database.ref('data/activeIssues').once('value').then(snap2 => {
+                const list2 = normalizeIssuesArray(snap2.val());
+                if (!list2.some(i => i && i.code === code)) {
+                  throw new Error('لم يتم العثور على الإنشغال في الخادم بعد الحفظ');
+                }
+              });
+            });
+          }
+        });
+      })
+      .then(() => {
+        if (!isMuted) { try { playNotificationSound(); } catch (soundErr) { console.warn('تعذر تشغيل صوت التنبيه:', soundErr); } }
+        showToast("✅ تم الإرسال", `تم إرسال ${submissionKind} ${code} بنجاح ووصل للخادم! ${deptName ? 'تم توجيهه إلى ' + deptName : ''}`);
+        document.getElementById('form-details').value = '';
+        document.getElementById('form-reporter').value = '';
+        document.getElementById('form-file').value = '';
+        document.getElementById('form-priority').selectedIndex = 0;
+        document.getElementById('form-submission-kind').selectedIndex = 0;
+        document.getElementById('form-target-dept').value = '';
+        resetPasteZone();
+        renderChatHub();
+        renderList();
+        renderKPIs();
+        updateChart();
+        renderDeptDashboard();
+      })
+      .catch(err => {
+        console.error('فشل تأكيد حفظ الإنشغال على Firebase:', err);
+        showToast("❌ فشل الإرسال", "تعذر حفظ الإنشغال على الخادم. تحقق من الاتصال بالإنترنت ثم أعد المحاولة.");
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.style.opacity = '';
+        btn.style.cursor = '';
+        btn.innerHTML = originalBtnHtml;
+      });
+    return; // finally الخارجي لا يُعيد تفعيل الزر قبل انتهاء Promise
   } catch (err) {
     console.error('فشل إرسال الإنشغال/المراسلة من المركز/المعهد/المدرسة الخاصة:', err);
     showToast("❌ فشل الإرسال", "حدث خطأ أثناء إرسال الإنشغال/المراسلة. يرجى المحاولة مرة أخرى أو تحديث الصفحة.");
-  } finally {
-    // مهما حدث (نجاح أو خطأ)، يجب أن يعود الزر قابلاً للاستخدام دائماً
     btn.disabled = false;
     btn.style.opacity = '';
     btn.style.cursor = '';
@@ -11626,5 +11834,5 @@ body.employee-mode .storage-monitor-card { display: none !important; }
 })();
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f6537b48303363',t:'MTc4NDc2NDAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f6537b48303363',t:'MTc4NDc2NDAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f973821c75b6c7',t:'MTc4NDc5Njc2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
