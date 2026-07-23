@@ -3917,6 +3917,7 @@ function loadDB() {
 // كان يرسل الأرشيف الكامل من جديد حتى لو لم يتغيّر شيء فيه، مما يجعل Firebase
 // يعيد بثّه لكل المستخدمين المتصلين عبر مستمع data/archivedIssues.
 let _lastPushedJSON = {};
+let _saveInProgress = false; // ✅ حماية: منع المستمعات من الكتابة فوق البيانات أثناء الحفظ
 
 function _pushToFirebaseNow() {
   const candidates = {
@@ -3943,21 +3944,34 @@ function _pushToFirebaseNow() {
 
   if (!hasChanges) return Promise.resolve(); // لا شيء تغيّر فعلياً
 
-  toSend.timestamp = Date.now();
-
-  // 🔥 استخدام update() بدل set(): لا يحذف أي مفتاح غير مذكور، وأكثر أمانًا
-  // ⚠️ نحدّث _lastPushedJSON فقط بعد نجاح الحفظ لتفادي مشكلة السباق الزمني:
-  // إذا وصلت بيانات قديمة من مستمع Firebase قبل اكتمال الحفظ، لن يتم تجاهل
-  // التغييرات المحلية لأن _lastPushedJSON لم يُحدَّث بعد.
-  return database.ref('data').update(toSend).then(() => {
-    // ✅ تم الحفظ بنجاح — الآن نُعلّم المفاتيح المرسلة بأنها مزامنة
-    for (const key of sentKeys) {
+  // ✅ حفظ كل حقل بشكل مستقل في مساره الخاص بـ Firebase
+  // هذا أكثر أماناً من update() على data/ لأنه:
+  // 1. يتجنب حد الحجم الإجمالي (16MB) لعملية write واحدة
+  // 2. إذا فشل حقل واحد (مثلاً بسبب مرفق كبير)، الباقي يُحفظ بنجاح
+  // 3. يُشغّل المستمع المناسب فقط بدلاً من إعادة بث كل البيانات
+  _saveInProgress = true; // ✅ حماية: منع المستمعات من الكتابة فوق البيانات
+  const promises = sentKeys.map(key => {
+    return database.ref('data/' + key).set(toSend[key]).then(() => {
+      // ✅ نجح الحفظ لهذا الحقل — نُعلّمه كمتزامن
       _lastPushedJSON[key] = JSON.stringify(candidates[key]);
+      console.log('[Firebase] ✅ تم حفظ:', key, '(' + (toSend[key].length || 0) + ' عنصر)');
+    }).catch(err => {
+      console.error('[Firebase] ❌ فشل حفظ:', key, err.message);
+      // نحتفظ بالبيانات المحلية رغم الفشل — سنحاول مرة أخرى عند الحفظ التالي
+    });
+  });
+
+  return Promise.all(promises).then(() => {
+    _saveInProgress = false; // ✅ انتهت عملية الحفظ — نسمح للمستعمعات بالعمل مجدداً
+    if (sentKeys.length > 0) {
+      console.log('[Firebase] 📤 تم حفظ ' + sentKeys.length + ' حقل: ' + sentKeys.join(', '));
     }
+    // ✅ بعد الحفظ: نُعيد تشغيل واجهة المستخدم لعرض آخر البيانات
+    updateUI();
   }).catch(err => {
-    console.log('[v0] خطأ في الحفظ على Firebase:', err);
+    _saveInProgress = false;
+    console.error('[Firebase] ❌ خطأ عام في الحفظ:', err);
     showToast('⚠️ تحذير', 'فشل الحفظ على الخادم، حاول تحديث الصفحة أو التحقق من الاتصال');
-    throw err; // نُعيد رمي الخطأ ليتم التقاطه في async functions
   });
 }
 
@@ -4052,6 +4066,8 @@ setInterval(() => {
   database.ref('data/activeIssues').on('value', (snapshot) => {
     const val = snapshot.val();
     if (!val) return;
+    // ✅ لا نكتب فوق البيانات المحلية إذا كان هناك حفظ قيد التنفيذ
+    if (_saveInProgress) return;
     const oldCount = activeIssues.length;
     activeIssues = val;
     if (currentRole === 'center') detectIncomingDirectorateIssues(val);
@@ -4117,6 +4133,7 @@ setInterval(() => {
   database.ref('data/archivedIssues').on('value', (snapshot) => {
     const val = snapshot.val();
     if (!val) return;
+    if (_saveInProgress) return; // ✅ حماية أثناء الحفظ
     archivedIssues = val;
     _markSynced('archivedIssues', val);
     pulseSyncBadge();
@@ -4126,6 +4143,7 @@ setInterval(() => {
   database.ref('data/centerIssues').on('value', (snapshot) => {
     const val = snapshot.val();
     if (!val) return;
+    if (_saveInProgress) return; // ✅ حماية أثناء الحفظ
     const oldCount = centerIssues.length;
     centerIssues = val;
     _markSynced('centerIssues', val);
@@ -11608,5 +11626,5 @@ body.employee-mode .storage-monitor-card { display: none !important; }
 })();
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f641ceae71b6d4',t:'MTc4NDc2MzI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f6537b48303363',t:'MTc4NDc2NDAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
