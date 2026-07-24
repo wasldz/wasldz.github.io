@@ -3905,8 +3905,9 @@ function loadDB() {
 
   const savedPass = localStorage.getItem(LS_KEYS.masterPass);
   if (savedPass) MASTER_PASSWORD = savedPass;
-  const savedManagerPass = localStorage.getItem(LS_KEYS.managerPass);
-  if (savedManagerPass) WILAYA_MANAGER_PASSWORD = savedManagerPass;
+  // 🔐 مهم: لا نحمل كلمة سر المدير الولائي من localStorage حتى لا تنتقل بالخطأ بين الولايات.
+  WILAYA_MANAGER_PASSWORD = null;
+  try { localStorage.removeItem(LS_KEYS.managerPass); } catch(e) {}
   lastSyncTimestamp = parseInt(localStorage.getItem(LS_KEYS.lastSync) || "0");
   isMuted = localStorage.getItem(LS_KEYS.mute) === "1";
 }
@@ -4195,8 +4196,10 @@ function listenToFirebase() {
     const val = snapshot.val();
     if (val) {
       WILAYA_MANAGER_PASSWORD = val;
-      localStorage.setItem(LS_KEYS.managerPass, val);
+    } else {
+      WILAYA_MANAGER_PASSWORD = null;
     }
+    try { localStorage.removeItem(LS_KEYS.managerPass); } catch(e) {}
   });
 
 let _lastIssueNotifiedCode = ''; // لمنع تكرار الإشعار عند إضافة الإنشغال لمصفوفتين
@@ -4743,16 +4746,13 @@ function toggleRemember() {
     const role = selectedLoginRole;
     if (role === 'directorate') {
       const user = document.getElementById('loginUser').value;
-      const pass = document.getElementById('loginPass').value;
-      if (user && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, user, pass }));
+      if (user) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, user }));
     } else if (role === 'department') {
       const dept = document.getElementById('loginDeptSelect').value;
-      const pass = document.getElementById('loginDeptPass').value;
-      if (dept && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, dept, pass }));
+      if (dept) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, dept }));
     } else {
       const center = document.getElementById('loginCenterSelect').value;
-      const pass = document.getElementById('loginCenterPass').value;
-      if (center && pass) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, center, pass }));
+      if (center) localStorage.setItem(LS_KEYS.remember, JSON.stringify({ role, center }));
     }
   } else { localStorage.removeItem(LS_KEYS.remember); }
 }
@@ -4762,20 +4762,27 @@ function loadRemembered() {
   if (data) {
     try {
       const parsed = JSON.parse(data);
+      if (parsed && typeof parsed === 'object' && 'pass' in parsed) {
+        const sanitized = { role: parsed.role };
+        if (parsed.user) sanitized.user = parsed.user;
+        if (parsed.dept) sanitized.dept = parsed.dept;
+        if (parsed.center) sanitized.center = parsed.center;
+        localStorage.setItem(LS_KEYS.remember, JSON.stringify(sanitized));
+      }
       if (parsed.role === 'directorate') {
         selectLoginRole('directorate');
         document.getElementById('loginUser').value = parsed.user || '';
-        document.getElementById('loginPass').value = parsed.pass || '';
+        document.getElementById('loginPass').value = '';
         document.getElementById('rememberMe').checked = true;
       } else if (parsed.role === 'department') {
         selectLoginRole('department');
         document.getElementById('loginDeptSelect').value = parsed.dept || '';
-        document.getElementById('loginDeptPass').value = parsed.pass || '';
+        document.getElementById('loginDeptPass').value = '';
         document.getElementById('rememberMe').checked = true;
       } else if (parsed.role === 'center') {
         selectLoginRole('center');
         document.getElementById('loginCenterSelect').value = parsed.center || '';
-        document.getElementById('loginCenterPass').value = parsed.pass || '';
+        document.getElementById('loginCenterPass').value = '';
         document.getElementById('rememberMe').checked = true;
         document.getElementById('loginCenterSearch').value = parsed.center || '';
         filterCenterSelect();
@@ -4812,9 +4819,9 @@ function changePassword() {
   if (newPass.length < 4) { alert("⚠️ كلمة السر الجديدة يجب أن تكون 4 أحرف على الأقل."); return; }
   if (newPass !== confirm) { alert("⚠️ كلمة السر الجديدة وتأكيدها غير متطابقين."); return; }
   if (isWilayaManager) {
-    // المدير الولائي: حفظ كلمة السر الجديدة في Firebase و localStorage
+    // المدير الولائي: حفظ كلمة السر الجديدة داخل Firebase للولاية الحالية فقط
     WILAYA_MANAGER_PASSWORD = newPass;
-    localStorage.setItem(LS_KEYS.managerPass, newPass);
+    try { localStorage.removeItem(LS_KEYS.managerPass); } catch(e) {}
     database.ref('data/wilayaManagerPassword').set(newPass);
   } else {
     // المديرية العادية: تغيير MASTER_PASSWORD
@@ -5140,6 +5147,8 @@ function initApp() {
     // تحميل ومزامنة كلمة مرور المدير الولائي
     if (data.wilayaManagerPassword) {
       WILAYA_MANAGER_PASSWORD = data.wilayaManagerPassword;
+    } else {
+      WILAYA_MANAGER_PASSWORD = null;
     }
     
     // 🔥 تسجيل كل الحقول كـ "متزامنة" حتى لا تُعاد كتابتها لاحقاً بلا داعٍ
@@ -7487,7 +7496,10 @@ function onWilayaChange() {
     // تحميل كلمة سر المدير الولائي
     if (data.wilayaManagerPassword) {
       WILAYA_MANAGER_PASSWORD = data.wilayaManagerPassword;
+    } else {
+      WILAYA_MANAGER_PASSWORD = null;
     }
+    try { localStorage.removeItem(LS_KEYS.managerPass); } catch(e) {}
   });
 }
 
@@ -10478,80 +10490,10 @@ function stopFirebaseStorageMonitor() {
 // ============================================================
 // ⚙️ نظام إدارة حسابات المديريات (أسماء مستخدمين + كلمات سر فريدة)
 // ============================================================
-const ADMIN_SETTINGS_PASSWORD = '1010199610101996';
+const ADMIN_SETTINGS_PASSWORD = ''; // معطّل أمنياً: لا نعرض كلمة سر إعدادات داخل الواجهة
 
 // قائمة حسابات المديريات الافتراضية — كل مديرية لها اسم مستخدم وكلمة سر فريدة ومعقدة
-const DEFAULT_DIRECTORATE_USERS = [
-  { wilaya: '01', name: 'أدرار', username: 'dir_adrar_01', password: 'Dr@01xK7' },
-  { wilaya: '02', name: 'الشلف', username: 'dir_chlef_02', password: 'Ch@02mN9' },
-  { wilaya: '03', name: 'الأغواط', username: 'dir_laghouat_03', password: 'Lg@03pR4' },
-  { wilaya: '04', name: 'أم البواقي', username: 'dir_oum_04', password: 'Ob@04sT6' },
-  { wilaya: '05', name: 'باتنة', username: 'dir_batna_05', password: 'Bt@05vW8' },
-  { wilaya: '06', name: 'بجاية', username: 'dir_bejaia_06', password: 'Bj@06xZ3' },
-  { wilaya: '07', name: 'بسكرة', username: 'dir_biskra_07', password: 'Bs@07yA5' },
-  { wilaya: '08', name: 'بشار', username: 'dir_bechar_08', password: 'Bc@08bD2' },
-  { wilaya: '09', name: 'البليدة', username: 'dir_blida_09', password: 'Bl@09eG7' },
-  { wilaya: '10', name: 'البويرة', username: 'dir_bouira_10', password: 'Bo@10hJ1' },
-  { wilaya: '11', name: 'تمنراست', username: 'dir_tamanrasset_11', password: 'Tm@11kL9' },
-  { wilaya: '12', name: 'تبسة', username: 'dir_tebessa_12', password: 'Tb@12nP4' },
-  { wilaya: '13', name: 'تلمسان', username: 'dir_tlemcen_13', password: 'Tl@13qR6' },
-  { wilaya: '14', name: 'تيارت', username: 'dir_tiaret_14', password: 'Ti@14sU8' },
-  { wilaya: '15', name: 'تيزي وزو', username: 'dir_tizi_15', password: 'Tz@15vX3' },
-  { wilaya: '16', name: 'الجزائر', username: 'dir_alger_16', password: 'Al@16yZ5' },
-  { wilaya: '17', name: 'الجلفة', username: 'dir_djelfa_17', password: 'Dj@17bC2' },
-  { wilaya: '18', name: 'جيجل', username: 'dir_jijel_18', password: 'Jj@18eF7' },
-  { wilaya: '19', name: 'سطيف', username: 'dir_setif_19', password: 'St@19hK1' },
-  { wilaya: '20', name: 'سعيدة', username: 'dir_saida_20', password: 'Sa@20mN9' },
-  { wilaya: '21', name: 'سكيكدة', username: 'dir_skikda_21', password: 'Sk@21pQ4' },
-  { wilaya: '22', name: 'سيدي بلعباس', username: 'dir_sba_22', password: 'Sb@22rS6' },
-  { wilaya: '23', name: 'عنابة', username: 'dir_annaba_23', password: 'An@23uV8' },
-  { wilaya: '24', name: 'قالمة', username: 'dir_guelma_24', password: 'Gl@24xY3' },
-  { wilaya: '25', name: 'قسنطينة', username: 'dir_constantine_25', password: 'Cs@25aB5' },
-  { wilaya: '26', name: 'المدية', username: 'dir_meda_26', password: 'Md@26cD2' },
-  { wilaya: '27', name: 'مستغانم', username: 'dir_mostaganem_27', password: 'Ms@27fG7' },
-  { wilaya: '28', name: 'المسيلة', username: 'dir_msila_28', password: 'Ml@28hJ1' },
-  { wilaya: '29', name: 'معسكر', username: 'dir_mascara_29', password: 'Ma@29kL9' },
-  { wilaya: '30', name: 'ورقلة', username: 'dir_ouargla_30', password: 'Ou@30nP4' },
-  { wilaya: '31', name: 'وهران', username: 'dir_oran_31', password: 'Or@31qR6' },
-  { wilaya: '32', name: 'البيض', username: 'dir_elbayadh_32', password: 'Eb@32sU8' },
-  { wilaya: '33', name: 'إليزي', username: 'dir_illizi_33', password: 'Il@33vX3' },
-  { wilaya: '34', name: 'برج بوعريريج', username: 'dir_bba_34', password: 'Bb@34yZ5' },
-  { wilaya: '35', name: 'بومرداس', username: 'dir_boumerdes_35', password: 'Bm@35bC2' },
-  { wilaya: '36', name: 'الطارف', username: 'dir_eltarf_36', password: 'Et@36eF7' },
-  { wilaya: '37', name: 'تندوف', username: 'dir_tindouf_37', password: 'Td@37hK1' },
-  { wilaya: '38', name: 'تيسمسيلت', username: 'dir_tissemsilt_38', password: 'Ts@38mN9' },
-  { wilaya: '39', name: 'الوادي', username: 'dir_eloued_39', password: 'Ew@39pQ4' },
-  { wilaya: '40', name: 'خنشلة', username: 'dir_khenchela_40', password: 'Kh@40rS6' },
-  { wilaya: '41', name: 'سوق أهراس', username: 'dir_soukahras_41', password: 'Sa@41uV8' },
-  { wilaya: '42', name: 'تيبازة', username: 'dir_tipaza_42', password: 'Tp@42xY3' },
-  { wilaya: '43', name: 'ميلة', username: 'dir_mila_43', password: 'Mi@43aB5' },
-  { wilaya: '44', name: 'عين الدفلى', username: 'dir_aindefla_44', password: 'Ad@44cD2' },
-  { wilaya: '45', name: 'النعامة', username: 'dir_naama_45', password: 'Na@45fG7' },
-  { wilaya: '46', name: 'عين تموشنت', username: 'dir_aintemouchent_46', password: 'At@46hJ1' },
-  { wilaya: '47', name: 'غرداية', username: 'dir_ghardaia_47', password: 'Gh@47kL9' },
-  { wilaya: '48', name: 'غليزان', username: 'dir_relizane_48', password: 'Rz@48nP4' },
-  { wilaya: '49', name: 'تيميمون', username: 'dir_timimoun_49', password: 'Tn@49qR6' },
-  { wilaya: '50', name: 'برج باجي مختار', username: 'dir_bbm_50', password: 'Bm@50sU8' },
-  { wilaya: '51', name: 'أولاد جلال', username: 'dir_ouledjalal_51', password: 'Oj@51vX3' },
-  { wilaya: '52', name: 'بني عباس', username: 'dir_beniabbes_52', password: 'Ba@52yZ5' },
-  { wilaya: '53', name: 'عين صالح', username: 'dir_ainsalah_53', password: 'As@53bC2' },
-  { wilaya: '54', name: 'عين قزام', username: 'dir_ainquzzam_54', password: 'Aq@54eF7' },
-  { wilaya: '55', name: 'تقرت', username: 'dir_touggourt_55', password: 'Tg@55hK1' },
-  { wilaya: '56', name: 'جانت', username: 'dir_djanet_56', password: 'Dn@56mN9' },
-  { wilaya: '57', name: 'المغير', username: 'dir_elmghair_57', password: 'Mg@57pQ4' },
-  { wilaya: '58', name: 'المنيعة', username: 'dir_elmenia_58', password: 'Mn@58rS6' },
-  { wilaya: '59', name: 'أفلو', username: 'dir_aflou_59', password: 'Af@59uV8' },
-  { wilaya: '60', name: 'الأبيض سيدي الشيخ', username: 'dir_abiodh_60', password: 'Ab@60xY3' },
-  { wilaya: '61', name: 'العريشة', username: 'dir_aricha_61', password: 'Ar@61aB5' },
-  { wilaya: '62', name: 'القنطرة', username: 'dir_kantara_62', password: 'Kn@62cD2' },
-  { wilaya: '63', name: 'بريكة', username: 'dir_barika_63', password: 'Br@63fG7' },
-  { wilaya: '64', name: 'بوسعادة', username: 'dir_bousaada_64', password: 'Bu@64hJ1' },
-  { wilaya: '65', name: 'بئر العاتر', username: 'dir_birelater_65', password: 'Be@65kL9' },
-  { wilaya: '66', name: 'قصر البخاري', username: 'dir_ksar_boukhari_66', password: 'Kb@66nP4' },
-  { wilaya: '67', name: 'قصر الشلالة', username: 'dir_ksar_chellala_67', password: 'Kc@67qR6' },
-  { wilaya: '68', name: 'عين وسارة', username: 'dir_ainoussera_68', password: 'Aw@68sU8' },
-  { wilaya: '69', name: 'مسعد', username: 'dir_msaad_69', password: 'Ms@69vX3' }
-];
+const DEFAULT_DIRECTORATE_USERS = [];
 
 // المتغير الحي الذي يحمل الحسابات الحالية (يُحمّل من Firebase أو يستخدم الافتراضي)
 let DIRECTORATE_USERS = [];
@@ -10563,11 +10505,10 @@ function loadDirectorateUsers() {
     if (val && Array.isArray(val) && val.length > 0) {
       DIRECTORATE_USERS = val;
     } else {
-      DIRECTORATE_USERS = DEFAULT_DIRECTORATE_USERS.slice();
-      database.ref('data/directorateUsers').set(DIRECTORATE_USERS);
+      DIRECTORATE_USERS = [];
     }
   }).catch(() => {
-    DIRECTORATE_USERS = DEFAULT_DIRECTORATE_USERS.slice();
+    DIRECTORATE_USERS = [];
   });
 }
 
@@ -10579,9 +10520,7 @@ function saveDirectorateUsers() {
 // التحقق من صحة بيانات دخول المديرية
 function verifyDirectorateLogin(username, password) {
   if (!username || !password) return false;
-  // التحقق من كلمة السر الرئيسية (وصول إداري) — يعمل مع أي ولاية
-  if (password === MASTER_PASSWORD) return true;
-  // التحقق من قائمة المديريات مع مطابقة الولاية المختارة
+  // 🔐 لا نسمح بالدخول بكلمة سر عامة من الواجهة؛ نعتمد فقط على حسابات المديريات المحمّلة من Firebase.
   const user = DIRECTORATE_USERS.find(u => u.username === username && u.password === password);
   if (!user) return false;
   // 🔒 التأكد من أن الولاية المختارة تطابق ولاية حساب المديرية
@@ -10597,58 +10536,8 @@ function verifyDirectorateLogin(username, password) {
 let _adminPanelUnlocked = false;
 
 function toggleAdminSettingsPanel() {
-  const panel = document.getElementById('adminInlinePanel');
-  const btn = document.getElementById('adminSettingsToggleBtn');
-  
-  // إذا كانت اللوحة ظاهرة، نغلقها
-  if (panel.style.display === 'block') {
-    panel.style.display = 'none';
-    btn.style.borderColor = 'var(--border)';
-    btn.style.color = 'var(--text-dim)';
-    return;
-  }
-  
-  // إذا لم تكن مفتوحة مسبقاً، نطلب كلمة المرور
-  if (!_adminPanelUnlocked) {
-    const pass = prompt('🔐 أدخل كلمة مرور الإعدادات:');
-    if (pass === null) return;
-    if (pass.trim() !== ADMIN_SETTINGS_PASSWORD) {
-      alert('⚠️ كلمة المرور غير صحيحة!');
-      return;
-    }
-    _adminPanelUnlocked = true;
-  }
-  
-  // إظهار اللوحة وتحميل البيانات
-  panel.style.display = 'block';
-  btn.style.borderColor = 'var(--algeria-green)';
-  btn.style.color = 'var(--algeria-green)';
-  
-  // تحميل البيانات إذا لم تكن محملة
-  if (!DIRECTORATE_USERS || DIRECTORATE_USERS.length === 0) {
-    document.getElementById('adminTableContainer').innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-dim);"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px; color:var(--algeria-green);"></i><br>جاري تحميل البيانات...</div>';
-    
-    if (typeof database !== 'undefined' && database) {
-      database.ref('data/directorateUsers').once('value').then(function(snap) {
-        var val = snap.val();
-        if (val && Array.isArray(val) && val.length > 0) {
-          DIRECTORATE_USERS = val;
-        } else {
-          DIRECTORATE_USERS = DEFAULT_DIRECTORATE_USERS.slice();
-          database.ref('data/directorateUsers').set(DIRECTORATE_USERS).catch(function(){});
-        }
-        renderAdminInlineTable();
-      }).catch(function() {
-        DIRECTORATE_USERS = DEFAULT_DIRECTORATE_USERS.slice();
-        renderAdminInlineTable();
-      });
-    } else {
-      DIRECTORATE_USERS = DEFAULT_DIRECTORATE_USERS.slice();
-      renderAdminInlineTable();
-    }
-  } else {
-    renderAdminInlineTable();
-  }
+  alert('تم تعطيل لوحة الإعدادات مؤقتاً لأسباب أمنية.');
+  return;
 }
 
 function renderAdminInlineTable() {
@@ -11834,5 +11723,5 @@ body.employee-mode .storage-monitor-card { display: none !important; }
 })();
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f6537b48303363',t:'MTc4NDc2NDAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f973821c75b6c7',t:'MTc4NDc5Njc2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f6537b48303363',t:'MTc4NDc2NDAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f973821c75b6c7',t:'MTc4NDc5Njc2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2023d0d8a933363',t:'MTc4NDg4ODkxMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
