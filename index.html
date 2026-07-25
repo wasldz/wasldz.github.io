@@ -3595,19 +3595,19 @@ database.ref = function(path) {
 // 💾 المصالح الأساسية (القائمة الثابتة - متضمنة أسماء المستخدمين والسر لكل مصلحة)
 // ============================================================
 const DEPARTMENTS_BASE = [
-  { id: "dept1", name: "خلية الرقمنة بالمديرية ", type: "متابعة التكوين", manager: "مسؤول التكوين", username: "suivi_formation", passwordHash: "8a201952fb164d43ef93945b7f4f4136f26e4727e31bc7f4fb413a6b4854f2e2" },
-  { id: "dept2", name: "مكتب متابعة مشاريع الإستثمار", type: "مشاريع الإستثمار", manager: "مسؤول الإستثمار", username: "suivi_investissement", passwordHash: "053053d279bae6a7dcc20d2e6078ec7be61e2e95ad776b9622703ae84351c59f" },
-  { id: "dept3", name: "مصلحة متابعة التكوين الحضوري", type: "التكوين الحضوري", manager: "مسؤول التكوين الحضوري", username: "suivi_presentiel", passwordHash: "e452ac8c7b5a4b15f80adf711b0d3b61fb61df5afe95b7925ed2636f95fd56cd" },
-  { id: "dept4", name: "مصلحة متابعة التمهين", type: "التمهين", manager: "مسؤول التمهين", username: "suivi_themeen", passwordHash: "52a33f04c4f50798742526a24f86e0e50c04d21ce462d90b32d19d0d1cb18e57" },
-  { id: "dept5", name: "مكتب متابعة الشهادات", type: "الشهادات", manager: "مسؤول الشهادات", username: "suivi_certificats", passwordHash: "1ca1d3769da2a518520fabf2ac5e37027c39146aeb83d1c4f63fd78363c2ef88" },
-  { id: "dept6", name: "مصلحة الإدارة والمالية والوسائل", type: "الإدارة والمالية", manager: "مسؤول الإدارة", username: "admin_finance", passwordHash: "9ff5b5d7526366a2341a1b0c0baab114ebd9811c31fa2be6bf3fe687410aa64b" },
-  { id: "dept7", name: " أمانة المديرية", type: "الأمانة", manager: "أمين المدير", username: "secretariat_directeur", passwordHash: "758a3c46e17440e64a74a7d9139eb76fe4bdcbc7869e156b71845387e8fa3bc1" }
+  { id: "dept1", name: "خلية الرقمنة بالمديرية ", type: "متابعة التكوين", manager: "مسؤول التكوين", username: "suivi_formation", password: "878789" },
+  { id: "dept2", name: "مكتب متابعة مشاريع الإستثمار", type: "مشاريع الإستثمار", manager: "مسؤول الإستثمار", username: "suivi_investissement", password: "5678" },
+  { id: "dept3", name: "مصلحة متابعة التكوين الحضوري", type: "التكوين الحضوري", manager: "مسؤول التكوين الحضوري", username: "suivi_presentiel", password: "9012" },
+  { id: "dept4", name: "مصلحة متابعة التمهين", type: "التمهين", manager: "مسؤول التمهين", username: "suivi_themeen", password: "3456" },
+  { id: "dept5", name: "مكتب متابعة الشهادات", type: "الشهادات", manager: "مسؤول الشهادات", username: "suivi_certificats", password: "7890" },
+  { id: "dept6", name: "مصلحة الإدارة والمالية والوسائل", type: "الإدارة والمالية", manager: "مسؤول الإدارة", username: "admin_finance", password: "1111" },
+  { id: "dept7", name: " أمانة المديرية", type: "الأمانة", manager: "أمين المدير", username: "secretariat_directeur", password: "20262026" }
 ];
 
 // ============================================================
 // 💾 البيانات الأساسية
 // ============================================================
-let MASTER_PASSWORD = null; // Plaintext master password removed.
+let MASTER_PASSWORD = "1996";
 let WILAYA_MANAGER_PASSWORD = null; // null = نستخدم الافتراضية (Mgr@XX_2026)
 let currentRole = null;
 let currentEmployee = null; // الموظف المسجّل الدخول (عامل/أستاذ/إداري)
@@ -3801,51 +3801,51 @@ const LS_KEYS = {
 const DEFAULT_FILE_TYPES = ["المكلف بالرقمنة","مصلحة التوجيه ( المستشارين )","مصلحة التكوين الحضوري","مصلحة التمهين","مصلحة الإدارة والمالية والوسائل","إنشغالات المداراء"];
 
 const DEFAULT_BBA_INSTITUTIONS = [
-  { name: "المعهد الوطني المتخصص في التكوين المهني ب .ب.ع 01", code: "INSFP001", passwordHash: "553bce8b3b19ebfeb1f89f661ff8ff6c64965d8d06239a0e1a289c47919366b4", type: "center" },
-  { name: "المعهد الوطني المتخصص في التكوين المهني ب .ب.ع 02", code: "INSFP002", passwordHash: "1883cdd2bafa1b112df186a1d3689000a2357e3e53323ebe55e93764782d0dc8", type: "center" },
-  { name: "المعهد الوطني المتخصص في التكوين المهني رأس الوادي", code: "INSFP003", passwordHash: "ccbdbfb5889ec303753136be62897162c94d6cdcc17c3adbbb76abf40bd82c40", type: "center" },
-  { name: "مركز التكوين المهني و التمهين برج بوعريريج03", code: "CFPA001", passwordHash: "e339507e6921cbc22ef66859a7c9290d8deb2edbae1c85e1f19218646636a3b7", type: "center" },
-  { name: "مركز التكوين المهني و التمهين العش", code: "CFPA002", passwordHash: "347a28cbcefe3443aaec7408ee41ee5f86c17b328a9bbb04423afe1490205b3d", type: "center" },
-  { name: "مركز التكوين المهني و التمهين برج بوعريريج04", code: "CFPA003", passwordHash: "b923d30422f18ed0a8df3cf0f236ba2ca5284c2a1d26f5026c6f309c6a61b806", type: "center" },
-  { name: "مركز التكوين المهني و التمهين حسناوة", code: "CFPA004", passwordHash: "b219ef7eda4feaf82df03b50bb6c49c294bee633bbeca5c6b9042a40b2f5cb6a", type: "center" },
-  { name: "مركز التكوين المهني و التمهين الياشير", code: "CFPA005", passwordHash: "8fcca3143007b58df0a4bb601cb39eef44782f62ce1a8aedaffeb5d578697055", type: "center" },
-  { name: "مركز التكوين المهني و التمهين بليمور", code: "CFPA006", passwordHash: "7579f84497a6380940a6956087428f056162c2e366a252f17d5080ddebde74a1", type: "center" },
-  { name: "مركز التكوين المهني و التمهين الجعافرة", code: "CFPA007", passwordHash: "ed5847fcde59f7e8d8b6c5c7a67f33518c62c331870838cefdb3dad656d6fc4b", type: "center" },
-  { name: "مركز التكوين المهني و التمهين خليل", code: "CFPA008", passwordHash: "a66849f2ed8ef85343a5c508a7a21ddb05339ada81958b533f459e5c0a388cac", type: "center" },
-  { name: "مركز التكوين المهني والتمهين المهير", code: "CFPA009", passwordHash: "d6c2c0289c697f289cbb700abbde938926f06fb70ccefc7d06b495f71320386b", type: "center" },
-  { name: "مركز التكوين المهني و التمهين الحمادية", code: "CFPA010", passwordHash: "565c599a226568f5c901ae496c76bf7d49f61a880c22bad4b0ea9dde34180f34", type: "center" },
-  { name: "مركز التكوين المهني و التمهين برج الغدير", code: "CFPA011", passwordHash: "ba93158426ff5b6e0b2a37de7a28d5e0cea6b85f45c1a0feb0164d604f53f223", type: "center" },
-  { name: "مركز التكوين المهني و التمهين عين تاغروت", code: "CFPA012", passwordHash: "3c008122b47a4f2cefe2c73bf536647532e92d57b072da1b519d7d55199052a1", type: "center" },
-  { name: "مركز التكوين المهني و التمهين العناصر", code: "CFPA013", passwordHash: "ad2cb1a540e32f9b5bb139d13352199a51d3cd79a1f6dc968a6fc41050750c34", type: "center" },
-  { name: "مركز التكوين المهني و التمهين راس الوادي", code: "CFPA014", passwordHash: "10937048bea0537a8f8d78aa2a0c2b46f4ae64e24618bc3ff06f106d17837f86", type: "center" },
-  { name: "مركز التكوين المهني و التمهين مجانة", code: "CFPA015", passwordHash: "0d6bab2bb70acc710bea61a066fa861459df341afea6993aafb93c857bc9e91a", type: "center" },
-  { name: "مركز التكوين المهني و التمهين المنصورة", code: "CFPA016", passwordHash: "8bd43a73274d141242e4fae3633802f75d2c45d8fc88930181cf5ed94bba6121", type: "center" },
-  { name: "مركز التكوين المهني و التمهين برج زمورة", code: "CFPA017", passwordHash: "c2e603ecd514a6345a4ff58b483cc5802b0dbda8334f5fa83f88c1f7a7dcf29f", type: "center" },
-  { name: "مركز التكوين المهني والتمهين ذكور", code: "CFPA018", passwordHash: "be9baae6deb775dce1d89093be16a9e157be9a73db75e5cebbd1898a99eddcc8", type: "center" },
-  { name: "احمد للتكوين", code: "PRV001", passwordHash: "2964a26d894cd652ee4926e8632a3dd56adc040b653dfc786384c007c7bfd7d2", type: "private" },
-  { name: "وشن سكول", code: "PRV002", passwordHash: "80a71673171c3c1076043124cd3e2c2e0b4443c73b59cdf031cca6a0d82343e0", type: "private" },
-  { name: "لكبير للتكوين المهني", code: "PRV003", passwordHash: "6df7463e27baba7e8386c1fd30b4bdee2f7668b31a629ebbabc8aae1a397babe", type: "private" },
-  { name: "ايكول صخراوي", code: "PRV004", passwordHash: "7fa5991fb97b1a6cdeec4a0a6b451ca3e37ec703cbd4bc336f91c19972782f9d", type: "private" },
-  { name: "سعاد ماضوي لتكوين", code: "PRV005", passwordHash: "8c2f463149c0ad78d7c0d2daede65c4bd795d70eaa82d7daaa863bd34f5d2e65", type: "private" },
-  { name: "براح سكول", code: "PRV006", passwordHash: "7765170d1dc3eaafff12a9c57c364d169fb13351623f6c89d87cc53a08ee601e", type: "private" },
-  { name: "الأنامل الذهبية", code: "PRV007", passwordHash: "0a45647b12048f20fbe8b35fcc3756f76e48287dec9535b2140002a5a1105382", type: "private" },
-  { name: "يد الأمل", code: "PRV008", passwordHash: "ca6ca14dc75a536b631a3843a5608206d8485e543cdce7fe1c7fbd16e9876441", type: "private" },
-  { name: "لبرايجيه", code: "PRV009", passwordHash: "4c80f7440dbe69f15af0084c3cc61309a2e5e69c3e7038e6182eb21b33d9033c", type: "private" },
-  { name: "شامل سكول", code: "PRV010", passwordHash: "69da6ec246a321ea6a2e65c1a554eface83f47e27666f41c66e1d75604a6594e", type: "private" },
-  { name: "ملحقة المؤسسة الخاصة للتكوين المهني ايكول صخراوي", code: "PRV011", passwordHash: "e5062c01545579c5ce80113b971875776131ec54b6d1cc5ad8920782c3cfc688", type: "private" },
-  { name: "المؤسسة الخاصة للتكوين المهني خطوط المستقبل", code: "PRV012", passwordHash: "8b291ec5d0e605cbafdca400dc2317b7aad486a9a5eae94ab320821fe8371656", type: "private" },
-  { name: "نوران", code: "PRV013", passwordHash: "f2f11574ab58aa782c4a68e9572364dd3bf37614a38414279429bf9de5175a40", type: "private" },
-  { name: "داماس", code: "PRV014", passwordHash: "a08c1a918def1eddf56fe027d8cdfa39472c09030d13be2c478c0d396d20b65f", type: "private" },
-  { name: "المؤسسة الخاصة للتكوين المهني البصير برو", code: "PRV015", passwordHash: "4d103a6787bcce8966c4b65393b768e908501f4ade9e91c15744e691514d13b4", type: "private" },
-  { name: "بلانيت وصال", code: "PRV016", passwordHash: "72db7fafa9774cb7a131aebd3f199f6f936ebc32269ca8732717612c0c2541b0", type: "private" },
-  { name: "الأميرة الصغيرة", code: "PRV017", passwordHash: "54f75f4da3c13217a09ae7507345c515f449410c48f76bddf12861f3bb27e91d", type: "private" },
-  { name: "الملكة الماسية", code: "PRV018", passwordHash: "5b96d28dacd825ecb65a55007f58668c5c5b7db07b38e04050a7985fb3a624cb", type: "private" },
-  { name: "البيروني", code: "PRV019", passwordHash: "2f46b4738c9b848b3476b9d8fe1fb3a5fd959dbf72a70bda4454e3065d34abcd", type: "private" },
-  { name: "المقراني سكول", code: "PRV020", passwordHash: "af35aa12bdde15bbbdcc0ab072569cb81dca3c6da25ca68a9ef0c0890321e5de", type: "private" },
-  { name: "المؤسسة الخاصة للتكوين المهني السليل", code: "PRV021", passwordHash: "820d687c04c4f75c58d303a3323310ebe84889ebd33d232b696b2ae22e404f0d", type: "private" },
-  { name: "كوندور اكاديمي", code: "PRV022", passwordHash: "3cc6a79b3dfb1b25a15e2f18697a6d08254b3deba45a8281b9ddb45f2fde5922", type: "private" },
-  { name: "ولد اعمر", code: "PRV023", passwordHash: "1c5961200f0e40420b06f13d47619d537d1b687bc2259e666b6bc47ba3667fe3", type: "private" },
-  { name: "المؤسسة الخاصة للتكوين المهني عقباش", code: "PRV024", passwordHash: "cca2f6f8818fda9c24770f4fc219459c4def7e5c6e1efa92fa912549a1c970dd", type: "private" }
+  { name: "المعهد الوطني المتخصص في التكوين المهني ب .ب.ع 01", code: "INSFP001", password: "fa@202601", type: "center" },
+  { name: "المعهد الوطني المتخصص في التكوين المهني ب .ب.ع 02", code: "INSFP002", password: "fa@202602", type: "center" },
+  { name: "المعهد الوطني المتخصص في التكوين المهني رأس الوادي", code: "INSFP003", password: "fa@202603", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج بوعريريج03", code: "CFPA001", password: "fa@245601", type: "center" },
+  { name: "مركز التكوين المهني و التمهين العش", code: "CFPA002", password: "fa@245602", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج بوعريريج04", code: "CFPA003", password: "fa@245603", type: "center" },
+  { name: "مركز التكوين المهني و التمهين حسناوة", code: "CFPA004", password: "fa@245604", type: "center" },
+  { name: "مركز التكوين المهني و التمهين الياشير", code: "CFPA005", password: "fa@245605", type: "center" },
+  { name: "مركز التكوين المهني و التمهين بليمور", code: "CFPA006", password: "fa@245606", type: "center" },
+  { name: "مركز التكوين المهني و التمهين الجعافرة", code: "CFPA007", password: "fa@245607", type: "center" },
+  { name: "مركز التكوين المهني و التمهين خليل", code: "CFPA008", password: "fa@245608", type: "center" },
+  { name: "مركز التكوين المهني والتمهين المهير", code: "CFPA009", password: "fa@245609", type: "center" },
+  { name: "مركز التكوين المهني و التمهين الحمادية", code: "CFPA010", password: "fa@245610", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج الغدير", code: "CFPA011", password: "fa@245611", type: "center" },
+  { name: "مركز التكوين المهني و التمهين عين تاغروت", code: "CFPA012", password: "fa@245612", type: "center" },
+  { name: "مركز التكوين المهني و التمهين العناصر", code: "CFPA013", password: "fa@245613", type: "center" },
+  { name: "مركز التكوين المهني و التمهين راس الوادي", code: "CFPA014", password: "fa@245614", type: "center" },
+  { name: "مركز التكوين المهني و التمهين مجانة", code: "CFPA015", password: "fa@245615", type: "center" },
+  { name: "مركز التكوين المهني و التمهين المنصورة", code: "CFPA016", password: "fa@245616", type: "center" },
+  { name: "مركز التكوين المهني و التمهين برج زمورة", code: "CFPA017", password: "fa@245617", type: "center" },
+  { name: "مركز التكوين المهني والتمهين ذكور", code: "CFPA018", password: "fa@245618", type: "center" },
+  { name: "احمد للتكوين", code: "PRV001", password: "fa@783001", type: "private" },
+  { name: "وشن سكول", code: "PRV002", password: "fa@783002", type: "private" },
+  { name: "لكبير للتكوين المهني", code: "PRV003", password: "fa@783003", type: "private" },
+  { name: "ايكول صخراوي", code: "PRV004", password: "fa@783004", type: "private" },
+  { name: "سعاد ماضوي لتكوين", code: "PRV005", password: "fa@783005", type: "private" },
+  { name: "براح سكول", code: "PRV006", password: "fa@783006", type: "private" },
+  { name: "الأنامل الذهبية", code: "PRV007", password: "fa@783007", type: "private" },
+  { name: "يد الأمل", code: "PRV008", password: "fa@783008", type: "private" },
+  { name: "لبرايجيه", code: "PRV009", password: "fa@783009", type: "private" },
+  { name: "شامل سكول", code: "PRV010", password: "fa@783010", type: "private" },
+  { name: "ملحقة المؤسسة الخاصة للتكوين المهني ايكول صخراوي", code: "PRV011", password: "fa@783011", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني خطوط المستقبل", code: "PRV012", password: "fa@783012", type: "private" },
+  { name: "نوران", code: "PRV013", password: "fa@783013", type: "private" },
+  { name: "داماس", code: "PRV014", password: "fa@783014", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني البصير برو", code: "PRV015", password: "fa@783015", type: "private" },
+  { name: "بلانيت وصال", code: "PRV016", password: "fa@783016", type: "private" },
+  { name: "الأميرة الصغيرة", code: "PRV017", password: "fa@783017", type: "private" },
+  { name: "الملكة الماسية", code: "PRV018", password: "fa@783018", type: "private" },
+  { name: "البيروني", code: "PRV019", password: "fa@783019", type: "private" },
+  { name: "المقراني سكول", code: "PRV020", password: "fa@783020", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني السليل", code: "PRV021", password: "fa@783021", type: "private" },
+  { name: "كوندور اكاديمي", code: "PRV022", password: "fa@783022", type: "private" },
+  { name: "ولد اعمر", code: "PRV023", password: "fa@783023", type: "private" },
+  { name: "المؤسسة الخاصة للتكوين المهني عقباش", code: "PRV024", password: "fa@783024", type: "private" }
 ];
 
 let INSTITUTIONS_DATA = [];
@@ -4559,7 +4559,7 @@ function toggleDirectorateAccessFields() {
 
 // كلمة سر المدير الولائي الافتراضية (محسوبة من رقم الولاية)
 function getDefaultWilayaManagerPassword(code) {
-  return null; // Plaintext predictable password removed.
+  return 'Mgr@' + code + '2026';
 }
 
 function getWilayaManagerCredentials() {
@@ -5128,9 +5128,9 @@ function initApp() {
         INSTITUTIONS_DATA = DEFAULT_BBA_INSTITUTIONS.slice();
       } else {
         INSTITUTIONS_DATA = [
-          { name: "المعهد الوطني المتخصص في التكوين المهني 01", code: "INSFP001", passwordHash: "e24497b3959b347ae1ec4afaa4d651f44531ee77e4b70f3a1fb115f54689bc17", type: "center" },
-          { name: "مركز التكوين المهني و التمهين 01", code: "CFPA001", passwordHash: "39eb16976b15d30fa09fc83c0386c67b3eb769c31a133699424aa769c34ef857", type: "center" },
-          { name: "مؤسسة خاصة للتكوين المهني 01", code: "PRV001", passwordHash: "d198a94c3bf1c0769c0b454f04da3128e275738715a5d2683cbd07b3f36843ff", type: "private" }
+          { name: "المعهد الوطني المتخصص في التكوين المهني 01", code: "INSFP001", password: "123456", type: "center" },
+          { name: "مركز التكوين المهني و التمهين 01", code: "CFPA001", password: "654321", type: "center" },
+          { name: "مؤسسة خاصة للتكوين المهني 01", code: "PRV001", password: "987654", type: "private" }
         ];
       }
       database.ref('data/institutions').set(INSTITUTIONS_DATA);
@@ -5140,7 +5140,7 @@ function initApp() {
     if (data.masterPassword) {
       MASTER_PASSWORD = data.masterPassword;
     } else {
-      MASTER_PASSWORD = null;
+      MASTER_PASSWORD = "1996";
       database.ref('data/masterPassword').set(MASTER_PASSWORD);
     }
 
@@ -5608,7 +5608,7 @@ function renderDepartmentsList() {
     const efficiency = totalIssues > 0 ? Math.round((resolvedIssues / totalIssues) * 100) : 0;
     
     const username = dept.username || dept.id;
-    const password = dept.password || '';
+    const password = dept.password || '1234';
     
     return `<div class="dept-stat-card" style="border-right:4px solid var(--algeria-green);">
       <div class="dept-name">${dept.name}</div>
@@ -5705,7 +5705,7 @@ function editDepartmentInfo(id) {
     dept.username = newUsername.trim();
   }
   
-  const newPassword = prompt('تعديل كلمة مرور المصلحة:', dept.password || '');
+  const newPassword = prompt('تعديل كلمة مرور المصلحة:', dept.password || '1234');
   if (newPassword && newPassword.trim()) {
     dept.password = newPassword.trim();
   }
@@ -5738,7 +5738,7 @@ function changeDepartmentPassword(id) {
   if (!dept) { showToast("⚠️ خطأ", "لم يتم العثور على المصلحة"); return; }
 
   const entered = prompt(`أدخل كلمة السر الجديدة للمصلحة:
-${dept.name}`, dept.password || '');
+${dept.name}`, dept.password || '1234');
   if (entered === null) return;
   const newPassword = entered.trim();
   if (newPassword.length < 4) { showToast("⚠️ كلمة قصيرة", "يجب أن تتكون كلمة السر من 4 أحرف أو أرقام على الأقل"); return; }
@@ -7479,9 +7479,9 @@ function onWilayaChange() {
         INSTITUTIONS_DATA = DEFAULT_BBA_INSTITUTIONS.slice();
       } else {
         INSTITUTIONS_DATA = [
-          { name: "المعهد الوطني المتخصص في التكوين المهني 01", code: "INSFP001", passwordHash: "e24497b3959b347ae1ec4afaa4d651f44531ee77e4b70f3a1fb115f54689bc17", type: "center" },
-          { name: "مركز التكوين المهني و التمهين 01", code: "CFPA001", passwordHash: "39eb16976b15d30fa09fc83c0386c67b3eb769c31a133699424aa769c34ef857", type: "center" },
-          { name: "مؤسسة خاصة للتكوين المهني 01", code: "PRV001", passwordHash: "d198a94c3bf1c0769c0b454f04da3128e275738715a5d2683cbd07b3f36843ff", type: "private" }
+          { name: "المعهد الوطني المتخصص في التكوين المهني 01", code: "INSFP001", password: "123456", type: "center" },
+          { name: "مركز التكوين المهني و التمهين 01", code: "CFPA001", password: "654321", type: "center" },
+          { name: "مؤسسة خاصة للتكوين المهني 01", code: "PRV001", password: "987654", type: "private" }
         ];
       }
     }
@@ -7491,7 +7491,7 @@ function onWilayaChange() {
     if (data.masterPassword) {
       MASTER_PASSWORD = data.masterPassword;
     } else {
-      MASTER_PASSWORD = null;
+      MASTER_PASSWORD = "1996";
     }
     // تحميل كلمة سر المدير الولائي
     if (data.wilayaManagerPassword) {
@@ -11723,90 +11723,5 @@ body.employee-mode .storage-monitor-card { display: none !important; }
 })();
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f6537b48303363',t:'MTc4NDc2NDAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f973821c75b6c7',t:'MTc4NDc5Njc2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2023d0d8a933363',t:'MTc4NDg4ODkxMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>
-/* Local source privacy mode: no plaintext static passwords in HTML. This is not server-side authentication. */
-(function() {
-  'use strict';
-  const LOCAL_PASSWORD_SALT = 'WASL-LOCAL-2026-v1';
-  const MANAGER_HASHES = Object.freeze({
-    '01': '35b2f64e7255ab8438eed264ccc808c4e4941b52df510f91adb26a386217d066', '02': '9fbf879c875fb143909e0ca57496cc73c94672a4ce610f1ef88d75c408d75619', '03': 'a866ba1275539001ad0ae5c3109b0d871d042f43486994d4002326e36576e90d',
-    '04': 'b76d6b94124b6dcd7bdca6119247d393f26962e69c50dc9429d27b2d5d48eb86', '05': 'dea2ebb5b456e80055d5e478e6d181e0449229855a613136b8148d407bef10b4', '06': 'f8b4045663aaa2dd914c94bb82bf457a22e80296fc679e9d3d3edbca0461fb45',
-    '07': 'f5d44cb3a752c8f32e432b9e43c4518e47019a2b5add534610f37b36d65997f9', '08': 'fbaf34f54e9d271e6ade59f5aa6e24c3b0c6ee1c40139a2abb01322aaac065a2', '09': '099c483c12f42e2a2a7fabd7017de903d119857629a0a0d0e8a4d0df8fa0ac6a',
-    '10': '277273b92225d0cfcdb6fdf2e5b3989a646f1db7d527659ca18a0a040f52d356', '11': '47920dc1e89b8e553f144f733b834b26c11e21dfe5b0750bceda8e88778e0593', '12': 'd1c4e89ba6486c3ef78f6b13d61e92b4cb36cf2da4b4fc8aad96130c7bf32a50',
-    '13': 'dd6cbd79bfce679831b7631ce405cef4d31ff684c43a59fcd5d1063f4ab97391', '14': '18ad8e39a7304d2f85e67fc52d476741d6794634004d0651e31b8d3377adcffc', '15': '9ab67f15370218d225fdfe5f72445da506eb467d1eae0209cbeb02ab4075d28e',
-    '16': 'cbc9b59c65eba6137c4ec644b438ee40aa0b1c0c45314a6c18ad32ea2e1d2286', '17': '45b26a0e2784fafa0d879468b190c216096c493cce7835b26f708a86c6b266aa', '18': '90dee2c83424365c4587f47715bee8f2b2a463aac6df1b759bd932282149cc15',
-    '19': '9b1205a8ebe6816332b6a6e2ad23673846070e296b6ce3762cb4620eab7711d6', '20': '45e99c60b489d8c36a44d9eba1e0774c388a58b8507dd0f166e5fdaa3440eed7', '21': '6f8fe28ba7ee134ea46e0ef758f68b4a6b2ef9ad2ac464d70441df63a5bb5409',
-    '22': '9bbb1994e23445ede2ac021ea4fc3e91e1bdbc5717a76eac4b675aa3b771902a', '23': '3e88bdcaf0b26a522c5a8ed1fe847dd41f968995ecbd907cb3555c3657b3e6a9', '24': 'c9ce873d3d9717e82b1fafc1d6a3f8c8286a42845f30394a28f6f4c8ead8646b',
-    '25': '0e802df355a2acb9d793fac8aa9cf11687aa1cbbbf4f65c9b923088e3e23f363', '26': '1c4931c1d0689c2bbbe5c2b5a8099a239373f4598599e48cf0dadd469a2455d2', '27': 'a524dd0d6a712a56e4d0217398fe3051cfceb19ef3aa7787c7f94f24d24cd5c4',
-    '28': 'a951329b663344d6d381a3959267ec51214aee54b5e9932968560df7be8d6012', '29': '7c0dcdd9646742bc371e6b87fa09dff49a56ead64491cb53c60984c138df4826', '30': 'ee451eecb3603f6f3094d24238b4269c7657e1f7e7f78d8e9e5f01298896be3c',
-    '31': 'dc1ab7827570128b72c66655eaf7a42cae3957cd227b4e68781cbb6f076b04bc', '32': '5b2486c04fc0b80b81520d0ba7fc1d8adaad8906185adf92d76eb1e7388793d3', '33': 'cc5d0fa520a5be8522b484da34a3af29fa735203b0e5d72376e637858b4967ce',
-    '34': 'f53375db19584f787dc6b3a6b792648a7e9131ec707c8acdb8e5e959211cbd3a', '35': 'f4083f4a12af98fd38be03205899b16af4f83cc91bb67278f46d3afa7bd3209f', '36': '2b684cff7e15f4eead8ed511e2abca9c476f804d60a00bd4457837a5f191c6d0',
-    '37': '122632e152ca887172e7a2a948914961c28bd047156a83b922cfeb49e37bc1b7', '38': '6bb1de97b33f08aa6ce1c7de7831892b605ab4f202e59d7e63e9bd6d8ff4bc7b', '39': 'fe4c820496ab3ba0daf9c14ba476914bf9281e8be829f2e5837b201850d01549',
-    '40': 'ce23053ace8b31eff6b2a1ac1c673547bab2b77a7c5b254fa57d2455fe0ac506', '41': 'ab9fab02704bbe75335befbd48d8a21dcecb6440b208ed0cb2f65e6aeaff8d17', '42': '288365012020ebfb77cdc952b410b07067c1185ab6100c10972172fc5c7524e6',
-    '43': '2d334867ba31c1f93b7304bb6660621b012ea32cb7e98b769c85b4b94211dc96', '44': 'e32ff2c7a7568b0c6932176b82d4e5c497b83c13a98b39a49199b1bf7cbc3b4d', '45': 'b184c593665c0cb6a21e761329f1cb2104894d0fd1af07787b71c6f75b076573',
-    '46': '70f277984f13d010b23e3966caf96f34198f2215ff31ce819b134104723053ba', '47': 'd9c85980459d5294db36cf2596e56932bf7f70dc9adde8c1b257bf3a45450a2e', '48': '61686e61c52bc049f5525233697db915f7f71d135a314f7a82b9785f67ad4682',
-    '49': 'a75c8f2c7ce21f97679ac8021577d7d3d7d593873f6ec95221c69ac9f84f8955', '50': '7eca98019f905a211941d1a3215bdd0bfecc0b216c8a06fcc190f41731910aab', '51': '3da0e3b9a6fac9d79754f937f0f238242126dd8e99f74a17900ffc37955ff905',
-    '52': 'e78dc34ac4361e11029c863357e9b2fc7117bcc8d455a4717c71c2cef9e0f9aa', '53': '1b3eb9d2b085ca7a5d337e1484b0994c6cd6337018b09758075e95f78d9d27dd', '54': 'cced53517a0417b2e3010517d05e8d824bf43145e0c46e7ad375084ea05c3240',
-    '55': 'ca67c87bc27efa220843ec698503120469d8eea91be2a5ef7c2128916a9f65be', '56': '5b65c3562006d5e92b0ef7db976ba08378874c87d8646abaf8e41aed077e2d80', '57': 'f6231ea204c5fdd87a24a71aea12645e6f58da6701cbb2a2656e7a77739e735c',
-    '58': '4cdd87c4455c46c35c02b5b6dd84f9d399b0d395bfe1a0c2f17b0cea821f96d4', '59': 'cbd21becd7aa902013fef84f2af7e3b3ebab28e5fb8ea32fa30fe9855817d9dd', '60': '618ba733adc28ee27ee64867ef0231f4b062812a78256edff3c8c623d3d2e7f2',
-    '61': '2cfba9844bf060858903d0802c0f1a168cf452c9360db68c878b3006eba45594', '62': '14c38944612b761fb85cba94b9710180d097c47beecc889cc68525b31a635095', '63': 'f66725a4a428d95cd74e9570d7ba3979273bc5acb693637196f1c7b21a46946b',
-    '64': '900946e2a4db6a39bed3de20821dcdc25d795562389a70a687fa8dbd025b32a5', '65': '3ef5cdd3a1b05a15bbb144656612af2f29c154874b83ef780425fb31354a5e62', '66': 'cb15510af71560cb849ce0b406ddc55629e37226f51b791c70c065e14d39a46f',
-    '67': 'e04b4b87bc4c25bf31eccff1e77f616d9f29fbbccb48b8a0b63282930c8e398a', '68': 'a81d16ae3152bfc000228c7ee4c0f2882b829919987eddad5cc21c63be725236', '69': '8087f97542edad8c08ac000b19543da014f8d8a94f0b9cf655c2ed6b3aa64941'
-  });
-  async function sha256(value) {
-    const bytes = new TextEncoder().encode(LOCAL_PASSWORD_SALT + ':' + value);
-    const sum = await crypto.subtle.digest('SHA-256', bytes);
-    return Array.from(new Uint8Array(sum)).map(x => x.toString(16).padStart(2, '0')).join('');
-  }
-  async function passwordMatches(record, candidate) {
-    if (!record || !candidate) return false;
-    if (record.passwordHash) return (await sha256(candidate)) === record.passwordHash;
-    // Legacy remote records may still use a password field. It is not embedded in this HTML.
-    return typeof record.password === 'string' && candidate === record.password;
-  }
-  window.handleLogin = async function() {
-    const err = document.getElementById('loginError'); if (err) err.style.display = 'none';
-    const fail = msg => { if (err) { err.textContent = msg; err.style.display = 'block'; } };
-    if (selectedLoginRole === 'directorate') {
-      const mode = document.getElementById('loginRoleDirectorate')?.value || 'digitization';
-      const user = document.getElementById('loginUser')?.value.trim();
-      const pass = mode === 'wilayaManager' ? document.getElementById('loginManagerPass')?.value.trim() : document.getElementById('loginPass')?.value.trim();
-      let valid = false;
-      if (mode === 'wilayaManager') {
-        valid = (await sha256(pass || '')) === MANAGER_HASHES[String(selectedWilaya || '34')];
-      } else {
-        const account = (DIRECTORATE_USERS || []).find(x => x.username === user);
-        valid = await passwordMatches(account, pass);
-      }
-      if (!valid) return fail('⚠️ تعذر تسجيل الدخول. تحقق من بيانات الدخول.');
-      currentRole = 'directorate'; isWilayaManager = mode === 'wilayaManager'; saveSession(); initApp(); return;
-    }
-    if (selectedLoginRole === 'department') {
-      const username = document.getElementById('loginDeptSelect')?.value;
-      const pass = document.getElementById('loginDeptPass')?.value.trim();
-      const dept = (departments || []).find(d => d.username === username || d.id === username);
-      if (!(await passwordMatches(dept, pass))) return fail('⚠️ تعذر تسجيل الدخول. تحقق من بيانات الدخول.');
-      currentRole = (dept.id === 'dept1' || dept.username === 'suivi_formation') ? 'directorate' : 'department';
-      currentDepartment = currentRole === 'department' ? dept.id : null; saveSession(); initApp(); return;
-    }
-    if (selectedLoginRole === 'center') {
-      const center = document.getElementById('loginCenterSelect')?.value;
-      const pass = document.getElementById('loginCenterPass')?.value.trim();
-      const inst = (INSTITUTIONS_DATA || []).find(i => i.name === center);
-      if (!(await passwordMatches(inst, pass))) return fail('⚠️ تعذر تسجيل الدخول. تحقق من بيانات الدخول.');
-      currentRole = 'center'; setCenterName(center); saveSession(); initApp(); return;
-    }
-    if (selectedLoginRole === 'employee') {
-      const inst = document.getElementById('loginEmployeeInst')?.value;
-      const pass = document.getElementById('loginEmployeePass')?.value.trim();
-      if (!inst || !pass) return fail('⚠️ أدخل المؤسسة وبيانات الدخول.');
-      verifyEmployeeLogin(inst, pass, function(ok, emp) {
-        if (!ok) return fail('⚠️ تعذر تسجيل الدخول. تحقق من بيانات الدخول.');
-        currentRole = 'employee'; setCenterName(inst); currentEmployee = emp; saveSession(); initApp();
-      });
-    }
-  };
-})();
-</script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f6537b48303363',t:'MTc4NDc2NDAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f973821c75b6c7',t:'MTc4NDc5Njc2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2023d0d8a933363',t:'MTc4NDg4ODkxMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
