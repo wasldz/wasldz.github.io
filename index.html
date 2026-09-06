@@ -3961,6 +3961,88 @@ function mergeIssuesByCode(remoteList, localList) {
   return Array.from(map.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 }
 
+// ============================================================
+// 🪦 منع عودة الإنشغال بعد أرشفته أو حذفه
+// السبب: mergeIssuesByCode يعمل باتحاد (union) بين النسخة المحلية والبعيدة،
+// ومستمع Firebase يعيد دفع أي عنصر محلي غير موجود على الخادم معتبراً إياه
+// «إنشغالاً جديداً لم يُحفظ بعد». عند الأرشفة/الحذف يُحذف العنصر من القائمة
+// ثم الدمج يعيده من النسخة القديمة أو من جهاز المؤسسة الذي ما زال يملكه.
+// الحل: تسجيل الرموز المُزالة + تجاهل العناصر التي كانت متزامنة سابقاً واختفت.
+// ============================================================
+const ISSUE_LIST_KEYS = ['activeIssues', 'archivedIssues', 'centerIssues', 'centerArchived'];
+let _sessionRemovedCodes = { activeIssues: {}, archivedIssues: {}, centerIssues: {}, centerArchived: {} };
+let _presentOverride = { activeIssues: {}, archivedIssues: {}, centerIssues: {}, centerArchived: {} };
+
+function _removedMap(listKey) {
+  if (!_sessionRemovedCodes[listKey] || typeof _sessionRemovedCodes[listKey] !== 'object') {
+    _sessionRemovedCodes[listKey] = {};
+  }
+  return _sessionRemovedCodes[listKey];
+}
+function markIssueRemoved(listKey, code) {
+  if (!listKey || !code) return;
+  _removedMap(listKey)[code] = Date.now();
+  if (_presentOverride[listKey]) delete _presentOverride[listKey][code];
+}
+function markIssuePresent(listKey, code) {
+  if (!listKey || !code) return;
+  const m = _removedMap(listKey);
+  if (m[code]) delete m[code];
+  if (!_presentOverride[listKey]) _presentOverride[listKey] = {};
+  _presentOverride[listKey][code] = Date.now();
+  try {
+    if (typeof database !== 'undefined' && database && code) {
+      database.ref('data/removedIssueCodes/' + listKey + '/' + String(code).replace(/[.#$\[\]\/]/g, '_')).remove().catch(function(){});
+    }
+  } catch (e) {}
+}
+function isIssueRemovedFromList(listKey, code) {
+  if (!code) return false;
+  if (_presentOverride[listKey] && _presentOverride[listKey][code]) return false;
+  return !!( _sessionRemovedCodes[listKey] && _sessionRemovedCodes[listKey][code]);
+}
+function _lastSyncedCodes(listKey) {
+  try {
+    const parsed = JSON.parse(_lastPushedJSON[listKey] || '[]');
+    const list = Array.isArray(parsed) ? parsed : normalizeIssuesArray(parsed);
+    return new Set((list || []).map(i => i && i.code).filter(Boolean));
+  } catch (e) {
+    return new Set();
+  }
+}
+function _collectLocalOnlyIssues(localList, remoteList, listKey) {
+  const remoteCodes = new Set((remoteList || []).map(i => i && i.code).filter(Boolean));
+  const prevSynced = _lastSyncedCodes(listKey);
+  return (localList || []).filter(i => {
+    if (!i || !i.code) return false;
+    if (remoteCodes.has(i.code)) return false;
+    if (isIssueRemovedFromList(listKey, i.code)) return false;
+    // كان موجوداً على الخادم ثم اختفى = أُرشِف أو حُذف من جهاز آخر — لا نُعد إدراجه ولا نعيد دفعه
+    if (prevSynced.has(i.code)) return false;
+    return true;
+  });
+}
+function _applyRemoteIssueList(listKey, remoteVal, currentLocal) {
+  const remote = normalizeIssuesArray(remoteVal).filter(i => i && i.code && !isIssueRemovedFromList(listKey, i.code));
+  const localOnly = _collectLocalOnlyIssues(currentLocal, remote, listKey);
+  return { merged: mergeIssuesByCode(remote, localOnly), localOnly: localOnly };
+}
+function _mergeIssueListForPush(listKey, remoteList, localList) {
+  const localCodes = new Set((localList || []).map(i => i && i.code).filter(Boolean));
+  const removed = new Set();
+  Object.keys(_removedMap(listKey)).forEach(c => removed.add(c));
+  _lastSyncedCodes(listKey).forEach(c => { if (!localCodes.has(c)) removed.add(c); });
+  removed.forEach(c => markIssueRemoved(listKey, c));
+  const merged = mergeIssuesByCode(remoteList, localList);
+  return (merged || []).filter(i => !i || !i.code || !removed.has(i.code));
+}
+function _normalizeRemoteOrSkip(listKey, raw) {
+  if (raw != null) return normalizeIssuesArray(raw);
+  // Firebase يخزّن المصفوفة الفارغة كـ null. إن كنّا نعرف بيانات سابقة أو حذفنا نحن، فالقائمة فارغة فعلاً.
+  if (_lastSyncedCodes(listKey).size > 0 || Object.keys(_removedMap(listKey)).length > 0) return [];
+  return null;
+}
+
 // طابور تحديثات بعيدة وصلت أثناء الحفظ المحلي — تُدمَج بعد انتهاء الحفظ
 let _pendingRemoteUpdates = {};
 
@@ -4021,12 +4103,12 @@ function _pushToFirebaseNow() {
       return ref.transaction((current) => {
         const remote = normalizeIssuesArray(current);
         const local = normalizeIssuesArray(toSend[key]);
-        // local أولاً ثم remote؟ لا: remote أولاً ثم local حتى تعديلاتنا المحلية تفوز لنفس الرمز
-        // مع الإبقاء على أي إنشغال موجود عند الطرف الآخر فقط
-        return mergeIssuesByCode(remote, local);
+        // اتحاد للإضافات المتزامنة + استبعاد الرموز التي أُرشفت/حُذفت محلياً حتى لا تعود من النسخة البعيدة
+        return _mergeIssueListForPush(key, remote, local);
       }).then((result) => {
         if (result && result.committed) {
-          const merged = normalizeIssuesArray(result.snapshot.val());
+          let merged = normalizeIssuesArray(result.snapshot.val());
+          merged = merged.filter(i => i && i.code && !isIssueRemovedFromList(key, i.code));
           // حدّث الذاكرة المحلية بالنتيجة المدمجة النهائية من الخادم
           if (key === 'activeIssues') activeIssues = merged;
           else if (key === 'archivedIssues') archivedIssues = merged;
@@ -4061,6 +4143,20 @@ function _pushToFirebaseNow() {
     });
   });
 
+  // حفظ رموز الأرشفة/الحذف على الخادم حتى لا تعيد الأجهزة الأخرى إدراج الإنشغال
+  try {
+    const tombUpdates = {};
+    ISSUE_LIST_KEYS.forEach(k => {
+      Object.keys(_removedMap(k)).forEach(code => {
+        const safe = String(code).replace(/[.#$\[\]\/]/g, '_');
+        tombUpdates[k + '/' + safe] = _removedMap(k)[code];
+      });
+    });
+    if (Object.keys(tombUpdates).length) {
+      promises.push(database.ref('data/removedIssueCodes').update(tombUpdates).catch(function(e){ console.warn('[Firebase] tombstones', e); }));
+    }
+  } catch (e) { console.warn(e); }
+
   return Promise.all(promises).then(() => {
     _saveInProgress = false;
     _pushQueueRunning = false;
@@ -4086,32 +4182,24 @@ function _flushPendingRemoteUpdates() {
   if (!pending || !Object.keys(pending).length) return;
   const applyMap = {
     activeIssues: (v) => {
-      const remote = normalizeIssuesArray(v);
-      const rc = new Set(remote.map(i => i && i.code).filter(Boolean));
-      const lo = activeIssues.filter(i => i && i.code && !rc.has(i.code));
-      activeIssues = mergeIssuesByCode(remote, lo);
-      _markSynced('activeIssues', remote);
+      const r = _applyRemoteIssueList('activeIssues', v, activeIssues);
+      activeIssues = r.merged;
+      _markSynced('activeIssues', normalizeIssuesArray(v));
     },
     archivedIssues: (v) => {
-      const remote = normalizeIssuesArray(v);
-      const rc = new Set(remote.map(i => i && i.code).filter(Boolean));
-      const lo = archivedIssues.filter(i => i && i.code && !rc.has(i.code));
-      archivedIssues = mergeIssuesByCode(remote, lo);
-      _markSynced('archivedIssues', remote);
+      const r = _applyRemoteIssueList('archivedIssues', v, archivedIssues);
+      archivedIssues = r.merged;
+      _markSynced('archivedIssues', normalizeIssuesArray(v));
     },
     centerIssues: (v) => {
-      const remote = normalizeIssuesArray(v);
-      const rc = new Set(remote.map(i => i && i.code).filter(Boolean));
-      const lo = centerIssues.filter(i => i && i.code && !rc.has(i.code));
-      centerIssues = mergeIssuesByCode(remote, lo);
-      _markSynced('centerIssues', remote);
+      const r = _applyRemoteIssueList('centerIssues', v, centerIssues);
+      centerIssues = r.merged;
+      _markSynced('centerIssues', normalizeIssuesArray(v));
     },
     centerArchived: (v) => {
-      const remote = normalizeIssuesArray(v);
-      const rc = new Set(remote.map(i => i && i.code).filter(Boolean));
-      const lo = centerArchived.filter(i => i && i.code && !rc.has(i.code));
-      centerArchived = mergeIssuesByCode(remote, lo);
-      _markSynced('centerArchived', remote);
+      const r = _applyRemoteIssueList('centerArchived', v, centerArchived);
+      centerArchived = r.merged;
+      _markSynced('centerArchived', normalizeIssuesArray(v));
     },
     userGuides: (v) => { userGuides = v || []; _markSynced('userGuides', userGuides); },
     fileTypes: (v) => { if (v) { fileTypes = v; _markSynced('fileTypes', fileTypes); } },
@@ -4215,9 +4303,8 @@ setInterval(() => {
 
   database.ref('data/activeIssues').on('value', (snapshot) => {
     const raw = snapshot.val();
-    // null = لا بيانات بعد — لا نمسح القائمة المحلية أثناء جلسة نشطة
-    if (raw == null) return;
-    const val = normalizeIssuesArray(raw);
+    const val = _normalizeRemoteOrSkip('activeIssues', raw);
+    if (val == null) return;
     // ✅ أثناء الحفظ: لا نتجاهل التحديث — نؤجّله للدمج بعده حتى لا يضيع إنشغال من جهاز آخر
     if (_saveInProgress) {
       _pendingRemoteUpdates.activeIssues = val;
@@ -4225,15 +4312,12 @@ setInterval(() => {
     }
     const oldCount = activeIssues.length;
     const oldCodes = new Set(activeIssues.map(i => i && i.code).filter(Boolean));
-    // احتفظ فقط بالإنشغالات المحلية التي لم تظهر بعد على الخادم (لم تُحفَظ بعد)
-    const remoteCodes = new Set(val.map(i => i && i.code).filter(Boolean));
-    const localOnly = activeIssues.filter(i => i && i.code && !remoteCodes.has(i.code));
-    activeIssues = mergeIssuesByCode(val, localOnly);
+    const applied = _applyRemoteIssueList('activeIssues', val, activeIssues);
+    const localOnly = applied.localOnly;
+    activeIssues = applied.merged;
     if (currentRole === 'center') detectIncomingDirectorateIssues(activeIssues);
-    // نُسجّل نسخة الخادم فقط كـ"متزامنة" حتى يُدفَع أي localOnly في الحفظ التالي
     _markSynced('activeIssues', val);
     if (localOnly.length && !_saveInProgress && !_pushQueueRunning) {
-      // دفع مؤجّل للإنشغالات المحلية التي لم تصل بعد للخادم (بدون تداخل مع المستمع)
       clearTimeout(window.__localOnlyPushTimer);
       window.__localOnlyPushTimer = setTimeout(() => { try { _pushToFirebaseNow(); } catch (e) { console.warn(e); } }, 300);
     }
@@ -4297,12 +4381,12 @@ setInterval(() => {
 
   database.ref('data/archivedIssues').on('value', (snapshot) => {
     const raw = snapshot.val();
-    if (raw == null) return;
-    const val = normalizeIssuesArray(raw);
+    const val = _normalizeRemoteOrSkip('archivedIssues', raw);
+    if (val == null) return;
     if (_saveInProgress) { _pendingRemoteUpdates.archivedIssues = val; return; }
-    const remoteCodesA = new Set(val.map(i => i && i.code).filter(Boolean));
-    const localOnlyA = archivedIssues.filter(i => i && i.code && !remoteCodesA.has(i.code));
-    archivedIssues = mergeIssuesByCode(val, localOnlyA);
+    const appliedA = _applyRemoteIssueList('archivedIssues', val, archivedIssues);
+    const localOnlyA = appliedA.localOnly;
+    archivedIssues = appliedA.merged;
     _markSynced('archivedIssues', val);
     if (localOnlyA.length && !_saveInProgress && !_pushQueueRunning) { clearTimeout(window.__localOnlyPushTimer); window.__localOnlyPushTimer = setTimeout(() => { try { _pushToFirebaseNow(); } catch (e) {} }, 300); }
     pulseSyncBadge();
@@ -4311,14 +4395,14 @@ setInterval(() => {
 
   database.ref('data/centerIssues').on('value', (snapshot) => {
     const raw = snapshot.val();
-    if (raw == null) return;
-    const val = normalizeIssuesArray(raw);
+    const val = _normalizeRemoteOrSkip('centerIssues', raw);
+    if (val == null) return;
     if (_saveInProgress) { _pendingRemoteUpdates.centerIssues = val; return; }
     const oldCount = centerIssues.length;
     const oldCodes = new Set(centerIssues.map(i => i && i.code).filter(Boolean));
-    const remoteCodes = new Set(val.map(i => i && i.code).filter(Boolean));
-    const localOnly = centerIssues.filter(i => i && i.code && !remoteCodes.has(i.code));
-    centerIssues = mergeIssuesByCode(val, localOnly);
+    const appliedC = _applyRemoteIssueList('centerIssues', val, centerIssues);
+    const localOnly = appliedC.localOnly;
+    centerIssues = appliedC.merged;
     _markSynced('centerIssues', val);
     if (localOnly.length && !_saveInProgress && !_pushQueueRunning) {
       clearTimeout(window.__localOnlyPushTimer);
@@ -4367,12 +4451,12 @@ setInterval(() => {
 
   database.ref('data/centerArchived').on('value', (snapshot) => {
     const raw = snapshot.val();
-    if (raw == null) return;
-    const val = normalizeIssuesArray(raw);
+    const val = _normalizeRemoteOrSkip('centerArchived', raw);
+    if (val == null) return;
     if (_saveInProgress) { _pendingRemoteUpdates.centerArchived = val; return; }
-    const remoteCodesCA = new Set(val.map(i => i && i.code).filter(Boolean));
-    const localOnlyCA = centerArchived.filter(i => i && i.code && !remoteCodesCA.has(i.code));
-    centerArchived = mergeIssuesByCode(val, localOnlyCA);
+    const appliedCA = _applyRemoteIssueList('centerArchived', val, centerArchived);
+    const localOnlyCA = appliedCA.localOnly;
+    centerArchived = appliedCA.merged;
     _markSynced('centerArchived', val);
     if (localOnlyCA.length && !_saveInProgress && !_pushQueueRunning) { clearTimeout(window.__localOnlyPushTimer); window.__localOnlyPushTimer = setTimeout(() => { try { _pushToFirebaseNow(); } catch (e) {} }, 300); }
     pulseSyncBadge();
@@ -4409,6 +4493,26 @@ setInterval(() => {
     auditLog = val;
     _markSynced('auditLog', val);
     updateUI();
+  });
+
+  database.ref('data/removedIssueCodes').on('value', (snapshot) => {
+    const val = snapshot.val() || {};
+    ISSUE_LIST_KEYS.forEach(k => {
+      const remote = val[k] || {};
+      const local = _removedMap(k);
+      Object.keys(remote).forEach(code => {
+        if (_presentOverride[k] && _presentOverride[k][code]) return;
+        if (remote[code]) local[code] = remote[code];
+      });
+    });
+    const beforeA = activeIssues.length, beforeC = centerIssues.length;
+    activeIssues = activeIssues.filter(i => i && i.code && !isIssueRemovedFromList('activeIssues', i.code));
+    archivedIssues = archivedIssues.filter(i => i && i.code && !isIssueRemovedFromList('archivedIssues', i.code));
+    centerIssues = centerIssues.filter(i => i && i.code && !isIssueRemovedFromList('centerIssues', i.code));
+    centerArchived = centerArchived.filter(i => i && i.code && !isIssueRemovedFromList('centerArchived', i.code));
+    if (activeIssues.length !== beforeA || centerIssues.length !== beforeC) {
+      try { updateUI(); } catch (e) {}
+    }
   });
 }
 
@@ -6367,6 +6471,8 @@ function archiveCenterIssue(code) {
   const issue = activeIssues[idx];
   activeIssues.splice(idx, 1);
   centerArchived.push(issue);
+  markIssueRemoved('activeIssues', code);
+  markIssuePresent('centerArchived', code);
   addAuditLog('أرشفة إنشغال مركز', code, issue.center || '');
   saveToFirebase();
   renderList(); renderKPIs(); updateChart();
@@ -6388,6 +6494,8 @@ function toggleStatus(code, value) {
     issue.status = "تم الحل ✅";
     activeIssues.splice(idx, 1);
     archivedIssues.unshift(issue);
+    markIssueRemoved('activeIssues', code);
+    markIssuePresent('archivedIssues', code);
     syncCenterIssueStatus(code, issue.status);
     addAuditLog('تسوية إنشغال', code, issue.center || '');
     saveToFirebase();
@@ -6411,6 +6519,9 @@ function deleteIssue(code) {
     });
   }
   activeIssues = activeIssues.filter(i => i.code !== code);
+  centerIssues = centerIssues.filter(i => i.code !== code);
+  markIssueRemoved('activeIssues', code);
+  markIssueRemoved('centerIssues', code);
   saveToFirebase();
   renderKPIs(); updateChart(); renderList();
   showToast("🗑️ تم الحذف", "تم حذف الإنشغال والمرفقات المرتبطة نهائياً.");
@@ -6477,6 +6588,8 @@ function restoreFromArchive(code) {
   issue.status = "قيد المعالجة 🔄";
   archivedIssues.splice(idx, 1);
   activeIssues.unshift(issue);
+  markIssueRemoved('archivedIssues', code);
+  markIssuePresent('activeIssues', code);
   addAuditLog('استعادة من الأرشيف', code, issue.center || '');
   saveToFirebase();
   renderKPIs(); updateChart(); renderList(); renderArchive();
@@ -6494,6 +6607,8 @@ function deleteFromArchive(code) {
     });
   }
   archivedIssues = archivedIssues.filter(i => i.code !== code);
+  markIssueRemoved('archivedIssues', code);
+  markIssueRemoved('activeIssues', code);
   saveToFirebase();
   renderKPIs(); updateChart(); renderArchive();
   showToast("🗑️ تم الحذف", "تم حذف الإنشغال والمرفقات نهائياً من الأرشيف.");
@@ -6511,6 +6626,8 @@ function deleteFromCenterArchive(code) {
     });
   }
   centerArchived = centerArchived.filter(i => i.code !== code);
+  markIssueRemoved('centerArchived', code);
+  markIssueRemoved('activeIssues', code);
   saveToFirebase();
   renderChatHub();
   showToast("🗑️ تم الحذف", "تم حذف الإنشغال والمرفقات نهائياً.");
@@ -6525,6 +6642,8 @@ function restoreFromCenterArchive(code) {
   issue.status = "قيد المعالجة 🔄";
   centerArchived.splice(idx, 1);
   activeIssues.unshift(issue);
+  markIssueRemoved('centerArchived', code);
+  markIssuePresent('activeIssues', code);
   addAuditLog('استعادة من أرشيف المؤسسات', code, issue.center || '');
   saveToFirebase();
   renderChatHub(); renderKPIs(); updateChart(); renderList();
@@ -6572,6 +6691,8 @@ function confirmArchiveTransfer() {
   // نقل الإنشغال من الأرشيف إلى القائمة النشطة
   archivedIssues.splice(idx, 1);
   activeIssues.unshift(issue);
+  markIssueRemoved('archivedIssues', code);
+  markIssuePresent('activeIssues', code);
   
   addAuditLog('تحويل من الأرشيف', code, `إلى ${getDepartmentName(deptId)}${reason ? ' — ' + reason : ''}`);
   saveToFirebase();
@@ -6721,6 +6842,8 @@ function deleteDeptIssue(code) {
     centerIssues.splice(centerIdx, 1);
   }
   activeIssues = activeIssues.filter(i => i.code !== code);
+  markIssueRemoved('activeIssues', code);
+  markIssueRemoved('centerIssues', code);
   saveToFirebase();
   renderDeptIssuesForDepartment();
   renderDeptKPIs();
@@ -10244,7 +10367,7 @@ function logout() {
     document.getElementById('loginDeptSelect').value = '';
     document.getElementById('loginDeptPass').value = '';
     notifiedMessages.clear();
-    ['activeIssues','archivedIssues','centerIssues','centerArchived','fileTypes','departments','auditLog']
+    ['activeIssues','archivedIssues','centerIssues','centerArchived','fileTypes','departments','auditLog','removedIssueCodes']
       .forEach(key => database.ref('data/' + key).off());
     database.ref('chats').off();
     database.ref('interChatRoom').off();
@@ -11723,5 +11846,5 @@ body.employee-mode .storage-monitor-card { display: none !important; }
 })();
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f6537b48303363',t:'MTc4NDc2NDAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f973821c75b6c7',t:'MTc4NDc5Njc2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2023d0d8a933363',t:'MTc4NDg4ODkxMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d1874d4cb8b6c5',t:'MTc4NDM3ODE0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1dc3351ca22b6ca',t:'MTc4NDQ5MDA1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ddbf622da53345',t:'MTc4NDUwNjI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f6537b48303363',t:'MTc4NDc2NDAwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f973821c75b6c7',t:'MTc4NDc5Njc2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2023d0d8a933363',t:'MTc4NDg4ODkxMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3704e9f99561025',t:'MTc4ODcyNzQxOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
